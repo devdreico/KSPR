@@ -1,0 +1,39 @@
+create extension if not exists pgcrypto;
+
+create table if not exists public.profiles (
+  id uuid primary key references auth.users(id) on delete cascade,
+  username text not null,
+  email text not null,
+  primary_technology text not null default 'TypeScript/React',
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+alter table public.profiles enable row level security;
+comment on table public.profiles is 'KSPR user profiles with username, email, and primary technology';
+
+create table if not exists public.analyses (
+  id uuid primary key default gen_random_uuid(),
+  analysis_id text not null unique,
+  user_id uuid references public.profiles(id) on delete set null,
+  project_name text not null,
+  status text not null,
+  provider text not null,
+  model text not null,
+  summary jsonb not null default '{}'::jsonb,
+  report jsonb not null default '{}'::jsonb,
+  artifacts jsonb not null default '[]'::jsonb,
+  response_text text not null default '',
+  created_at timestamptz not null default now()
+);
+
+create index if not exists analyses_project_name_idx on public.analyses (project_name);
+create index if not exists analyses_created_at_idx on public.analyses (created_at desc);
+
+alter table public.analyses add column if not exists user_id uuid references public.profiles(id) on delete set null;
+alter table public.analyses add column if not exists response_text text not null default '';
+
+create index if not exists analyses_user_id_idx on public.analyses (user_id);
+
+alter table public.analyses enable row level security;
+comment on table public.analyses is 'KSPR analysis results and generated context artifacts';

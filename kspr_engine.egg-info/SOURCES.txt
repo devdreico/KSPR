@@ -1,0 +1,7 @@
+README.md
+pyproject.toml
+kspr_engine.egg-info/PKG-INFO
+kspr_engine.egg-info/SOURCES.txt
+kspr_engine.egg-info/dependency_links.txt
+kspr_engine.egg-info/requires.txt
+kspr_engine.egg-info/top_level.txt

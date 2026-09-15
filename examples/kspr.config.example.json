@@ -1,0 +1,59 @@
+{
+  "$schema": "https://kspr.dev/config.json",
+  "model": "gemini/gemini-2.5-flash",
+  "small_model": "gemini/gemini-2.5-flash",
+  "provider": {
+    "gemini": {
+      "name": "Google Gemini",
+      "models": {
+        "gemini-2.5-flash": {
+          "name": "Gemini 2.5 Flash",
+          "variants": ["low", "high"]
+        },
+        "gemini-2.5-pro": {
+          "name": "Gemini 2.5 Pro",
+          "variants": ["low", "high"]
+        }
+      }
+    },
+    "my-gateway": {
+      "name": "Mi gateway compatible",
+      "options": {
+        "baseURL": "https://api.example.com/v1"
+      },
+      "models": {
+        "my-model": {
+          "name": "My Model"
+        }
+      }
+    }
+  },
+  "agent": {
+    "kspr-i": {
+      "description": "Ingeniería inversa agentica",
+      "model": "gemini/gemini-2.5-flash",
+      "prompt": "Eres KSPR I. Trabaja solo con evidencia, cita archivos y líneas, y separa hallazgos de hipótesis."
+    }
+  },
+  "default_agent": "kspr-i",
+  "permission": {
+    "*": "ask",
+    "edit": "deny",
+    "bash": "deny"
+  },
+  "command": {
+    "inventory": {
+      "description": "Genera un inventario UI completo",
+      "template": "Recupera botones, enlaces, formularios, eventos y contratos visibles con evidencia."
+    }
+  },
+  "mcp": {
+    "kspr-context": {
+      "type": "remote",
+      "url": "mcp://local-context-server",
+      "enabled": true
+    }
+  },
+  "theme": "light",
+  "note": "Las credenciales se conectan en la interfaz y nunca se versionan."
+}
