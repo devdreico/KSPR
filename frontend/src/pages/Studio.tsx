@@ -236,13 +236,12 @@ export function Studio() {
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
   const [commandQuery, setCommandQuery] = useState("");
   const [commandIndex, setCommandIndex] = useState(0);
-  const [modelModalOpen, setModelModalOpen] = useState(false);
+  const [apiHubOpen, setApiHubOpen] = useState(false);
   const [modelSearch, setModelSearch] = useState("");
   const [customModelOpen, setCustomModelOpen] = useState(false);
   const [customModelId, setCustomModelId] = useState("");
   const [customModelName, setCustomModelName] = useState("");
   const [customModelProvider, setCustomModelProvider] = useState("openai-compatible");
-  const [providerModalOpen, setProviderModalOpen] = useState(false);
   const [configModalOpen, setConfigModalOpen] = useState(false);
   const [helpModalOpen, setHelpModalOpen] = useState(false);
   const [mcpModalOpen, setMcpModalOpen] = useState(false);
@@ -358,7 +357,7 @@ export function Studio() {
         setCommandQuery("");
       }
       if (mod && key === "l") { event.preventDefault(); setSidebarOpen(true); }
-      if (mod && key === "m") { event.preventDefault(); setModelModalOpen(true); }
+      if (mod && key === "m") { event.preventDefault(); setApiHubOpen(true); }
       if (mod && event.key === ",") { event.preventDefault(); setConfigModalOpen(true); }
       if (mod && key === "e" && event.shiftKey) { event.preventDefault(); exportSession(activeSession); }
       else if (mod && key === "e") { event.preventDefault(); composerRef.current?.focus(); }
@@ -376,8 +375,7 @@ export function Studio() {
       }
       if (event.key === "Escape") {
         setCommandPaletteOpen(false);
-        setModelModalOpen(false);
-        setProviderModalOpen(false);
+        setApiHubOpen(false);
         setConfigModalOpen(false);
         setHelpModalOpen(false);
         setContextModalOpen(false);
@@ -404,7 +402,7 @@ export function Studio() {
     setProviderId(model.providerId);
     setModelId(model.id);
     setModelVariant(model.variants?.[0] || "default");
-    setModelModalOpen(false);
+    setApiHubOpen(false);
   }
 
   function selectAgent(agent: AgentProfile) {
@@ -718,8 +716,8 @@ export function Studio() {
     switch (commandId) {
       case "new": createSession(); break;
       case "sessions": setSidebarOpen(true); break;
-      case "models": setModelModalOpen(true); break;
-      case "provider": setProviderModalOpen(true); break;
+      case "models": setApiHubOpen(true); break;
+      case "provider": setApiHubOpen(true); break;
       case "config": setConfigModalOpen(true); break;
       case "agents": setAgentModalOpen(true); break;
       case "mcp": setMcpModalOpen(true); break;
@@ -892,7 +890,7 @@ export function Studio() {
         <label className="session-search"><Search size={14} /><input value={sessionSearch} onChange={(event) => setSessionSearch(event.target.value)} placeholder="Buscar sesiones" /></label>
         <div className="workspace-label"><span>WORKSPACE</span><strong>casper / empresarial</strong></div>
         <div className="session-list"><span className="session-group-label">Recientes</span>{filteredSessions.map((session) => <div className={session.id === activeSessionId ? "session-row active" : "session-row"} key={session.id}><button onClick={() => selectSession(session)}><span>{session.title}</span><small>{session.messages.length ? `${session.messages.length} mensajes` : "vacía"}</small></button>{session.id === activeSessionId && <button className="session-delete" onClick={() => deleteSession(session.id)} aria-label="Eliminar sesión"><X size={12} /></button>}</div>)}{!filteredSessions.length && <div className="session-empty">No hay sesiones que coincidan.</div>}</div>
-        <div className="sidebar-bottom"><button onClick={() => setProviderModalOpen(true)}><Sparkles size={15} /><span>Proveedores</span><i className={providerConnected ? "connected-dot" : ""} /></button><button onClick={() => setConfigModalOpen(true)}><Settings2 size={15} /><span>Configuración</span><kbd>⌘,</kbd></button><div className="sidebar-agent"><img src="/casper-ai-logo.png" alt="" /><span><strong>{agentMode}</strong><small>Agente activo</small></span><ChevronDown size={13} /></div></div>
+        <div className="sidebar-bottom"><button onClick={() => setApiHubOpen(true)}><Sparkles size={15} /><span>APIs y Modelos</span><i className={providerConnected ? "connected-dot" : ""} /></button><button onClick={() => setConfigModalOpen(true)}><Settings2 size={15} /><span>Configuración</span><kbd>⌘,</kbd></button><div className="sidebar-agent"><img src="/casper-ai-logo.png" alt="" /><span><strong>{agentMode}</strong><small>Agente activo</small></span><ChevronDown size={13} /></div></div>
       </aside>
       {sidebarOpen && <button className="mobile-sidebar-overlay" onClick={() => setSidebarOpen(false)} aria-label="Cerrar barra lateral" />}
 
@@ -911,13 +909,98 @@ export function Studio() {
           <label className="permission-control"><span>PERMISOS</span><select value={permissionMode} onChange={(event) => { const next = event.target.value as PermissionMode; setPermissionMode(next); localStorage.setItem("kspr_permission_mode", next); }}><option value="ask">Preguntar antes de actuar</option><option value="allow">Permitir acciones</option><option value="deny">Solo lectura</option></select></label>
           {selectedModel?.variants && selectedModel.variants.length > 1 && <label className="variant-control"><span>VARIANTE</span><select value={modelVariant} onChange={(event) => setModelVariant(event.target.value)}>{selectedModel.variants.map((variant) => <option key={variant}>{variant}</option>)}</select></label>}
           {running && <button type="button" className="stop-response-button" onClick={stopRunning}><Square size={13} fill="currentColor" /> Detener respuesta <kbd>Ctrl+G</kbd></button>}
-          <form className="composer-wrap opencode-composer" onSubmit={sendMessage}>{files.length > 0 && <div className="attachment-list">{files.map((file) => <span className="attachment-chip" key={file.path}><FileText size={13} />{file.path}<button type="button" onClick={() => removeFile(file.path)} aria-label={`Quitar ${file.path}`}><X size={12} /></button></span>)}</div>}{showSlashMenu && <div className="composer-popover slash-popover">{allCommands.filter((command) => command.slash.startsWith(draft)).slice(0, 6).map((command) => <button type="button" key={command.id} onClick={() => setDraft(`${command.slash} `)}><span><Command size={13} />{command.slash}</span><small>{command.description}</small></button>)}</div>}{showFileMenu && <div className="composer-popover file-popover">{filteredFiles.map((file) => <button type="button" key={file.path} onClick={() => chooseFileReference(file.path)}><FileText size={13} />@{file.path}</button>)}</div>}<textarea ref={composerRef} value={draft} onChange={(event) => setDraft(event.target.value)} onKeyDown={handleComposerKeyDown} placeholder="Pregunta a KSPR I..." rows={3} spellCheck /><div className="composer-tools"><div className="composer-left"><label className="tool-button" title="Adjuntar archivos"><Paperclip size={17} /><input type="file" multiple accept=".zip,.py,.js,.jsx,.ts,.tsx,.cs,.java,.sql,.html,.vue,.php,.md,.txt,.json,.yaml,.yml" onChange={addFiles} /></label><button type="button" className={recording ? "tool-button recording" : "tool-button"} onClick={() => void startRecording()} title={recording ? "Detener grabación" : "Grabar y transcribir audio"}>{recording ? <Square size={15} fill="currentColor" /> : <Mic size={17} />}</button><button type="button" className="composer-select" onClick={() => setModelModalOpen(true)}><span>{selectedModel?.providerName} / <strong>{selectedModel?.name}</strong></span><ChevronDown size={14} /></button><span className="agent-pill"><Sparkles size={12} /> {agentMode}</span></div><button className="send-button" type="submit" disabled={running || (!draft.trim() && !files.length)} aria-label="Enviar mensaje">{running ? <LoaderCircle size={17} className="spin" /> : <ArrowUp size={18} />}</button></div>{error && <div className="composer-error">{error}</div>}</form><div className="chat-disclaimer">KSPR I puede equivocarse. Verifica evidencias antes de modificar producción · <button onClick={() => setCommandPaletteOpen(true)}>⌘K para comandos</button></div></section></main>
+          <form className="composer-wrap opencode-composer" onSubmit={sendMessage}>{files.length > 0 && <div className="attachment-list">{files.map((file) => <span className="attachment-chip" key={file.path}><FileText size={13} />{file.path}<button type="button" onClick={() => removeFile(file.path)} aria-label={`Quitar ${file.path}`}><X size={12} /></button></span>)}</div>}{showSlashMenu && <div className="composer-popover slash-popover">{allCommands.filter((command) => command.slash.startsWith(draft)).slice(0, 6).map((command) => <button type="button" key={command.id} onClick={() => setDraft(`${command.slash} `)}><span><Command size={13} />{command.slash}</span><small>{command.description}</small></button>)}</div>}{showFileMenu && <div className="composer-popover file-popover">{filteredFiles.map((file) => <button type="button" key={file.path} onClick={() => chooseFileReference(file.path)}><FileText size={13} />@{file.path}</button>)}</div>}<textarea ref={composerRef} value={draft} onChange={(event) => setDraft(event.target.value)} onKeyDown={handleComposerKeyDown} placeholder="Pregunta a KSPR I..." rows={3} spellCheck /><div className="composer-tools"><div className="composer-left"><label className="tool-button" title="Adjuntar archivos"><Paperclip size={17} /><input type="file" multiple accept=".zip,.py,.js,.jsx,.ts,.tsx,.cs,.java,.sql,.html,.vue,.php,.md,.txt,.json,.yaml,.yml" onChange={addFiles} /></label><button type="button" className={recording ? "tool-button recording" : "tool-button"} onClick={() => void startRecording()} title={recording ? "Detener grabación" : "Grabar y transcribir audio"}>{recording ? <Square size={15} fill="currentColor" /> : <Mic size={17} />}</button><button type="button" className="composer-select" onClick={() => setApiHubOpen(true)}><span>{selectedModel?.providerName} / <strong>{selectedModel?.name}</strong></span><ChevronDown size={14} /></button><span className="agent-pill"><Sparkles size={12} /> {agentMode}</span></div><button className="send-button" type="submit" disabled={running || (!draft.trim() && !files.length)} aria-label="Enviar mensaje">{running ? <LoaderCircle size={17} className="spin" /> : <ArrowUp size={18} />}</button></div>{error && <div className="composer-error">{error}</div>}</form><div className="chat-disclaimer">KSPR I puede equivocarse. Verifica evidencias antes de modificar producción · <button onClick={() => setCommandPaletteOpen(true)}>⌘K para comandos</button></div></section></main>
         <footer><span>KSPR / OBSERVABILITY FOR LEGACY SYSTEMS</span><span><Terminal size={11} /> Secure static analysis · No code execution</span></footer>
       </div>
 
       {commandPaletteOpen && <div className="modal-overlay command-overlay" onClick={() => setCommandPaletteOpen(false)}><div className="command-palette" onClick={(event) => event.stopPropagation()}><div className="command-search"><Search size={16} /><input autoFocus value={commandQuery} onChange={(event) => { setCommandQuery(event.target.value); setCommandIndex(0); }} onKeyDown={handleCommandPaletteKeyDown} placeholder="Buscar comandos..." /></div><div className="command-list">{filteredCommands.map((command, index) => <button className={index === commandIndex ? "command-highlighted" : ""} key={command.id} onClick={() => executeCommand(command.id)}><span className="command-icon"><Command size={14} /></span><span><strong>{command.title}</strong><small>{command.description}</small></span><em>{command.shortcut || command.slash}</em></button>)}{!filteredCommands.length && <div className="command-empty">No hay comandos que coincidan.</div>}</div><div className="command-footer"><span>↑↓ navegar</span><span>↵ ejecutar</span><span>esc cerrar</span></div></div></div>}
-      {modelModalOpen && <div className="modal-overlay" onClick={() => setModelModalOpen(false)}><div className="modal-box model-modal" onClick={(event) => event.stopPropagation()}><div className="modal-header"><h2><Sparkles size={18} /> Modelos</h2><button className="modal-close" onClick={() => setModelModalOpen(false)}><X size={18} /></button></div><div className="modal-search"><Search size={14} /><input autoFocus value={modelSearch} onChange={(event) => setModelSearch(event.target.value)} placeholder="Filtrar modelos..." /></div><div className="model-list">{filteredModels.map((model) => <button className={model.id === selectedModel?.id && model.providerId === providerId ? "model-option selected" : "model-option"} key={`${model.providerId}:${model.id}`} onClick={() => selectModel(model)}><span className="model-mark"><Sparkles size={14} /></span><span><strong>{model.name}</strong><small>{model.providerName} · {model.description}</small></span>{model.custom && <em className="custom-model-tag">custom</em>}{model.id === selectedModel?.id && model.providerId === providerId && <Check size={15} />}</button>)}{!filteredModels.length && <div className="command-empty">Conecta un proveedor o añade un modelo manual.</div>}</div>{customModelOpen && <div className="custom-model-form"><div className="config-grid"><div className="modal-field"><label>Proveedor</label><select value={customModelProvider} onChange={(event) => setCustomModelProvider(event.target.value)}><option value="openai-compatible">OpenAI-compatible</option><option value="gemini">Google Gemini</option></select></div><div className="modal-field"><label>ID del modelo</label><input value={customModelId} onChange={(event) => setCustomModelId(event.target.value)} placeholder="my-model-id" /></div></div><div className="modal-field"><label>Nombre visible</label><input value={customModelName} onChange={(event) => setCustomModelName(event.target.value)} placeholder="Mi modelo" /></div><button className="modal-button primary" onClick={addCustomModel} disabled={!customModelId.trim()}>Guardar modelo</button></div>}<div className="modal-actions"><button className="modal-button secondary" onClick={() => { setCustomModelOpen((open) => !open); setProviderModalOpen(false); }}>{customModelOpen ? "Cancelar modelo" : "Añadir modelo"}</button><button className="modal-button secondary" onClick={() => { setModelModalOpen(false); setProviderModalOpen(true); }}>Conectar proveedor</button></div></div></div>}
-      {providerModalOpen && <div className="modal-overlay" onClick={() => setProviderModalOpen(false)}><div className="modal-box provider-modal" onClick={(event) => event.stopPropagation()}><div className="modal-header"><h2><Sparkles size={18} /> Conectar proveedor</h2><button className="modal-close" onClick={() => setProviderModalOpen(false)}><X size={18} /></button></div><div className="provider-cards"><button className={connectProvider === "gemini" ? "provider-card active" : "provider-card"} onClick={() => setConnectProvider("gemini")}><Sparkles size={17} /><span><strong>Google Gemini</strong><small>Gemini API · modelos generativos</small></span>{connectProvider === "gemini" && <Check size={14} />}</button><button className={connectProvider === "openai-compatible" ? "provider-card active" : "provider-card"} onClick={() => setConnectProvider("openai-compatible")}><Terminal size={17} /><span><strong>OpenAI-compatible</strong><small>OpenRouter, Groq, gateways o endpoint propio</small></span>{connectProvider === "openai-compatible" && <Check size={14} />}</button><button className={connectProvider === "custom" ? "provider-card active" : "provider-card"} onClick={() => setConnectProvider("custom")}><Command size={17} /><span><strong>Proveedor personalizado</strong><small>Cualquier API con contrato /chat/completions</small></span>{connectProvider === "custom" && <Check size={14} />}</button></div>{connectProvider === "custom" && <div className="config-grid"><div className="modal-field"><label>Provider ID</label><input value={customProviderId} onChange={(event) => setCustomProviderId(event.target.value.replace(/[^a-zA-Z0-9._-]/g, "-"))} placeholder="mi-proveedor" /></div><div className="modal-field"><label>Nombre visible</label><input value={customProviderName} onChange={(event) => setCustomProviderName(event.target.value)} placeholder="Mi proveedor" /></div></div>}<div className="modal-field"><label>{connectProvider === "gemini" ? "Google Gemini API Key o token OAuth" : "Provider API Key"}</label><input type="password" value={connectKey} onChange={(event) => setConnectKey(event.target.value)} placeholder={connectProvider === "gemini" ? "AIzaSy... o token OAuth" : "sk-..."} /></div>{connectProvider === "gemini" && <div className="modal-field"><label>Tipo de credencial</label><select value={geminiAuthMode} onChange={(event) => setGeminiAuthMode(event.target.value as "api_key" | "bearer")}><option value="api_key">Google API Key · x-goog-api-key</option><option value="bearer">OAuth access token · Bearer</option></select></div>}{connectProvider !== "gemini" && <div className="modal-field"><label>Base URL</label><input value={connectBaseUrl} onChange={(event) => setConnectBaseUrl(event.target.value)} placeholder="https://api.example.com/v1" /></div>}<button type="button" className="modal-button primary full-button" onClick={() => void connectSelectedProvider()}>Conectar y cargar modelos</button>{providerStatus && <div className={providerConnected ? "provider-status connected" : "provider-status"}>{providerConnected ? "● " : "○ "}{providerStatus}</div>}<p className="modal-help">La credencial vive únicamente en la sesión del navegador y se reenvía al backend por HTTPS. No se guarda en Supabase ni en archivos del proyecto.</p></div></div>}
+            {apiHubOpen && (
+        <div className="modal-overlay" onClick={() => setApiHubOpen(false)}>
+          <div className="modal-box model-modal api-hub-modal" onClick={(event) => event.stopPropagation()}>
+            <div className="modal-header">
+              <h2><Sparkles size={18} /> Conexión de APIs y Modelos</h2>
+              <button className="modal-close" onClick={() => setApiHubOpen(false)}><X size={18} /></button>
+            </div>
+            <p className="modal-help-inline" style={{ marginBottom: "14px" }}>Único sitio para agregar APIs, seleccionar proveedor y elegir tu modelo activo.</p>
+
+            <div className="api-hub-section" style={{ marginBottom: "16px" }}>
+              <strong style={{ display: "block", fontSize: "11px", fontWeight: "600", marginBottom: "8px", color: "var(--ink)" }}>1. Proveedor y Credenciales API</strong>
+              <div className="provider-cards">
+                <button className={connectProvider === "gemini" ? "provider-card active" : "provider-card"} onClick={() => setConnectProvider("gemini")}>
+                  <Sparkles size={17} />
+                  <span><strong>Google Gemini</strong><small>Gemini API</small></span>
+                  {connectProvider === "gemini" && <Check size={14} />}
+                </button>
+                <button className={connectProvider === "openai-compatible" ? "provider-card active" : "provider-card"} onClick={() => setConnectProvider("openai-compatible")}>
+                  <Terminal size={17} />
+                  <span><strong>OpenAI-compatible</strong><small>OpenRouter, Groq, etc.</small></span>
+                  {connectProvider === "openai-compatible" && <Check size={14} />}
+                </button>
+                <button className={connectProvider === "custom" ? "provider-card active" : "provider-card"} onClick={() => setConnectProvider("custom")}>
+                  <Command size={17} />
+                  <span><strong>Personalizado</strong><small>/chat/completions</small></span>
+                  {connectProvider === "custom" && <Check size={14} />}
+                </button>
+              </div>
+              {connectProvider === "custom" && (
+                <div className="config-grid">
+                  <div className="modal-field"><label>Provider ID</label><input value={customProviderId} onChange={(event) => setCustomProviderId(event.target.value.replace(/[^a-zA-Z0-9._-]/g, "-"))} placeholder="mi-proveedor" /></div>
+                  <div className="modal-field"><label>Nombre visible</label><input value={customProviderName} onChange={(event) => setCustomProviderName(event.target.value)} placeholder="Mi proveedor" /></div>
+                </div>
+              )}
+              <div className="modal-field">
+                <label>{connectProvider === "gemini" ? "Google Gemini API Key" : "API Key / Token Bearer"}</label>
+                <input type="password" value={connectKey} onChange={(event) => setConnectKey(event.target.value)} placeholder={connectProvider === "gemini" ? "AIzaSy..." : "sk-..."} />
+              </div>
+              {connectProvider !== "gemini" && (
+                <div className="modal-field">
+                  <label>Base URL del endpoint</label>
+                  <input value={connectBaseUrl} onChange={(event) => setConnectBaseUrl(event.target.value)} placeholder="https://api.openai.com/v1" />
+                </div>
+              )}
+              <button type="button" className="modal-button primary full-button" onClick={() => void connectSelectedProvider()} style={{ marginTop: "4px" }}>Conectar y Listar Modelos</button>
+              {providerStatus && <div className={providerConnected ? "provider-status connected" : "provider-status"}>{providerStatus}</div>}
+            </div>
+
+            <div className="api-hub-section" style={{ borderTop: "1px solid var(--line)", paddingTop: "14px" }}>
+              <strong style={{ display: "block", fontSize: "11px", fontWeight: "600", marginBottom: "8px", color: "var(--ink)" }}>2. Seleccionar Modelo Activo</strong>
+              <div className="modal-search" style={{ margin: "6px 0" }}>
+                <Search size={14} />
+                <input value={modelSearch} onChange={(event) => setModelSearch(event.target.value)} placeholder="Filtrar modelos disponibles..." />
+              </div>
+              <div className="model-list" style={{ maxHeight: "200px", margin: "6px 0" }}>
+                {filteredModels.map((model) => (
+                  <button className={model.id === selectedModel?.id && model.providerId === providerId ? "model-option selected" : "model-option"} key={`${model.providerId}:${model.id}`} onClick={() => selectModel(model)}>
+                    <span className="model-mark"><Sparkles size={14} /></span>
+                    <span><strong>{model.name}</strong><small>{model.providerName} · {model.description}</small></span>
+                    {model.custom && <em className="custom-model-tag">custom</em>}
+                    {model.id === selectedModel?.id && model.providerId === providerId && <Check size={15} />}
+                  </button>
+                ))}
+                {!filteredModels.length && <div className="command-empty">No hay modelos. Conecta un proveedor arriba o añade un modelo manual.</div>}
+              </div>
+
+              {!customModelOpen ? (
+                <button type="button" className="modal-button" style={{ width: "100%", marginTop: "6px" }} onClick={() => setCustomModelOpen(true)}>+ Añadir modelo manual</button>
+              ) : (
+                <div className="custom-model-form">
+                  <div className="config-grid">
+                    <div className="modal-field"><label>Proveedor</label><select value={customModelProvider} onChange={(event) => setCustomModelProvider(event.target.value)}><option value="openai-compatible">OpenAI-compatible</option><option value="gemini">Google Gemini</option><option value="local">KSPR Local</option></select></div>
+                    <div className="modal-field"><label>ID del modelo</label><input value={customModelId} onChange={(event) => setCustomModelId(event.target.value)} placeholder="gpt-4o / gemini-2.5-pro" /></div>
+                  </div>
+                  <div className="modal-field"><label>Nombre visible</label><input value={customModelName} onChange={(event) => setCustomModelName(event.target.value)} placeholder="Mi modelo personalizado" /></div>
+                  <div style={{ display: "flex", gap: "8px" }}>
+                    <button type="button" className="modal-button primary" onClick={addCustomModel}>Guardar y Seleccionar</button>
+                    <button type="button" className="modal-button" onClick={() => setCustomModelOpen(false)}>Cancelar</button>
+                  </div>
+                </div>
+              )}
+            </div>
+
+          </div>
+        </div>
+      )}
+
       {configModalOpen && <div className="modal-overlay" onClick={() => setConfigModalOpen(false)}><div className="modal-box config-modal" onClick={(event) => event.stopPropagation()}><div className="modal-header"><h2><Settings2 size={18} /> Configuración de KSPR I</h2><button className="modal-close" onClick={() => setConfigModalOpen(false)}><X size={18} /></button></div><div className="config-grid"><div className="modal-field"><label>Tema de interfaz</label><select value={theme} onChange={(event) => setTheme(event.target.value)}><option value="light">Phantom Light</option><option value="dark">Carbon Dark</option></select></div><div className="modal-field"><label>Agente activo</label><select value={agentMode} onChange={(event) => { setAgentMode(event.target.value); localStorage.setItem("kspr_agent_mode", event.target.value); }}><option>KSPR I</option><option>KSPR I · Plan</option><option>KSPR I · Review</option></select></div></div><div className="modal-field"><label>MCP Context Endpoint</label><input value={mcpConfig} onChange={(event) => { setMcpConfig(event.target.value); localStorage.setItem("kspr_mcp_config", event.target.value); }} placeholder="mcp://local-context-server" /></div><div className="modal-field"><label>Main Prompt de KSPR I (.md)</label><p className="modal-help-inline">Se aplica antes del mensaje en todos los modelos conectados.</p><textarea className="prompt-editor" value={personalityMd} onChange={(event) => { setPersonalityMd(event.target.value); localStorage.setItem("kspr_main_prompt", event.target.value); }} /></div><div className="modal-field"><label>Comandos personalizados</label><p className="modal-help-inline">Un comando por línea: <code>/nombre — descripción</code>.</p><textarea className="command-editor" value={customCommands} onChange={(event) => { setCustomCommands(event.target.value); localStorage.setItem("kspr_custom_commands", event.target.value); }} placeholder="/inventario — Genera un inventario UI completo" /></div><div className="config-transfer"><strong>Configuración portable</strong><span>Exporta proveedores, modelos, agente, comandos y Main Prompt sin credenciales.</span><div><button className="modal-button secondary" onClick={exportConfiguration}>Exportar JSON</button><label className="modal-button secondary import-config">Importar JSON<input type="file" accept="application/json,.json" onChange={importConfiguration} /></label></div></div><div className="modal-actions"><button className="modal-button" onClick={() => setConfigModalOpen(false)}>Guardar configuración</button></div></div></div>}
       {helpModalOpen && <div className="modal-overlay" onClick={() => setHelpModalOpen(false)}><div className="modal-box help-modal" onClick={(event) => event.stopPropagation()}><div className="modal-header"><h2><HelpCircle size={18} /> Comandos de KSPR I</h2><button className="modal-close" onClick={() => setHelpModalOpen(false)}><X size={18} /></button></div><div className="help-list">{allCommands.map((command) => <div key={command.id}><code>{command.slash}</code><span><strong>{command.title}</strong><small>{command.description}</small></span></div>)}</div><p className="modal-help">También puedes usar <code>@archivo</code> para referenciar un archivo adjunto y <code>⌘K</code> / <code>Ctrl+K</code> para abrir la paleta.</p></div></div>}
       {mcpModalOpen && <McpManager servers={mcpServers} onChange={setMcpServers} onClose={() => setMcpModalOpen(false)} />}
