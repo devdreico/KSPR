@@ -1,8 +1,8 @@
-# KSPR — arquitectura inicial
+# CASPER AI - Empresarial — arquitectura inicial
 
 ## Identidad
 
-KSPR I significa **Reverse Engineering Artificial Intelligence Agent**. Es un proyecto independiente para convertir código, UI y contexto de sistemas legados en documentación técnica reutilizable por personas y agentes.
+**CASPER AI - Empresarial** utiliza el motor de inteligencia artificial **KSPR** (**Reverse Engineering Artificial Intelligence Agent**). Es una plataforma empresarial para convertir código, UI y contexto de sistemas legados en documentación técnica reutilizable por personas y agentes.
 
 ## Flujo de análisis
 

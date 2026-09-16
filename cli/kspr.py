@@ -53,7 +53,7 @@ def collect_source(source: Path) -> list[SourceFile]:
 
 
 async def main() -> None:
-    parser = argparse.ArgumentParser(description="KSPR - Reverse Engineering Artificial Intelligence Agent")
+    parser = argparse.ArgumentParser(description="CASPER AI - Empresarial (KSPR Engine - Reverse Engineering AI Agent)")
     parser.add_argument("source", type=Path)
     parser.add_argument("--git-url", default=None, help="Clona un repositorio Git en modo lectura para analizarlo")
     parser.add_argument("--output", type=Path, default=Path("kspr-context"))

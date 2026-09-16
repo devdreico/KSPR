@@ -1,6 +1,6 @@
-# KSPR
+# CASPER AI - Empresarial
 
-**KSPR — Reverse Engineering Artificial Intelligence Agent** transforma repositorios y contextos legados en un mapa técnico auditable y reutilizable por otros agentes.
+**CASPER AI - Empresarial** (impulsado por el modelo de inteligencia artificial **KSPR I**) transforma repositorios y contextos legados en un mapa técnico auditable y reutilizable por otros agentes.
 
 KSPR I recupera funcionalidades de interfaces y backend —botones, enlaces, formularios, eventos, consultas, procedimientos, rutas y mutaciones de estado—, contrasta sus hallazgos mediante iteraciones y exporta una carpeta Markdown de contexto masivo.
 

@@ -4,7 +4,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    app_name: str = "KSPR - Reverse Engineering Artificial Intelligence Agent"
+    app_name: str = "CASPER AI - Empresarial"
     environment: str = "development"
     cors_origins: str = "http://localhost:5173"
     default_provider: str = "gemini"
