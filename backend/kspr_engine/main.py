@@ -296,6 +296,7 @@ async def provider_status(
     base_url: str | None = Query(default=None),
     x_kspr_api_key: str | None = Header(default=None, alias="X-KSPR-API-Key"),
     x_gemini_api_key: str | None = Header(default=None, alias="X-Gemini-API-Key"),
+    x_kspr_base_url: str | None = Header(default=None, alias="X-KSPR-Base-URL"),
     x_kspr_auth_mode: str = Header(default="api_key", alias="X-KSPR-Auth-Mode"),
 ) -> dict:
     """Checks a provider connection and returns models allowed for generation."""
@@ -304,7 +305,7 @@ async def provider_status(
             provider,
             settings,
             api_key=x_kspr_api_key or x_gemini_api_key,
-            base_url=base_url,
+            base_url=base_url or x_kspr_base_url,
             auth_mode=x_kspr_auth_mode,
         )
         list_models = getattr(adapter, "list_models", None)

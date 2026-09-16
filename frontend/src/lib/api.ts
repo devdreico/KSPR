@@ -46,14 +46,23 @@ export type AnalysisProgress = {
   message: string;
 };
 
-const API = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? "" : "http://localhost:8000");
+const API = import.meta.env.VITE_API_URL || "";
 
 async function parse<T>(response: Response): Promise<T> {
+  const text = await response.text();
+  if (text.trim().toLowerCase().startsWith("<!doctype") || text.trim().toLowerCase().startsWith("<html")) {
+    throw new Error("El servidor backend no está respondiendo en /api (comprueba que uvicorn esté corriendo en el puerto 8000).");
+  }
+  let payload: any = {};
+  try {
+    payload = JSON.parse(text);
+  } catch {
+    payload = { detail: text.slice(0, 200) };
+  }
   if (!response.ok) {
-    const payload = await response.json().catch(() => ({}));
     throw new Error(payload.detail || "KSPR API error " + response.status);
   }
-  return response.json();
+  return payload;
 }
 
 function providerHeaders(auth?: ProviderAuth): Record<string, string> {
