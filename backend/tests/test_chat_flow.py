@@ -9,7 +9,7 @@ class FakeChatProvider:
     def __init__(self):
         self.prompts: list[str] = []
 
-    async def complete(self, prompt: str, model: str) -> str:
+    async def complete(self, prompt: str, model: str, effort: str | None = None) -> str:
         self.prompts.append(prompt)
         return "Hola, soy KSPR I, el modelo de ingeniería inversa agentica de KSPR."
 

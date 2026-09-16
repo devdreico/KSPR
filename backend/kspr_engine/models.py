@@ -38,6 +38,7 @@ class AnalysisRequest(BaseModel):
     provider: str | None = None
     model: str | None = None
     variant: str | None = Field(default=None, max_length=80)
+    effort: str | None = Field(default=None, max_length=50)
     instruction: str | None = Field(default=None, max_length=100_000)
     iterations: int = Field(default=3, ge=1, le=8)
     mode: ProcessingMode = ProcessingMode.auto

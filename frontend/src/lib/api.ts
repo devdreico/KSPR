@@ -6,6 +6,7 @@ export type AnalysisRequest = {
   provider: string;
   model?: string;
   variant?: string;
+  effort?: string;
   iterations: number;
   mode: "auto" | "direct" | "async";
   instruction?: string;

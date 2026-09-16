@@ -18,12 +18,12 @@ class ProviderError(RuntimeError):
 class ModelProvider:
     name: ProviderName
 
-    async def complete(self, prompt: str, model: str) -> str:
+    async def complete(self, prompt: str, model: str, effort: str | None = None) -> str:
         raise NotImplementedError
 
-    async def complete_stream(self, prompt: str, model: str, on_delta) -> str:
+    async def complete_stream(self, prompt: str, model: str, on_delta, effort: str | None = None) -> str:
         """Fallback for providers without a streaming adapter."""
-        response = await self.complete(prompt, model)
+        response = await self.complete(prompt, model, effort=effort)
         if response:
             await on_delta(response)
         return response
@@ -32,7 +32,7 @@ class ModelProvider:
 class LocalProvider(ModelProvider):
     name = ProviderName.local
 
-    async def complete(self, prompt: str, model: str) -> str:
+    async def complete(self, prompt: str, model: str, effort: str | None = None) -> str:
         if "hola" in prompt.lower() or "preséntate" in prompt.lower() or "presentate" in prompt.lower():
             return "Hola, soy KSPR I, el modelo de ingeniería inversa agentica de KSPR. Estoy listo para estudiar la evidencia y devolverte un contexto técnico auditable."
         return "KSPR I está funcionando en modo local de demostración. Conecta Gemini o un gateway compatible para obtener razonamiento LLM sobre el contexto entregado."
@@ -70,11 +70,12 @@ class GeminiProvider(ModelProvider):
         authorization = {"Authorization": "Bearer " + key} if self.auth_mode == "bearer" else {"x-goog-api-key": key}
         return {**authorization, "Content-Type": "application/json"}
 
-    async def complete(self, prompt: str, model: str) -> str:
+    async def complete(self, prompt: str, model: str, effort: str | None = None) -> str:
         url = self.settings.gemini_base_url.rstrip("/") + f"/models/{model}:generateContent"
+        tokens = 32768 if effort == "high" else (4096 if effort == "low" else 8192)
         payload = {
             "contents": [{"role": "user", "parts": [{"text": prompt}]}],
-            "generationConfig": {"temperature": 0.2, "maxOutputTokens": 8_192},
+            "generationConfig": {"temperature": 0.2 if not effort or effort == "default" else 0.7, "maxOutputTokens": tokens},
         }
         async with httpx.AsyncClient(timeout=180) as client:
             response = await client.post(url, headers=self._headers(), json=payload)
@@ -84,11 +85,12 @@ class GeminiProvider(ModelProvider):
         except (KeyError, IndexError, TypeError) as exc:
             raise ProviderError("Gemini no devolvió texto utilizable.") from exc
 
-    async def complete_stream(self, prompt: str, model: str, on_delta) -> str:
+    async def complete_stream(self, prompt: str, model: str, on_delta, effort: str | None = None) -> str:
         url = self.settings.gemini_base_url.rstrip("/") + f"/models/{model}:streamGenerateContent"
+        tokens = 32768 if effort == "high" else (4096 if effort == "low" else 8192)
         payload = {
             "contents": [{"role": "user", "parts": [{"text": prompt}]}],
-            "generationConfig": {"temperature": 0.2, "maxOutputTokens": 8_192},
+            "generationConfig": {"temperature": 0.2 if not effort or effort == "default" else 0.7, "maxOutputTokens": tokens},
         }
         chunks: list[str] = []
         async with httpx.AsyncClient(timeout=180) as client, client.stream("POST", url, params={"alt": "sse"}, headers=self._headers(), json=payload) as response:
@@ -187,13 +189,15 @@ class OpenAICompatibleProvider(ModelProvider):
     def _headers(self) -> dict[str, str]:
         return {"Authorization": "Bearer " + self._require_key(), "Content-Type": "application/json"}
 
-    async def complete(self, prompt: str, model: str) -> str:
+    async def complete(self, prompt: str, model: str, effort: str | None = None) -> str:
         url = self.base_url.rstrip("/") + "/chat/completions"
-        payload = {
+        payload: dict[str, Any] = {
             "model": model,
             "messages": [{"role": "user", "content": prompt}],
-            "temperature": 0.2,
+            "temperature": 0.2 if not effort or effort == "default" else 0.7,
         }
+        if effort and effort in {"low", "medium", "high"}:
+            payload["reasoning_effort"] = effort
         async with httpx.AsyncClient(timeout=180) as client:
             response = await client.post(url, headers=self._headers(), json=payload)
         data = self._response_data(response)
@@ -202,14 +206,16 @@ class OpenAICompatibleProvider(ModelProvider):
         except (KeyError, IndexError, TypeError, AttributeError) as exc:
             raise ProviderError("El proveedor compatible no devolvió texto utilizable.") from exc
 
-    async def complete_stream(self, prompt: str, model: str, on_delta) -> str:
+    async def complete_stream(self, prompt: str, model: str, on_delta, effort: str | None = None) -> str:
         url = self.base_url.rstrip("/") + "/chat/completions"
-        payload = {
+        payload: dict[str, Any] = {
             "model": model,
             "messages": [{"role": "user", "content": prompt}],
-            "temperature": 0.2,
+            "temperature": 0.2 if not effort or effort == "default" else 0.7,
             "stream": True,
         }
+        if effort and effort in {"low", "medium", "high"}:
+            payload["reasoning_effort"] = effort
         chunks: list[str] = []
         async with httpx.AsyncClient(timeout=180) as client, client.stream("POST", url, headers=self._headers(), json=payload) as response:
                 if response.is_error:

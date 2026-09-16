@@ -140,9 +140,9 @@ async def analyze(
         )
         stream_completion = getattr(provider, "complete_stream", None)
         if on_token and stream_completion:
-            model_response = await stream_completion(prompt, model, on_token)
+            model_response = await stream_completion(prompt, model, on_token, effort=request.effort)
         else:
-            model_response = await provider.complete(prompt, model)
+            model_response = await provider.complete(prompt, model, effort=request.effort)
             if on_token and model_response:
                 await on_token(model_response)
         response_text = model_response.strip()

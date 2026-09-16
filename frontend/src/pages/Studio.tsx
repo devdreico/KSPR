@@ -211,6 +211,7 @@ export function Studio() {
   const [modelId, setModelId] = useState(INITIAL_SESSIONS[0].model?.modelId || DEFAULT_MODELS[0].id);
   const [providerId, setProviderId] = useState(INITIAL_SESSIONS[0].model?.providerId || DEFAULT_MODELS[0].providerId);
   const [modelVariant, setModelVariant] = useState(INITIAL_SESSIONS[0].variant || "default");
+  const [modelEffort, setModelEffort] = useState(() => localStorage.getItem("kspr_model_effort") || "medium");
   const [geminiApiKey, setGeminiApiKey] = useState("");
   const [geminiAuthMode, setGeminiAuthMode] = useState<"api_key" | "bearer">("api_key");
   const [compatibleApiKey, setCompatibleApiKey] = useState("");
@@ -802,6 +803,7 @@ export function Studio() {
         provider: selectedModel.providerId,
         model: selectedModel.id,
         variant: modelVariant,
+        effort: modelEffort,
         instruction,
         iterations: 3,
         mode: "auto",
@@ -995,6 +997,28 @@ export function Studio() {
                   </div>
                 </div>
               )}
+            </div>
+
+            <div className="api-hub-section" style={{ borderTop: "1px solid var(--line)", paddingTop: "14px" }}>
+              <strong style={{ display: "block", fontSize: "11px", fontWeight: "600", marginBottom: "8px", color: "var(--ink)" }}>3. Nivel de Esfuerzo (Model Effort / Razonamiento)</strong>
+              <div className="provider-cards" style={{ gridTemplateColumns: "repeat(4, 1fr)" }}>
+                <button type="button" className={modelEffort === "low" ? "provider-card active" : "provider-card"} onClick={() => { setModelEffort("low"); localStorage.setItem("kspr_model_effort", "low"); }}>
+                  <span><strong>Low</strong><small>Rápido</small></span>
+                  {modelEffort === "low" && <Check size={14} />}
+                </button>
+                <button type="button" className={modelEffort === "medium" ? "provider-card active" : "provider-card"} onClick={() => { setModelEffort("medium"); localStorage.setItem("kspr_model_effort", "medium"); }}>
+                  <span><strong>Medium</strong><small>Equilibrado</small></span>
+                  {modelEffort === "medium" && <Check size={14} />}
+                </button>
+                <button type="button" className={modelEffort === "high" ? "provider-card active" : "provider-card"} onClick={() => { setModelEffort("high"); localStorage.setItem("kspr_model_effort", "high"); }}>
+                  <span><strong>High</strong><small>Deep thinking</small></span>
+                  {modelEffort === "high" && <Check size={14} />}
+                </button>
+                <button type="button" className={modelEffort === "default" ? "provider-card active" : "provider-card"} onClick={() => { setModelEffort("default"); localStorage.setItem("kspr_model_effort", "default"); }}>
+                  <span><strong>Default</strong><small>Estándar</small></span>
+                  {modelEffort === "default" && <Check size={14} />}
+                </button>
+              </div>
             </div>
 
           </div>
