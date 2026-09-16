@@ -14,6 +14,20 @@ class FakeChatProvider:
         return "Hola, soy KSPR I, el modelo de ingeniería inversa agentica de KSPR."
 
 
+def _get_auth_headers() -> dict[str, str]:
+    """Register a test user and return auth headers."""
+    client = TestClient(app)
+    register_data = {"username": "chatuser", "email": "chat@example.com", "password": "password123"}
+    reg_resp = client.post("/api/v1/auth/register", json=register_data)
+    if reg_resp.status_code == 409:
+        # User might already exist, try login
+        login_resp = client.post("/api/v1/auth/login", json={"identifier": "chat@example.com", "password": "password123"})
+        token = login_resp.json()["access_token"]
+    else:
+        token = reg_resp.json()["access_token"]
+    return {"Authorization": f"Bearer {token}"}
+
+
 @pytest.mark.asyncio
 async def test_chat_prompt_round_trip_keeps_main_prompt_and_previous_review(monkeypatch):
     from kspr_engine import analyzer
@@ -43,7 +57,9 @@ def test_http_chat_contract_returns_model_text(monkeypatch):
 
     provider = FakeChatProvider()
     monkeypatch.setattr(analyzer, "get_provider", lambda *_args, **_kwargs: provider)
-    response = TestClient(app).post(
+    headers = _get_auth_headers()
+    client = TestClient(app)
+    response = client.post(
         "/api/v1/analyze",
         json={
             "project_name": "KSPR HTTP smoke test",
@@ -54,6 +70,7 @@ def test_http_chat_contract_returns_model_text(monkeypatch):
             "iterations": 1,
             "mode": "direct",
         },
+        headers=headers,
     )
 
     assert response.status_code == 200
@@ -61,7 +78,9 @@ def test_http_chat_contract_returns_model_text(monkeypatch):
 
 
 def test_local_chat_contract_can_complete_the_first_ui_smoke_gate():
-    response = TestClient(app).post(
+    headers = _get_auth_headers()
+    client = TestClient(app)
+    response = client.post(
         "/api/v1/analyze",
         json={
             "project_name": "KSPR local smoke test",
@@ -72,6 +91,7 @@ def test_local_chat_contract_can_complete_the_first_ui_smoke_gate():
             "iterations": 1,
             "mode": "direct",
         },
+        headers=headers,
     )
 
     assert response.status_code == 200
@@ -83,7 +103,9 @@ def test_stream_chat_contract_emits_progress_and_result(monkeypatch):
 
     provider = FakeChatProvider()
     monkeypatch.setattr(analyzer, "get_provider", lambda *_args, **_kwargs: provider)
-    response = TestClient(app).post(
+    headers = _get_auth_headers()
+    client = TestClient(app)
+    response = client.post(
         "/api/v1/analyze/stream",
         json={
             "project_name": "KSPR SSE smoke test",
@@ -94,6 +116,7 @@ def test_stream_chat_contract_emits_progress_and_result(monkeypatch):
             "iterations": 1,
             "mode": "direct",
         },
+        headers=headers,
     )
 
     assert response.status_code == 200

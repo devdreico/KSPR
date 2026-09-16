@@ -83,3 +83,36 @@ class JobStatus(BaseModel):
     message: str
     result: AnalysisResult | None = None
     error: str | None = None
+
+
+class UserRegisterRequest(BaseModel):
+    username: str = Field(min_length=3, max_length=50)
+    email: str = Field(min_length=5, max_length=100)
+    password: str = Field(min_length=6, max_length=100)
+
+
+class UserLoginRequest(BaseModel):
+    identifier: str = Field(min_length=2, max_length=100)  # username or email
+    password: str = Field(min_length=1, max_length=100)
+
+
+class UserProfile(BaseModel):
+    id: str
+    username: str
+    email: str
+    primary_technology: str = "TypeScript/React"
+    created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
+
+
+class TokenResponse(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
+    user: UserProfile
+
+
+class OAuthLoginRequest(BaseModel):
+    provider: str = Field(min_length=2, max_length=30)
+    token: str = Field(min_length=1)
+    email: str = Field(min_length=5, max_length=100)
+    username: str | None = Field(default=None, max_length=50)
+

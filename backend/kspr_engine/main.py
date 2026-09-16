@@ -5,22 +5,34 @@ import json
 
 from fastapi import (
     BackgroundTasks,
+    Depends,
     FastAPI,
     File,
     Header,
     HTTPException,
     Query,
     UploadFile,
+    status,
 )
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 
 from .analyzer import analyze
+from .auth import get_current_user, hash_password
 from .config import get_settings
 from .jobs import job_store
-from .models import AnalysisRequest, AnalysisResult, JobStatus
+from .models import (
+    AnalysisRequest,
+    AnalysisResult,
+    JobStatus,
+    OAuthLoginRequest,
+    TokenResponse,
+    UserLoginRequest,
+    UserProfile,
+    UserRegisterRequest,
+)
 from .providers import GeminiProvider, ProviderError, get_provider
-from .repository import SupabaseRepository
+from .repository import SupabaseRepository, UserRepository
 
 settings = get_settings()
 app = FastAPI(title=settings.app_name, version="0.1.0", description="CASPER AI - Empresarial (Powered by KSPR Engine).")
@@ -38,9 +50,68 @@ async def health() -> dict:
     }
 
 
+# ==================== AUTHENTICATION ENDPOINTS ====================
+
+@app.post("/api/v1/auth/register", response_model=TokenResponse, status_code=status.HTTP_201_CREATED)
+async def register(request: UserRegisterRequest) -> TokenResponse:
+    user_repo = UserRepository(settings)
+
+    email_exists, username_exists = await user_repo.user_exists(request.email, request.username)
+    if email_exists:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="El email ya está registrado")
+    if username_exists:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="El nombre de usuario ya está en uso")
+
+    password_hash = hash_password(request.password)
+    user = await user_repo.create_user(
+        username=request.username,
+        email=request.email,
+        password_hash=password_hash,
+    )
+
+    from .auth import JWTHandler
+    jwt_handler = JWTHandler(settings)
+    access_token = jwt_handler.create_access_token(user.id)
+
+    return TokenResponse(access_token=access_token, user=user)
+
+
+@app.post("/api/v1/auth/login", response_model=TokenResponse)
+async def login(request: UserLoginRequest) -> TokenResponse:
+    user_repo = UserRepository(settings)
+
+    user = await user_repo.verify_credentials(request.identifier, request.password)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Credenciales inválidas",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    from .auth import JWTHandler
+    jwt_handler = JWTHandler(settings)
+    access_token = jwt_handler.create_access_token(user.id)
+
+    return TokenResponse(access_token=access_token, user=user)
+
+
+@app.get("/api/v1/auth/me", response_model=UserProfile)
+async def get_current_user_profile(current_user: UserProfile = Depends(get_current_user)) -> UserProfile:  # noqa: B008
+    return current_user
+
+
+@app.post("/api/v1/auth/oauth", response_model=TokenResponse, status_code=status.HTTP_501_NOT_IMPLEMENTED)
+async def oauth_login(request: OAuthLoginRequest) -> TokenResponse:
+    raise HTTPException(
+        status_code=status.HTTP_501_NOT_IMPLEMENTED,
+        detail="OAuth login no implementado en v1. Próximamente: Google, GitHub.",
+    )
+
+
 @app.post("/api/v1/analyze", response_model=AnalysisResult)
 async def create_analysis(
     request: AnalysisRequest,
+    current_user: UserProfile = Depends(get_current_user),  # noqa: B008
     x_kspr_api_key: str | None = Header(default=None, alias="X-KSPR-API-Key"),
     x_gemini_api_key: str | None = Header(default=None, alias="X-Gemini-API-Key"),
     x_kspr_base_url: str | None = Header(default=None, alias="X-KSPR-Base-URL"),
@@ -58,13 +129,14 @@ async def create_analysis(
         )
     except ProviderError as exc:
         raise HTTPException(status_code=502, detail=str(exc)) from exc
-    await SupabaseRepository(settings).save_analysis(result)
+    await SupabaseRepository(settings).save_analysis(result, user_id=current_user.id)
     return result
 
 
 @app.post("/api/v1/analyze/stream")
 async def stream_analysis(
     request: AnalysisRequest,
+    current_user: UserProfile = Depends(get_current_user),  # noqa: B008
     x_kspr_api_key: str | None = Header(default=None, alias="X-KSPR-API-Key"),
     x_gemini_api_key: str | None = Header(default=None, alias="X-Gemini-API-Key"),
     x_kspr_base_url: str | None = Header(default=None, alias="X-KSPR-Base-URL"),
@@ -92,7 +164,7 @@ async def stream_analysis(
                     provider_auth_mode=x_kspr_auth_mode,
                     on_token=token,
                 )
-                await SupabaseRepository(settings).save_analysis(result)
+                await SupabaseRepository(settings).save_analysis(result, user_id=current_user.id)
                 await queue.put({"type": "result", "result": result.model_dump(mode="json")})
             except Exception as exc:  # noqa: BLE001 - serialized at the stream boundary
                 await queue.put({"type": "error", "message": str(exc)})
@@ -122,6 +194,7 @@ async def stream_analysis(
 async def create_job(
     request: AnalysisRequest,
     background_tasks: BackgroundTasks,
+    current_user: UserProfile = Depends(get_current_user),  # noqa: B008
     x_kspr_api_key: str | None = Header(default=None, alias="X-KSPR-API-Key"),
     x_gemini_api_key: str | None = Header(default=None, alias="X-Gemini-API-Key"),
     x_kspr_base_url: str | None = Header(default=None, alias="X-KSPR-Base-URL"),
@@ -136,12 +209,13 @@ async def create_job(
         x_kspr_api_key or x_gemini_api_key,
         x_kspr_base_url,
         x_kspr_auth_mode,
+        current_user.id,
     )
     return job
 
 
 @app.get("/api/v1/jobs/{job_id}", response_model=JobStatus)
-async def get_job(job_id: str) -> JobStatus:
+async def get_job(job_id: str, current_user: UserProfile = Depends(get_current_user)) -> JobStatus:  # noqa: B008
     job = job_store.get(job_id)
     if not job:
         raise HTTPException(status_code=404, detail="Job no encontrado")
@@ -149,7 +223,7 @@ async def get_job(job_id: str) -> JobStatus:
 
 
 @app.delete("/api/v1/jobs/{job_id}")
-async def cancel_job(job_id: str) -> dict:
+async def cancel_job(job_id: str, current_user: UserProfile = Depends(get_current_user)) -> dict:  # noqa: B008
     if not job_store.cancel(job_id):
         raise HTTPException(status_code=409, detail="El job no puede cancelarse en su estado actual")
     return {"job_id": job_id, "status": "cancelled", "message": "Job cancelado"}

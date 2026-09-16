@@ -40,6 +40,7 @@ class JobStore:
         gemini_api_key: str | None = None,
         provider_base_url: str | None = None,
         provider_auth_mode: str = "api_key",
+        user_id: str | None = None,
     ) -> None:
         async def progress(value: int, stage: str, message: str):
             job = self.jobs[job_id]
@@ -51,7 +52,7 @@ class JobStore:
         try:
             await progress(1, "queued", "Iniciando agente KSPR")
             result = await analyze(request, settings, progress, gemini_api_key, provider_base_url, provider_auth_mode)
-            await SupabaseRepository(settings).save_analysis(result)
+            await SupabaseRepository(settings).save_analysis(result, user_id=user_id)
             self.jobs[job_id].result = result
             self.jobs[job_id].status = "completed"
         except JobCancelled:
