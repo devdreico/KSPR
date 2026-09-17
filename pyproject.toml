@@ -3,7 +3,7 @@ requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "kspr-engine"
+name = "kspr-ai"
 version = "0.1.0"
 description = "KSPR AI - Empresarial — Powered by KSPR Engine"
 requires-python = ">=3.11"
