@@ -8,6 +8,9 @@ from pydantic import BaseModel, Field, field_validator
 class ProviderName(StrEnum):
     local = "local"
     gemini = "gemini"
+    openai = "openai"
+    groq = "groq"
+    deepseek = "deepseek"
     openai_compatible = "openai-compatible"
 
 

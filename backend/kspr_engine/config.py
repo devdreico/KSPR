@@ -12,7 +12,12 @@ class Settings(BaseSettings):
     gemini_api_key: str | None = None
     gemini_base_url: str = "https://generativelanguage.googleapis.com/v1beta"
     gemini_transcription_model: str = "gemini-2.5-flash"
-    openai_compatible_base_url: str = "https://api.openai.com/v1"
+    openai_api_key: str | None = None
+    openai_base_url: str = "https://api.openai.com/v1"
+    groq_api_key: str | None = None
+    groq_base_url: str = "https://api.groq.com/openai/v1"
+    deepseek_api_key: str | None = None
+    deepseek_base_url: str = "https://api.deepseek.com/v1"
     supabase_url: str | None = None
     supabase_anon_key: str | None = None
     supabase_service_role_key: str | None = None
