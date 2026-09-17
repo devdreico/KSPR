@@ -5,21 +5,15 @@ echo "=================================================="
 echo "  KSPR AI - Instalador Automático para Bash"
 echo "=================================================="
 
-# Verificar dependencias
 if ! command -v python3 &> /dev/null; then
-    echo "[!] Error: python3 es requerido pero no está instalado."
-    exit 1
-fi
-
-if ! command -v pip &> /dev/null; then
-    echo "[!] Error: pip es requerido pero no está instalado."
+    echo "[!] Error: python3 es requerido."
     exit 1
 fi
 
 INSTALL_DIR="${KSPR_INSTALL_DIR:-$HOME/.kspr}"
-BIN_DIR="${KSPR_BIN_DIR:-/usr/local/bin}"
+BIN_DIR="${KSPR_BIN_DIR:-$HOME/.local/bin}"
 
-echo "[*] Clonando KSPR en $INSTALL_DIR..."
+echo "[*] Clonando/Actualizando KSPR en $INSTALL_DIR..."
 if [ -d "$INSTALL_DIR" ]; then
     cd "$INSTALL_DIR"
     git pull origin main || true
@@ -28,18 +22,29 @@ else
     cd "$INSTALL_DIR"
 fi
 
-echo "[*] Instalando dependencias del motor Python..."
-pip install -e .
+echo "[*] Creando entorno virtual aislado (venv)..."
+python3 -m venv "$INSTALL_DIR/.venv"
 
-echo "[*] Configurando enlace simbólico en $BIN_DIR/kspr..."
-if [ -w "$BIN_DIR" ]; then
-    ln -sf "$INSTALL_DIR/bin/kspr.sh" "$BIN_DIR/kspr"
-else
-    echo "[*] Se requieren permisos de administrador (sudo) para instalar en $BIN_DIR"
-    sudo ln -sf "$INSTALL_DIR/bin/kspr.sh" "$BIN_DIR/kspr"
+echo "[*] Instalando dependencias en el entorno virtual..."
+"$INSTALL_DIR/.venv/bin/pip" install --upgrade pip
+"$INSTALL_DIR/.venv/bin/pip" install -e "$INSTALL_DIR"
+
+echo "[*] Creando script ejecutable en $BIN_DIR/kspr..."
+mkdir -p "$BIN_DIR"
+cat << 'EOF' > "$BIN_DIR/kspr"
+#!/usr/bin/env bash
+exec "$HOME/.kspr/.venv/bin/python" "$HOME/.kspr/cli/kspr.py" "$@"
+EOF
+
+chmod +x "$BIN_DIR/kspr"
+
+# Asegurar que ~/.local/bin esté en el PATH
+if [[ ":$PATH:" != *":$BIN_DIR:"* ]]; then
+    echo "export PATH=\"\$HOME/.local/bin:\$PATH\"" >> ~/.bashrc
+    echo "[*] Se añadió $BIN_DIR a tu PATH en ~/.bashrc"
 fi
 
 echo ""
 echo " ✓ ¡KSPR AI instalado con éxito!"
-echo " Ejecuta 'kspr --help' o 'kspr --interactive' para comenzar."
+echo " Ejecuta 'source ~/.bashrc' y luego 'kspr --help' o 'kspr --interactive'."
 echo "=================================================="
