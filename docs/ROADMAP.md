@@ -1,4 +1,4 @@
-# CASPER AI - Empresarial — alcance y primeras metas
+# KSPR AI - Empresarial — alcance y primeras metas
 
 ## Entregado en v0.1
 

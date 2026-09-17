@@ -10,7 +10,7 @@ def test_health_and_safe_zip_ingestion():
     client = TestClient(app)
     health = client.get("/api/v1/health")
     assert health.status_code == 200
-    assert health.json()["name"].startswith("CASPER AI")
+    assert health.json()["name"].startswith("KSPR AI")
 
     archive = io.BytesIO()
     with zipfile.ZipFile(archive, "w") as zipped:

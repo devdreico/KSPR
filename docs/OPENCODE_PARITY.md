@@ -1,6 +1,6 @@
-# CASPER AI - Empresarial / OpenCode Desktop parity
+# KSPR AI - Empresarial / OpenCode Desktop parity
 
-CASPER AI - Empresarial toma como referencia el flujo de trabajo de OpenCode Desktop: sesión a la izquierda, conversación central, compositor único y configuración accesible desde comandos. La implementación conserva la identidad de KSPR y añade el análisis estático seguro del proyecto.
+KSPR AI - Empresarial toma como referencia el flujo de trabajo de OpenCode Desktop: sesión a la izquierda, conversación central, compositor único y configuración accesible desde comandos. La implementación conserva la identidad de KSPR y añade el análisis estático seguro del proyecto.
 
 ## Capacidades implementadas
 

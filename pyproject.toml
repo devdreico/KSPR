@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "kspr-engine"
 version = "0.1.0"
-description = "CASPER AI - Empresarial — Powered by KSPR Engine"
+description = "KSPR AI - Empresarial — Powered by KSPR Engine"
 requires-python = ">=3.11"
 dependencies = [
   "fastapi>=0.115.0",

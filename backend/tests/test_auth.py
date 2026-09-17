@@ -231,4 +231,4 @@ def test_health_endpoint_unaffected():
     client = TestClient(app)
     resp = client.get("/api/v1/health")
     assert resp.status_code == 200
-    assert resp.json()["name"] == "CASPER AI - Empresarial"
+    assert resp.json()["name"] == "KSPR AI - Empresarial"

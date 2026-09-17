@@ -35,7 +35,7 @@ from .providers import GeminiProvider, ProviderError, get_provider
 from .repository import SupabaseRepository, UserRepository
 
 settings = get_settings()
-app = FastAPI(title=settings.app_name, version="0.1.0", description="CASPER AI - Empresarial (Powered by KSPR Engine).")
+app = FastAPI(title=settings.app_name, version="0.1.0", description="KSPR AI - Empresarial (Powered by KSPR Engine).")
 app.add_middleware(CORSMiddleware, allow_origins=settings.allowed_origins, allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
 
 
