@@ -1,0 +1,11 @@
+__pycache__
+.venv
+frontend
+test-context
+backend/uvicorn.log
+.git
+.github
+docs
+*.pyc
+*.pyo
+.DS_Store

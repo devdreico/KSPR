@@ -1,0 +1,30 @@
+{
+  "name": "kspr-cli",
+  "version": "0.1.0",
+  "description": "KSPR AI - Empresarial (Reverse Engineering AI Agent CLI)",
+  "bin": {
+    "kspr": "./bin/kspr.js"
+  },
+  "files": [
+    "bin",
+    "cli",
+    "backend",
+    "pyproject.toml",
+    "README.md"
+  ],
+  "preferGlobal": true,
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "kspr",
+    "cli",
+    "reverse-engineering",
+    "ai",
+    "opencode",
+    "static-analysis",
+    "agent"
+  ],
+  "author": "KSPR AI Team",
+  "license": "MIT"
+}

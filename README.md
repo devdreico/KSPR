@@ -42,8 +42,20 @@ Para Vercel, importa `frontend/` como proyecto Vite y define `VITE_API_URL` con 
 
 ## CLI
 
+Puedes instalar y ejecutar KSPR directamente desde **npm**:
+
+```bash
+npm install -g kspr
+# o ejecución instantánea con npx:
+npx kspr
+```
+
+O bien ejecutar el script localmente:
+
 ```bash
 python cli/kspr.py ./mi-repositorio --output ./kspr-context --iterations 3
+# o interactivo tipo OpenCode:
+python cli/kspr.py
 # o un repositorio Git:
 python cli/kspr.py . --git-url https://github.com/org/repo.git --output ./kspr-context
 ```
