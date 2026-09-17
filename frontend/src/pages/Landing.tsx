@@ -81,9 +81,9 @@ export function Landing() {
               fontSize: "13px",
               boxShadow: "0 10px 30px rgba(0,0,0,0.15)"
             }}>
-              <span>npm install -g kspr-ai</span>
+              <span>curl -sSL .../install.sh | bash</span>
               <button
-                onClick={() => copyToClipboard("npm install -g kspr-ai", "install-cmd")}
+                onClick={() => copyToClipboard("curl -sSL https://raw.githubusercontent.com/devdreiortiz/KSPR/main/bin/install.sh | bash", "install-cmd")}
                 style={{ background: "transparent", border: "none", color: "#aaa", cursor: "pointer", display: "flex", alignItems: "center", gap: 4 }}
                 title="Copiar comando"
               >
@@ -103,14 +103,14 @@ export function Landing() {
               fontSize: "13px",
               boxShadow: "0 10px 30px rgba(0,0,0,0.15)"
             }}>
-              <span>npx kspr-ai</span>
+              <span>npm install -g kspr-ai</span>
               <button
-                onClick={() => copyToClipboard("npx kspr-ai", "npx-cmd")}
+                onClick={() => copyToClipboard("npm install -g kspr-ai", "npm-cmd")}
                 style={{ background: "transparent", border: "none", color: "#aaa", cursor: "pointer", display: "flex", alignItems: "center", gap: 4 }}
                 title="Copiar comando"
               >
-                {copiedCmd === "npx-cmd" ? <Check size={14} color="#4ade80" /> : <Copy size={14} />}
-                <span style={{ fontSize: "11px", fontFamily: "'Montserrat', sans-serif", fontWeight: 700 }}>{copiedCmd === "npx-cmd" ? "Copiado" : "Copiar"}</span>
+                {copiedCmd === "npm-cmd" ? <Check size={14} color="#4ade80" /> : <Copy size={14} />}
+                <span style={{ fontSize: "11px", fontFamily: "'Montserrat', sans-serif", fontWeight: 700 }}>{copiedCmd === "npm-cmd" ? "Copiado" : "Copiar"}</span>
               </button>
             </div>
           </div>
@@ -270,10 +270,10 @@ export function Landing() {
             }}>
               {terminalTab === "install" && (
                 <div>
-                  <div style={{ color: "#71717a" }}># Instalar KSPR globalmente desde npm</div>
+                  <div style={{ color: "#71717a" }}># Instalación rápida mediante script Bash con cURL</div>
+                  <div style={{ color: "#4ade80", margin: "8px 0" }}>$ curl -sSL https://raw.githubusercontent.com/devdreiortiz/KSPR/main/bin/install.sh | bash</div>
+                  <div style={{ color: "#71717a", marginTop: "12px" }}># O instalación global mediante npm</div>
                   <div style={{ color: "#4ade80", margin: "8px 0" }}>$ npm install -g kspr-ai</div>
-                  <div style={{ color: "#71717a", marginTop: "12px" }}># O ejecución instantánea sin instalación previa con npx</div>
-                  <div style={{ color: "#4ade80", margin: "8px 0" }}>$ npx kspr-ai --help</div>
                   <div style={{ color: "#a1a1aa", marginTop: "12px" }}>✓ Disponible con wrappers Node.js (kspr.js), Bash (kspr.sh) y Bun (kspr.bun).</div>
                 </div>
               )}
@@ -353,6 +353,10 @@ export function Landing() {
           <h2 style={{ fontSize: "20px", marginTop: 0, marginBottom: 20, fontWeight: 700, fontFamily: "'Montserrat', sans-serif" }}>Referencia Rápida de Metodologías CLI</h2>
           <div style={{ display: "grid", gap: "14px" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 16px", background: "#f8f9fa", borderRadius: "8px", border: "1px solid var(--line)", flexWrap: "wrap", gap: 8 }}>
+              <code style={{ fontFamily: "'DM Mono', monospace", fontSize: "13px" }}>curl -sSL https://raw.githubusercontent.com/devdreiortiz/KSPR/main/bin/install.sh | bash</code>
+              <span style={{ color: "var(--muted)", fontSize: "13px", fontFamily: "'Montserrat', sans-serif", fontWeight: 600 }}>Instalación automática Bash</span>
+            </div>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 16px", background: "#f8f9fa", borderRadius: "8px", border: "1px solid var(--line)", flexWrap: "wrap", gap: 8 }}>
               <code style={{ fontFamily: "'DM Mono', monospace", fontSize: "13px" }}>npm install -g kspr-ai && kspr --help</code>
               <span style={{ color: "var(--muted)", fontSize: "13px", fontFamily: "'Montserrat', sans-serif", fontWeight: 600 }}>Instalación global npm</span>
             </div>
@@ -362,11 +366,7 @@ export function Landing() {
             </div>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 16px", background: "#f8f9fa", borderRadius: "8px", border: "1px solid var(--line)", flexWrap: "wrap", gap: 8 }}>
               <code style={{ fontFamily: "'DM Mono', monospace", fontSize: "13px" }}>bash bin/kspr.sh ./repo --output ./context</code>
-              <span style={{ color: "var(--muted)", fontSize: "13px", fontFamily: "'Montserrat', sans-serif", fontWeight: 600 }}>Wrapper Bash</span>
-            </div>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 16px", background: "#f8f9fa", borderRadius: "8px", border: "1px solid var(--line)", flexWrap: "wrap", gap: 8 }}>
-              <code style={{ fontFamily: "'DM Mono', monospace", fontSize: "13px" }}>bun run bin/kspr.bun --interactive</code>
-              <span style={{ color: "var(--muted)", fontSize: "13px", fontFamily: "'Montserrat', sans-serif", fontWeight: 600 }}>Wrapper Bun</span>
+              <span style={{ color: "var(--muted)", fontSize: "13px", fontFamily: "'Montserrat', sans-serif", fontWeight: 600 }}>Wrapper Bash local</span>
             </div>
           </div>
         </section>
