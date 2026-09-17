@@ -236,6 +236,7 @@ async def interactive_shell() -> None:
             elif cmd == "/help":
                 print_box("KSPR CLI Commands", [
                     "/help              - Muestra esta ayuda de comandos",
+                    "/api               - Configura proveedores y API Keys (Google, OpenAI, Groq, DeepSeek)",
                     "/analyze [path]    - Ejecuta el análisis estático",
                     "/model [name]      - Cambia o muestra el modelo activo",
                     "/provider [name]   - Cambia el proveedor (gemini/local/openai/groq/deepseek)",
@@ -284,6 +285,54 @@ async def interactive_shell() -> None:
                 for path in attached_files:
                     lines.append(f" - @{path}")
                 print_box("Active Context", lines, Color.BRIGHT_CYAN)
+            elif cmd == "/api":
+                providers_list = ["gemini", "openai", "groq", "deepseek", "local"]
+                print_box("API & Provider Configuration", [
+                    "Selecciona el proveedor para configurar su API Key:",
+                    " 1. gemini   (Google Generative AI)",
+                    " 2. openai   (OpenAI GPT-4 / GPT-3.5)",
+                    " 3. groq     (Groq Llama / Mixtral)",
+                    " 4. deepseek (Deepseek Chat / Reasoner)",
+                    " 5. local    (Modo local sin API Key)"
+                ], Color.BRIGHT_MAGENTA)
+                
+                prov_choice = arg.strip().lower() if arg else input(f"{Color.BRIGHT_MAGENTA}Elige proveedor (1-5 o nombre): {Color.RESET}").strip().lower()
+                
+                selected_prov = active_provider
+                if prov_choice in {"1", "gemini"}:
+                    selected_prov = "gemini"
+                elif prov_choice in {"2", "openai"}:
+                    selected_prov = "openai"
+                elif prov_choice in {"3", "groq"}:
+                    selected_prov = "groq"
+                elif prov_choice in {"4", "deepseek"}:
+                    selected_prov = "deepseek"
+                elif prov_choice in {"5", "local"}:
+                    selected_prov = "local"
+                elif prov_choice in providers_list:
+                    selected_prov = prov_choice
+                
+                if selected_prov == "local":
+                    print_colored("[✓] El proveedor local no requiere API Key.", Color.GREEN)
+                    active_provider = selected_prov
+                else:
+                    env_key = f"KSPR_{selected_prov.upper()}_API_KEY"
+                    current_key = os.getenv(env_key, "")
+                    masked = (current_key[:6] + "..." + current_key[-4:]) if len(current_key) > 10 else ("Configurada" if current_key else "No configurada")
+                    
+                    print_colored(f"[*] Proveedor seleccionado: {selected_prov}", Color.CYAN)
+                    print_colored(f"[*] Estado actual API Key: {masked}", Color.YELLOW)
+                    
+                    new_key = input(f"{Color.BRIGHT_CYAN}Introduce la API Key para {selected_prov}: {Color.RESET}").strip()
+                    if new_key:
+                        os.environ[env_key] = new_key
+                        if selected_prov == "gemini":
+                            os.environ["GEMINI_API_KEY"] = new_key
+                        print_colored(f"[✓] API Key para '{selected_prov}' guardada y aplicada exitosamente.", Color.GREEN)
+                        active_provider = selected_prov
+                    else:
+                        print_colored("[!] API Key no modificada (vacía).", Color.YELLOW)
+                print_dashboard(active_provider, active_model, active_agent, active_iterations, current_workspace, len(attached_files))
             elif cmd == "/analyze":
                 target_path = Path(arg) if arg else current_workspace
                 print_colored(f"[*] Iniciando análisis estático sobre {target_path}...", Color.YELLOW)
