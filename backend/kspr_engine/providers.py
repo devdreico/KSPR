@@ -77,7 +77,7 @@ class GeminiProvider(ModelProvider):
         full_text = f"{KSPR_I_SYSTEM_PROMPT}\n\n[INSTRUCCIÓN DEL USUARIO]:\n{prompt}"
         payload = {
             "contents": [{"role": "user", "parts": [{"text": full_text}]}],
-            "generationConfig": {"temperature": 0.2 if not effort or effort == "default" else 0.7, "maxOutputTokens": tokens},
+            "generationConfig": {"temperature": 0.0, "maxOutputTokens": tokens},
         }
         async with httpx.AsyncClient(timeout=180) as client:
             response = await client.post(url, headers=self._headers(), json=payload)
@@ -93,7 +93,7 @@ class GeminiProvider(ModelProvider):
         full_text = f"{KSPR_I_SYSTEM_PROMPT}\n\n[INSTRUCCIÓN DEL USUARIO]:\n{prompt}"
         payload = {
             "contents": [{"role": "user", "parts": [{"text": full_text}]}],
-            "generationConfig": {"temperature": 0.2 if not effort or effort == "default" else 0.7, "maxOutputTokens": tokens},
+            "generationConfig": {"temperature": 0.0, "maxOutputTokens": tokens},
         }
         chunks: list[str] = []
         async with httpx.AsyncClient(timeout=180) as client, client.stream("POST", url, params={"alt": "sse"}, headers=self._headers(), json=payload) as response:
@@ -197,7 +197,7 @@ class OpenAICompatibleProvider(ModelProvider):
         payload: dict[str, Any] = {
             "model": model,
             "messages": [{"role": "user", "content": prompt}],
-            "temperature": 0.2 if not effort or effort == "default" else 0.7,
+            "temperature": 0.0,
         }
         if effort and effort in {"low", "medium", "high"}:
             payload["reasoning_effort"] = effort
@@ -214,7 +214,7 @@ class OpenAICompatibleProvider(ModelProvider):
         payload: dict[str, Any] = {
             "model": model,
             "messages": [{"role": "user", "content": prompt}],
-            "temperature": 0.2 if not effort or effort == "default" else 0.7,
+            "temperature": 0.0,
             "stream": True,
         }
         if effort and effort in {"low", "medium", "high"}:
@@ -293,7 +293,7 @@ class OpenAIProvider(ModelProvider):
         payload: dict[str, Any] = {
             "model": model,
             "messages": [{"role": "user", "content": prompt}],
-            "temperature": 0.2 if not effort or effort == "default" else 0.7,
+            "temperature": 0.0,
         }
         if effort and effort in {"low", "medium", "high"}:
             payload["reasoning_effort"] = effort
@@ -310,7 +310,7 @@ class OpenAIProvider(ModelProvider):
         payload: dict[str, Any] = {
             "model": model,
             "messages": [{"role": "user", "content": prompt}],
-            "temperature": 0.2 if not effort or effort == "default" else 0.7,
+            "temperature": 0.0,
             "stream": True,
         }
         if effort and effort in {"low", "medium", "high"}:
@@ -389,7 +389,7 @@ class GroqProvider(ModelProvider):
         payload: dict[str, Any] = {
             "model": model,
             "messages": [{"role": "user", "content": prompt}],
-            "temperature": 0.2 if not effort or effort == "default" else 0.7,
+            "temperature": 0.0,
         }
         if effort and effort in {"low", "medium", "high"}:
             payload["reasoning_effort"] = effort
@@ -406,7 +406,7 @@ class GroqProvider(ModelProvider):
         payload: dict[str, Any] = {
             "model": model,
             "messages": [{"role": "user", "content": prompt}],
-            "temperature": 0.2 if not effort or effort == "default" else 0.7,
+            "temperature": 0.0,
             "stream": True,
         }
         if effort and effort in {"low", "medium", "high"}:
@@ -485,7 +485,7 @@ class DeepseekProvider(ModelProvider):
         payload: dict[str, Any] = {
             "model": model,
             "messages": [{"role": "user", "content": prompt}],
-            "temperature": 0.2 if not effort or effort == "default" else 0.7,
+            "temperature": 0.0,
         }
         if effort and effort in {"low", "medium", "high"}:
             payload["reasoning_effort"] = effort
@@ -502,7 +502,7 @@ class DeepseekProvider(ModelProvider):
         payload: dict[str, Any] = {
             "model": model,
             "messages": [{"role": "user", "content": prompt}],
-            "temperature": 0.2 if not effort or effort == "default" else 0.7,
+            "temperature": 0.0,
             "stream": True,
         }
         if effort and effort in {"low", "medium", "high"}:
