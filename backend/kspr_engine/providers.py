@@ -9,6 +9,7 @@ import httpx
 
 from .config import Settings
 from .models import ProviderName
+from .prompts import KSPR_I_SYSTEM_PROMPT
 
 
 class ProviderError(RuntimeError):
@@ -73,8 +74,9 @@ class GeminiProvider(ModelProvider):
     async def complete(self, prompt: str, model: str, effort: str | None = None) -> str:
         url = self.settings.gemini_base_url.rstrip("/") + f"/models/{model}:generateContent"
         tokens = 32768 if effort == "high" else (4096 if effort == "low" else 8192)
+        full_text = f"{KSPR_I_SYSTEM_PROMPT}\n\n[INSTRUCCIÓN DEL USUARIO]:\n{prompt}"
         payload = {
-            "contents": [{"role": "user", "parts": [{"text": prompt}]}],
+            "contents": [{"role": "user", "parts": [{"text": full_text}]}],
             "generationConfig": {"temperature": 0.2 if not effort or effort == "default" else 0.7, "maxOutputTokens": tokens},
         }
         async with httpx.AsyncClient(timeout=180) as client:
@@ -88,8 +90,9 @@ class GeminiProvider(ModelProvider):
     async def complete_stream(self, prompt: str, model: str, on_delta, effort: str | None = None) -> str:
         url = self.settings.gemini_base_url.rstrip("/") + f"/models/{model}:streamGenerateContent"
         tokens = 32768 if effort == "high" else (4096 if effort == "low" else 8192)
+        full_text = f"{KSPR_I_SYSTEM_PROMPT}\n\n[INSTRUCCIÓN DEL USUARIO]:\n{prompt}"
         payload = {
-            "contents": [{"role": "user", "parts": [{"text": prompt}]}],
+            "contents": [{"role": "user", "parts": [{"text": full_text}]}],
             "generationConfig": {"temperature": 0.2 if not effort or effort == "default" else 0.7, "maxOutputTokens": tokens},
         }
         chunks: list[str] = []

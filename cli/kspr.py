@@ -74,7 +74,6 @@ def print_box(title: str, lines: list[str], color: Color = Color.BRIGHT_GREEN) -
     
     print_colored(f"┌─ {title} " + "─" * max(0, width - len(title) - 4) + "┐", color)
     for line in lines:
-        # Pad line to fit box
         padding = max(0, width - len(line) - 4)
         print_colored(f"│  {line}" + " " * padding + "│", color)
     print_colored(f"└{horizontal}┘", color)
@@ -102,17 +101,17 @@ async def animate_spinner(task_coro, message: str) -> Any:
     
     task = asyncio.create_task(task_coro)
     
-    sys.stdout.write("\033[?25l") # Hide cursor
+    sys.stdout.write("\033[?25l")
     try:
         while not task.done():
             sys.stdout.write(f"\r{Color.BRIGHT_CYAN}{spinners[idx]} {message}{Color.RESET}")
             sys.stdout.flush()
             idx = (idx + 1) % len(spinners)
             await asyncio.sleep(0.08)
-        sys.stdout.write("\r\033[K") # Clear line
+        sys.stdout.write("\r\033[K")
         return await task
     finally:
-        sys.stdout.write("\033[?25h") # Show cursor
+        sys.stdout.write("\033[?25h")
         sys.stdout.flush()
 
 
@@ -155,6 +154,16 @@ def collect_source(source: Path) -> list[SourceFile]:
     if source.suffix.lower() == ".zip":
         return collect_zip(source)
     raise SystemExit("Error: La fuente debe ser un directorio o un archivo ZIP válido.")
+
+
+def run_update() -> None:
+    print_colored("[*] Actualizando KSPR AI a la última versión...", Color.CYAN)
+    cmd = "curl -sSL https://raw.githubusercontent.com/devdreiortiz/KSPR/main/bin/install.sh | bash"
+    try:
+        subprocess.run(cmd, shell=True, check=True)
+        print_colored("[✓] ¡KSPR se ha actualizado exitosamente!", Color.BRIGHT_GREEN)
+    except Exception as e:
+        print_colored(f"[!] Error al actualizar: {e}", Color.RED)
 
 
 # ---- Batch Analysis ----
@@ -211,13 +220,14 @@ async def interactive_shell() -> None:
     active_agent = "Architect"
     active_iterations = 3
     attached_files: dict[str, str] = {}
+    indexed_models: dict[str, list[dict[str, Any]]] = {}
 
     print_dashboard(active_provider, active_model, active_agent, active_iterations, current_workspace, len(attached_files))
     print()
 
     while True:
         try:
-            prompt = input(f"{Color.BRIGHT_CYAN}┌─[{active_agent.lower()}@{active_provider}] \n└─> {Color.RESET}").strip()
+            prompt = input(f"{Color.BRIGHT_CYAN}┌─[{active_agent.lower()}@{active_provider}:{active_model}] \n└─> {Color.RESET}").strip()
         except (KeyboardInterrupt, EOFError):
             print_colored("\n¡Hasta luego!", Color.MAGENTA)
             break
@@ -236,28 +246,51 @@ async def interactive_shell() -> None:
             elif cmd == "/help":
                 print_box("KSPR CLI Commands", [
                     "/help              - Muestra esta ayuda de comandos",
-                    "/api               - Configura proveedores y API Keys (Google, OpenAI, Groq, DeepSeek)",
+                    "/api               - Configura proveedores, API Keys e indexa modelos disponibles",
+                    "/model [name/num]  - Muestra, busca o selecciona un modelo indexado",
                     "/analyze [path]    - Ejecuta el análisis estático",
-                    "/model [name]      - Cambia o muestra el modelo activo",
-                    "/provider [name]   - Cambia el proveedor (gemini/local/openai/groq/deepseek)",
+                    "/provider [name]   - Cambia el proveedor activo",
                     "/agent [name]      - Establece el rol del agente (Architect, Developer, Auditor)",
                     "/iterations [n]    - Cambia iteraciones de análisis (1-8)",
                     "/context           - Muestra los archivos en contexto",
                     "/clear             - Limpia la pantalla y redibuja el dashboard",
-                    "/exit              - Sale de la sesión interactiva",
-                    "Ctrl+K             - Panel de configuración rápida (o /ctrlk)"
+                    "/update            - Actualiza KSPR a la última versión",
+                    "/exit              - Sale de la sesión interactiva"
                 ], Color.BRIGHT_BLUE)
             elif cmd == "/clear":
                 os.system("cls" if os.name == "nt" else "clear")
                 print_header()
                 print_dashboard(active_provider, active_model, active_agent, active_iterations, current_workspace, len(attached_files))
                 print()
+            elif cmd == "/update":
+                run_update()
             elif cmd == "/model":
                 if arg:
-                    active_model = arg
-                    print_colored(f"[✓] Modelo activo actualizado a: {active_model}", Color.GREEN)
+                    # Check if arg is a number selecting from indexed models
+                    if active_provider in indexed_models and arg.isdigit():
+                        idx = int(arg) - 1
+                        models = indexed_models[active_provider]
+                        if 0 <= idx < len(models):
+                            active_model = models[idx].get("id")
+                            print_colored(f"[✓] Modelo activo actualizado a: {active_model}", Color.GREEN)
+                        else:
+                            print_colored("[!] Índice de modelo fuera de rango.", Color.RED)
+                    else:
+                        active_model = arg
+                        print_colored(f"[✓] Modelo activo actualizado a: {active_model}", Color.GREEN)
+                elif active_provider in indexed_models and indexed_models[active_provider]:
+                    models = indexed_models[active_provider]
+                    print_box(f"Modelos Disponibles ({active_provider})", [f" {idx+1}. {m.get('id')} ({m.get('name', '')})" for idx, m in enumerate(models)], Color.BRIGHT_CYAN)
+                    m_choice = input(f"{Color.BRIGHT_CYAN}Elige número de modelo o escribe nombre: {Color.RESET}").strip()
+                    if m_choice.isdigit() and 1 <= int(m_choice) <= len(models):
+                        active_model = models[int(m_choice)-1].get("id")
+                        print_colored(f"[✓] Modelo activo actualizado a: {active_model}", Color.GREEN)
+                    elif m_choice:
+                        active_model = m_choice
+                        print_colored(f"[✓] Modelo activo actualizado a: {active_model}", Color.GREEN)
                 else:
                     print_colored(f"[*] Modelo activo actual: {active_model}", Color.CYAN)
+                    print_colored("[*] Consejo: Ejecuta /api para indexar automáticamente los modelos de tu proveedor.", Color.YELLOW)
                 print_dashboard(active_provider, active_model, active_agent, active_iterations, current_workspace, len(attached_files))
             elif cmd == "/provider":
                 if arg in {"gemini", "local", "openai", "groq", "deepseek"}:
@@ -288,7 +321,7 @@ async def interactive_shell() -> None:
             elif cmd == "/api":
                 providers_list = ["gemini", "openai", "groq", "deepseek", "local"]
                 print_box("API & Provider Configuration", [
-                    "Selecciona el proveedor para configurar su API Key:",
+                    "Selecciona el proveedor para configurar su API Key e indexar modelos:",
                     " 1. gemini   (Google Generative AI)",
                     " 2. openai   (OpenAI GPT-4 / GPT-3.5)",
                     " 3. groq     (Groq Llama / Mixtral)",
@@ -315,6 +348,7 @@ async def interactive_shell() -> None:
                 if selected_prov == "local":
                     print_colored("[✓] El proveedor local no requiere API Key.", Color.GREEN)
                     active_provider = selected_prov
+                    indexed_models[selected_prov] = [{"id": "kspr-local", "name": "KSPR Local Demo"}]
                 else:
                     env_key = f"KSPR_{selected_prov.upper()}_API_KEY"
                     current_key = os.getenv(env_key, "")
@@ -330,6 +364,24 @@ async def interactive_shell() -> None:
                             os.environ["GEMINI_API_KEY"] = new_key
                         print_colored(f"[✓] API Key para '{selected_prov}' guardada y aplicada exitosamente.", Color.GREEN)
                         active_provider = selected_prov
+                        
+                        # Automatically index models
+                        try:
+                            settings = Settings()
+                            temp_prov = get_provider(ProviderName(selected_prov), settings, api_key=new_key)
+                            print_colored(f"[*] Indexando modelos disponibles desde la API de {selected_prov}...", Color.YELLOW)
+                            models = await animate_spinner(temp_prov.list_models(), f"Consultando modelos de {selected_prov}...")
+                            if models:
+                                indexed_models[selected_prov] = models
+                                model_lines = [f" {idx+1}. {m.get('id')} ({m.get('name', '')})" for idx, m in enumerate(models[:20])]
+                                print_box(f"Modelos Indexados ({selected_prov}) - Total: {len(models)}", model_lines, Color.BRIGHT_GREEN)
+                                active_model = models[0].get("id")
+                                print_colored(f"[✓] Modelo predeterminado establecido a: {active_model}", Color.GREEN)
+                            else:
+                                print_colored("[!] No se encontraron modelos en la respuesta de la API.", Color.YELLOW)
+                        except Exception as ex:
+                            print_colored(f"[!] No se pudieron indexar modelos automáticamente: {ex}", Color.RED)
+                            print_colored("[*] Puedes configurar el modelo manualmente usando /model <nombre>", Color.YELLOW)
                     else:
                         print_colored("[!] API Key no modificada (vacía).", Color.YELLOW)
                 print_dashboard(active_provider, active_model, active_agent, active_iterations, current_workspace, len(attached_files))
@@ -339,37 +391,6 @@ async def interactive_shell() -> None:
                 await run_batch_analysis(
                     target_path, None, target_path.parent / "kspr-context", None, active_iterations, active_provider, active_model
                 )
-            elif cmd == "/ctrlk" or cmd == "ctrl+k":
-                print_box("Panel de Configuración Rápida (Ctrl+K)", [
-                    f"1. Cambiar proveedor   [ Actual: {active_provider} ]",
-                    f"2. Cambiar modelo      [ Actual: {active_model} ]",
-                    f"3. Cambiar esfuerzo    [ Actual: {active_iterations} iteraciones ]",
-                    f"4. Cambiar agente      [ Actual: {active_agent} ]",
-                    "5. Salir del panel"
-                ], Color.BRIGHT_MAGENTA)
-                choice = input(f"{Color.BRIGHT_MAGENTA}Selecciona opción (1-5): {Color.RESET}").strip()
-                
-                if choice == "1":
-                    p = input("Nuevo proveedor (gemini, local, openai, groq, deepseek): ").strip().lower()
-                    if p in {"gemini", "local", "openai", "groq", "deepseek"}:
-                        active_provider = p
-                        print_colored(f"[✓] Proveedor cambiado a: {p}", Color.GREEN)
-                elif choice == "2":
-                    m = input("Nuevo modelo: ").strip()
-                    if m:
-                        active_model = m
-                        print_colored(f"[✓] Modelo cambiado a: {m}", Color.GREEN)
-                elif choice == "3":
-                    it = input("Iteraciones (1-8): ").strip()
-                    if it.isdigit() and 1 <= int(it) <= 8:
-                        active_iterations = int(it)
-                        print_colored(f"[✓] Iteraciones cambiadas a: {it}", Color.GREEN)
-                elif choice == "4":
-                    ag = input("Agente (Architect, Developer, Auditor): ").strip()
-                    if ag:
-                        active_agent = ag
-                        print_colored(f"[✓] Agente cambiado a: {ag}", Color.GREEN)
-                print_dashboard(active_provider, active_model, active_agent, active_iterations, current_workspace, len(attached_files))
             else:
                 print_colored(f"[!] Comando desconocido: {cmd}. Escribe /help para ver los comandos.", Color.YELLOW)
             print()
@@ -404,7 +425,6 @@ async def interactive_shell() -> None:
 
             response = await animate_spinner(call_llm(), f"KSPR I ({active_agent}) procesando con {active_provider}:{active_model}...")
             
-            # Print response in decorated box
             response_lines = response.splitlines()
             print_box(f"KSPR I · {active_agent} ({active_provider}:{active_model})", response_lines if response_lines else [response], Color.BRIGHT_CYAN)
             if attached_files:
@@ -426,6 +446,10 @@ async def interactive_shell() -> None:
 
 
 def main() -> None:
+    if len(sys.argv) > 1 and sys.argv[1] == "update":
+        run_update()
+        return
+
     parser = argparse.ArgumentParser(prog="kspr", description="KSPR AI - Empresarial CLI Engine")
     parser.add_argument("-V", "--version", action="version", version=f"%(prog)s {__version__}", help="Muestra la versión y sale")
     parser.add_argument("source", type=Path, nargs="?", default=None, help="Ruta al directorio o ZIP a analizar (si se omite, abre el shell interactivo)")
