@@ -131,12 +131,15 @@ async def analyze(
     for iteration in range(1, request.iterations + 1):
         if on_progress:
             await on_progress(10 + iteration * (55 // request.iterations), "reasoning", f"Iteración {iteration}/{request.iterations}: revisión de evidencia")
+        # Extraer contenido de personality.md si viene en los archivos del request
+        personality_file = next((f.content for f in request.files if f.path == "personality.md"), "")
         prompt = build_master_prompt(
             request.project_name,
             {**report, "source_context": source_context},
             iteration,
             prior_review,
             instruction=request.instruction or "",
+            personality_content=personality_file,
         )
         stream_completion = getattr(provider, "complete_stream", None)
         if on_token and stream_completion:

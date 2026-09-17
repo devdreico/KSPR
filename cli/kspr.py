@@ -19,23 +19,7 @@ from kspr_engine.models import AnalysisRequest, SourceFile
 
 __version__ = "0.1.0"
 
-KSPR_ASCII = r"""
-XXXX
- XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-XXX         XXXXX          XXX
-XXX         XXXXX          XXX
-XXX         XXXXX          XXX
-XXX         XXXXX          XXX
-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-XXXXXXXXXXXXXX  XXXXXXXXXXXXXX
- XXXXXXXXXXXX    XXXXXXXXXXXX
-  XXXXXXXXXX      XXXXXXXXXX
-  XXXXXXXXXX      XXXXXXXXXX
-"""
+KSPR_ASCII = "\n".join(("▓▓▓▓▓▓▓▓▓", "▓  ▓▓  ▓ ", "▓▓▓▓▓▓▓▓ ", "▓▓▓  ▓▓▓ "))
 
 ALLOWED = {".py", ".js", ".jsx", ".ts", ".tsx", ".cs", ".java", ".sql", ".html", ".vue", ".php", ".md", ".txt", ".json", ".yaml", ".yml"}
 

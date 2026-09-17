@@ -308,9 +308,7 @@ export function Landing() {
                   <div style={{ color: "#71717a" }}># Iniciar el shell interactivo OpenCode con el logotipo ASCII</div>
                   <div style={{ color: "#4ade80", margin: "8px 0" }}>$ kspr --interactive</div>
                   <div style={{ color: "#e2e8f0", marginTop: "6px" }}>
-                    XXXX<br/>
-                    &nbsp;XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX<br/>
-                    XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX<br/>
+                    <pre aria-label="Logotipo KSPR" style={{ whiteSpace: "pre", lineHeight: 1.2 }}>{["▓▓▓▓▓▓▓▓▓", "▓  ▓▓  ▓ ", "▓▓▓▓▓▓▓▓ ", "▓▓▓  ▓▓▓ "].join("\n")}</pre>
                     <span style={{ color: "#38bdf8" }}>  KSPR CLI — OpenCode Interactive Terminal Agent (v0.1.0)</span><br/>
                     <span style={{ color: "#a1a1aa" }}>  Escribe una consulta, referencia archivos con @ o usa /help para comandos.</span><br/>
                     <span style={{ color: "#4ade80" }}>kspr (architect)&gt; /help</span>
