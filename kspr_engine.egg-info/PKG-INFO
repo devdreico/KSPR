@@ -1,7 +1,7 @@
 Metadata-Version: 2.4
 Name: kspr-engine
 Version: 0.1.0
-Summary: CASPER AI - Empresarial — Powered by KSPR Engine
+Summary: KSPR AI - Empresarial — Powered by KSPR Engine
 Requires-Python: >=3.11
 Requires-Dist: fastapi>=0.115.0
 Requires-Dist: httpx>=0.27.0
