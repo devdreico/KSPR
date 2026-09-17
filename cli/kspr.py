@@ -8,6 +8,7 @@ import os
 import subprocess
 import sys
 import tempfile
+import time
 import zipfile
 from pathlib import Path
 
@@ -20,7 +21,6 @@ from kspr_engine.providers import get_provider, ProviderName, ProviderError
 
 __version__ = "0.1.0"
 
-# Color codes for terminal
 class Color:
     """ANSI color codes for terminal styling."""
     RESET = "\033[0m"
@@ -28,7 +28,6 @@ class Color:
     DIM = "\033[2m"
     UNDERLINE = "\033[4m"
     
-    # Foreground colors
     BLACK = "\033[30m"
     RED = "\033[31m"
     GREEN = "\033[32m"
@@ -38,7 +37,6 @@ class Color:
     CYAN = "\033[36m"
     WHITE = "\033[37m"
     
-    # Bright foreground colors
     BRIGHT_BLACK = "\033[90m"
     BRIGHT_RED = "\033[91m"
     BRIGHT_GREEN = "\033[92m"
@@ -47,67 +45,80 @@ class Color:
     BRIGHT_MAGENTA = "\033[95m"
     BRIGHT_CYAN = "\033[96m"
     BRIGHT_WHITE = "\033[97m"
-    
-    # Background colors
-    BG_BLACK = "\033[40m"
-    BG_RED = "\033[41m"
-    BG_GREEN = "\033[42m"
-    BG_YELLOW = "\033[43m"
-    BG_BLUE = "\033[44m"
-    BG_MAGENTA = "\033[45m"
-    BG_CYAN = "\033[46m"
-    BG_WHITE = "\033[47m"
 
-KSPR_ASCII = "\n".join(("▒▒▒▒▒▒▒▒▒▒▒▒ ▒▒ ▒▒ ▒▒▒▒▒▒▒▒▒ ▒▒▒▒▒  ",
- "▒   ▒   ▒  ▒▒▒  ▒▒▒  ▒   ▒▒   ▒▒",
- "▒▒▒▒▒▒▒▒▒  ▒▒ ▒   ▒▒ ▒▒▒▒▒▒▒▒▒▒  ",
- "▒▒▒   ▒▒▒  ▒▒  ▒▒▒▒▒ ▒▒   ▒▒  ▒▒",
- " ▒▒▒ ▒ ▒▒▒ ▒▒▒ ▒▒▒  ▒▒▒ ▒ ▒▒▒▒  ",
- "  ▒▒▒ ▒  █ █  █ █ █  █ █  █ █ █  ",
- "   █ █   █ █ █ █ █ █  █ █  █ █ █  ",
- "    █    █ █  █ █  █  █ █  █ █  █",
- "     █    █ █  █ █ █  █  █  █ █"))
-
+KSPR_ASCII = [
+    "▒▒▒▒▒▒▒▒▒▒▒▒ ▒▒ ▒▒ ▒▒▒▒▒▒▒▒▒ ▒▒▒▒▒  ",
+    "▒   ▒   ▒  ▒▒▒  ▒▒▒  ▒   ▒▒   ▒▒",
+    "▒▒▒▒▒▒▒▒▒  ▒▒ ▒   ▒▒ ▒▒▒▒▒▒▒▒▒▒  ",
+    "▒▒▒   ▒▒▒  ▒▒  ▒▒▒▒▒ ▒▒   ▒▒  ▒▒",
+    " ▒▒▒ ▒ ▒▒▒ ▒▒▒ ▒▒▒  ▒▒▒ ▒ ▒▒▒▒  ",
+    "  ▒▒▒ ▒  █ █  █ █ █  █ █  █ █ █  ",
+    "   █ █   █ █ █ █ █ █  █ █  █ █ █  ",
+    "    █    █ █  █ █  █  █ █  █ █  █",
+    "     █    █ █  █ █ █  █  █  █ █"
+]
 
 ALLOWED = {".py", ".js", ".jsx", ".ts", ".tsx", ".cs", ".java", ".sql", ".html", ".vue", ".php", ".md", ".txt", ".json", ".yaml", ".yml"}
 
 
 def print_colored(text: str, color: Color, bold: bool = False) -> None:
-    """Print text with color styling."""
     prefix = Color.BOLD if bold else ""
-    suffix = Color.RESET
-    print(f"{color}{prefix}{text}{suffix}")
+    print(f"{color}{prefix}{text}{Color.RESET}")
+
+
+def get_terminal_width() -> int:
+    try:
+        return os.get_terminal_size().columns
+    except OSError:
+        return 80
+
+
+def print_box(title: str, lines: list[str], color: Color = Color.BRIGHT_GREEN) -> None:
+    width = min(max(len(title) + 4, max((len(l) for l in lines), default=40) + 4), get_terminal_width() - 2)
+    horizontal = "─" * (width - 2)
+    
+    print_colored(f"┌─ {title} " + "─" * max(0, width - len(title) - 4) + "┐", color)
+    for line in lines:
+        # Pad line to fit box
+        padding = max(0, width - len(line) - 4)
+        print_colored(f"│  {line}" + " " * padding + "│", color)
+    print_colored(f"└{horizontal}┘", color)
 
 
 def print_header() -> None:
-    """Print the KSPR CLI header."""
-    print_colored("▒▒▒▒▒▒▒▒▒▒▒▒ ▒▒ ▒▒ ▒▒▒▒▒▒▒▒▒ ▒▒▒▒▒  ", Color.BRIGHT_GREEN, True)
-    print_colored("▒   ▒   ▒  ▒▒▒  ▒▒▒  ▒   ▒▒   ▒▒", Color.BRIGHT_GREEN)
-    print_colored("▒▒▒▒▒▒▒▒▒  ▒▒ ▒   ▒▒ ▒▒▒▒▒▒▒▒▒▒  ", Color.BRIGHT_GREEN)
-    print_colored("▒▒▒   ▒▒▒  ▒▒  ▒▒▒▒▒ ▒▒   ▒▒  ▒▒", Color.BRIGHT_GREEN)
-    print_colored(" ▒▒▒ ▒ ▒▒▒ ▒▒▒ ▒▒▒  ▒▒▒ ▒ ▒▒▒▒  ", Color.BRIGHT_GREEN)
-    print_colored("  ▒▒▒ ▒  █ █  █ █ █  █ █  █ █ █  ", Color.BRIGHT_GREEN)
-    print_colored("   █ █   █ █ █ █ █ █  █ █  █ █ █  ", Color.BRIGHT_GREEN)
-    print_colored("    █    █ █  █ █  █  █ █  █ █  █", Color.BRIGHT_GREEN)
-    print_colored("     █    █ █  █ █ █  █  █  █ █", Color.BRIGHT_GREEN)
+    for line in KSPR_ASCII:
+        print_colored(line, Color.BRIGHT_GREEN, True)
     print()
 
 
-def print_colored_center(text: str, color: Color = Color.BRIGHT_CYAN) -> None:
-    """Print centered text with color."""
-    terminal_width = os.get_terminal_size().columns
-    padding = (terminal_width - len(text)) // 2
-    print_colorized = color + Color.BOLD + " " * padding + text + Color.RESET
-    print(print_colorized)
+def print_dashboard(provider: str, model: str, agent: str, iterations: int, workspace: Path, attached_count: int) -> None:
+    width = min(get_terminal_width() - 2, 82)
+    horizontal = "─" * (width - 2)
+    
+    print_colored(f"┌{horizontal}┐", Color.CYAN)
+    print_colored(f"│ {Color.BOLD}KSPR CLI v0.1.0{Color.RESET} │ {Color.YELLOW}Provider:{Color.RESET} {provider:<10} │ {Color.YELLOW}Model:{Color.RESET} {model:<18} │ {Color.YELLOW}Iter:{Color.RESET} {iterations} │", Color.CYAN)
+    print_colored(f"│ {Color.YELLOW}Agent:{Color.RESET} {agent:<10} │ {Color.YELLOW}Workspace:{Color.RESET} {str(workspace):<36} │ {Color.YELLOW}Files:{Color.RESET} {attached_count:<3} │", Color.CYAN)
+    print_colored(f"└{horizontal}┘", Color.CYAN)
 
 
-def print_divider(color: Color = Color.BRIGHT_BLACK) -> None:
-    """Print a divider line."""
+async def animate_spinner(task_coro, message: str) -> Any:
+    spinners = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"]
+    idx = 0
+    
+    task = asyncio.create_task(task_coro)
+    
+    sys.stdout.write("\033[?25l") # Hide cursor
     try:
-        term_width = os.get_terminal_size().columns
-    except OSError:
-        term_width = 80
-    print_colored("─" * term_width, color)
+        while not task.done():
+            sys.stdout.write(f"\r{Color.BRIGHT_CYAN}{spinners[idx]} {message}{Color.RESET}")
+            sys.stdout.flush()
+            idx = (idx + 1) % len(spinners)
+            await asyncio.sleep(0.08)
+        sys.stdout.write("\r\033[K") # Clear line
+        return await task
+    finally:
+        sys.stdout.write("\033[?25h") # Show cursor
+        sys.stdout.flush()
 
 
 # ---- Collect functions ----
@@ -151,7 +162,7 @@ def collect_source(source: Path) -> list[SourceFile]:
     raise SystemExit("Error: La fuente debe ser un directorio o un archivo ZIP válido.")
 
 
-# ---- Analysis functions ----
+# ---- Batch Analysis ----
 
 async def run_batch_analysis(source: Path, git_url: str | None, output: Path, project_name: str | None, iterations: int, provider: str, model: str | None) -> None:
     if git_url:
@@ -184,22 +195,20 @@ async def run_batch_analysis(source: Path, git_url: str | None, output: Path, pr
         target.parent.mkdir(parents=True, exist_ok=True)
         target.write_text(artifact.content, encoding="utf-8")
 
-    print_colored("\n" + "="*60, Color.BRIGHT_GREEN)
-    print_colored(f" ✓ KSPR completó el análisis con éxito", Color.BRIGHT_GREEN)
-    print_colored(f" • ID de Sesión: {result.analysis_id}", Color.WHITE)
-    print_colored(f" • Archivos analizados: {result.summary.files_analyzed}", Color.WHITE)
-    print_colored(f" • Elementos UI detectados: {result.summary.ui_elements}", Color.WHITE)
-    print_colored(f" • Flujos mapeados: {result.summary.flows}", Color.WHITE)
-    print_colored(f" • Artefactos exportados: {len(result.artifacts)}", Color.WHITE)
-    print_colored(f" • Directorio de salida: {output.resolve()}", Color.WHITE)
-    print_colored("="*60 + "\n", Color.BRIGHT_GREEN)
+    print_box("KSPR Analysis Success", [
+        f"Session ID: {result.analysis_id}",
+        f"Files Analyzed: {result.summary.files_analyzed}",
+        f"UI Elements: {result.summary.ui_elements}",
+        f"Flows Mapped: {result.summary.flows}",
+        f"Exported Artifacts: {len(result.artifacts)}",
+        f"Output Directory: {output.resolve()}"
+    ], Color.BRIGHT_GREEN)
 
 
 # ---- Interactive Shell ----
 
 async def interactive_shell() -> None:
     print_header()
-    print_divider(Color.BRIGHT_BLACK)
     
     current_workspace = Path.cwd()
     active_model = "gemini-2.5-flash"
@@ -208,9 +217,12 @@ async def interactive_shell() -> None:
     active_iterations = 3
     attached_files: dict[str, str] = {}
 
+    print_dashboard(active_provider, active_model, active_agent, active_iterations, current_workspace, len(attached_files))
+    print()
+
     while True:
         try:
-            prompt = input(f"\033[36mkspr ({active_agent.lower()})>\033[0m ").strip()
+            prompt = input(f"{Color.BRIGHT_CYAN}┌─[{active_agent.lower()}@{active_provider}] \n└─> {Color.RESET}").strip()
         except (KeyboardInterrupt, EOFError):
             print_colored("\n¡Hasta luego!", Color.MAGENTA)
             break
@@ -227,57 +239,56 @@ async def interactive_shell() -> None:
                 print_colored("Saliendo de la sesión de KSPR CLI.", Color.MAGENTA)
                 break
             elif cmd == "/help":
-                print_colored("\nComandos disponibles en KSPR CLI:", Color.BRIGHT_BLUE)
-                print_colored("  /help              Muestra esta ayuda de comandos", Color.WHITE)
-                print_colored("  /analyze [path]    Ejecuta el análisis estático", Color.WHITE)
-                print_colored("  /model [name]      Cambia o muestra el modelo activo", Color.WHITE)
-                print_colored("  /provider [name]   Cambia el proveedor (gemini/local/openai/groq/deepseek)", Color.WHITE)
-                print_colored("  /agent [name]      Establece el rol del agente", Color.WHITE)
-                print_colored("  /iterations [n]    Cambia iteraciones (1-8)", Color.WHITE)
-                print_colored("  /context           Muestra archivos en contexto", Color.WHITE)
-                print_colored("  /clear             Limpia la pantalla", Color.WHITE)
-                print_colored("  /exit              Sale de la sesión interactiva", Color.WHITE)
-                print_colored("  Ctrl+K             Panel de configuración rápida", Color.WHITE)
-                print_divider(Color.BRIGHT_BLACK)
+                print_box("KSPR CLI Commands", [
+                    "/help              - Muestra esta ayuda de comandos",
+                    "/analyze [path]    - Ejecuta el análisis estático",
+                    "/model [name]      - Cambia o muestra el modelo activo",
+                    "/provider [name]   - Cambia el proveedor (gemini/local/openai/groq/deepseek)",
+                    "/agent [name]      - Establece el rol del agente (Architect, Developer, Auditor)",
+                    "/iterations [n]    - Cambia iteraciones de análisis (1-8)",
+                    "/context           - Muestra los archivos en contexto",
+                    "/clear             - Limpia la pantalla y redibuja el dashboard",
+                    "/exit              - Sale de la sesión interactiva",
+                    "Ctrl+K             - Panel de configuración rápida (o /ctrlk)"
+                ], Color.BRIGHT_BLUE)
             elif cmd == "/clear":
                 os.system("cls" if os.name == "nt" else "clear")
                 print_header()
-                print_divider(Color.BRIGHT_BLACK)
+                print_dashboard(active_provider, active_model, active_agent, active_iterations, current_workspace, len(attached_files))
+                print()
             elif cmd == "/model":
                 if arg:
                     active_model = arg
-                    print_colored(f"[*] Modelo activo actualizado a: {active_model}", Color.GREEN)
+                    print_colored(f"[✓] Modelo activo actualizado a: {active_model}", Color.GREEN)
                 else:
-                    print_colored(f"[*] Modelo activo: {active_model}", Color.CYAN)
+                    print_colored(f"[*] Modelo activo actual: {active_model}", Color.CYAN)
+                print_dashboard(active_provider, active_model, active_agent, active_iterations, current_workspace, len(attached_files))
             elif cmd == "/provider":
                 if arg in {"gemini", "local", "openai", "groq", "deepseek"}:
                     active_provider = arg
-                    print_colored(f"[*] Proveedor activo actualizado a: {active_provider}", Color.GREEN)
+                    print_colored(f"[✓] Proveedor activo actualizado a: {active_provider}", Color.GREEN)
                 else:
-                    print_colored(f"[*] Proveedor activo: {active_provider} (opciones: gemini/local/openai/groq/deepseek)", Color.YELLOW)
+                    print_colored(f"[!] Proveedor activo actual: {active_provider} (opciones: gemini, local, openai, groq, deepseek)", Color.YELLOW)
+                print_dashboard(active_provider, active_model, active_agent, active_iterations, current_workspace, len(attached_files))
             elif cmd == "/agent":
                 if arg:
                     active_agent = arg
-                    print_colored(f"[*] Agente activo actualizado a: {active_agent}", Color.GREEN)
+                    print_colored(f"[✓] Agente activo actualizado a: {active_agent}", Color.GREEN)
                 else:
-                    print_colored(f"[*] Agente activo: {active_agent}", Color.CYAN)
+                    print_colored(f"[*] Agente activo actual: {active_agent}", Color.CYAN)
+                print_dashboard(active_provider, active_model, active_agent, active_iterations, current_workspace, len(attached_files))
             elif cmd == "/iterations":
                 if arg.isdigit() and 1 <= int(arg) <= 8:
                     active_iterations = int(arg)
-                    print_colored(f"[*] Iteraciones activas actualizadas a: {active_iterations}", Color.GREEN)
+                    print_colored(f"[✓] Iteraciones activas actualizadas a: {active_iterations}", Color.GREEN)
                 else:
-                    print_colored(f"[*] Iteraciones activas: {active_iterations} (rango 1-8)", Color.YELLOW)
-                    print_colored("      Uso: /iterations <1-8>", Color.DIM)
+                    print_colored(f"[*] Iteraciones activas actuales: {active_iterations} (rango 1-8)", Color.YELLOW)
+                print_dashboard(active_provider, active_model, active_agent, active_iterations, current_workspace, len(attached_files))
             elif cmd == "/context":
-                print_colored(f"\nWorkspace actual: {current_workspace}", Color.CYAN)
-                print_colored(f"Archivos adjuntos en contexto ({len(attached_files)}):", Color.CYAN)
+                lines = [f"Workspace: {current_workspace}", f"Archivos adjuntos ({len(attached_files)}):"]
                 for path in attached_files:
-                    print_colored(f" - @{path}", Color.WHITE)
-                print_divider(Color.BRIGHT_BLACK)
-            elif cmd == "/clear":
-                os.system("cls" if os.name == "nt" else "clear")
-                print_header()
-                print_divider(Color.BRIGHT_BLACK)
+                    lines.append(f" - @{path}")
+                print_box("Active Context", lines, Color.BRIGHT_CYAN)
             elif cmd == "/analyze":
                 target_path = Path(arg) if arg else current_workspace
                 print_colored(f"[*] Iniciando análisis estático sobre {target_path}...", Color.YELLOW)
@@ -285,54 +296,39 @@ async def interactive_shell() -> None:
                     target_path, None, target_path.parent / "kspr-context", None, active_iterations, active_provider, active_model
                 )
             elif cmd == "/ctrlk" or cmd == "ctrl+k":
-                # Show the configuration panel
-                print_colored("\n=== Panel de Configuración Rápida ===", Color.BRIGHT_MAGENTA)
-                print_colored(f"1. Cambiar proveedor   (Actual: {active_provider})", Color.WHITE)
-                print_colored(f"2. Cambiar modelo      (Actual: {active_model})", Color.WHITE)
-                print_colored(f"3. Cambiar esfuerzo    (Actual: {active_iterations} iteraciones)", Color.WHITE)
-                print_colored("4. Agregar API Key", Color.WHITE)
-                print_colored("5. Salir del panel (ESC)", Color.WHITE)
-                print_colored("Selecciona una opción (1-5) o presiona ESC para cancelar", Color.DIM)
-                choice = input("\nOpción: ").strip()
+                print_box("Panel de Configuración Rápida (Ctrl+K)", [
+                    f"1. Cambiar proveedor   [ Actual: {active_provider} ]",
+                    f"2. Cambiar modelo      [ Actual: {active_model} ]",
+                    f"3. Cambiar esfuerzo    [ Actual: {active_iterations} iteraciones ]",
+                    f"4. Cambiar agente      [ Actual: {active_agent} ]",
+                    "5. Salir del panel"
+                ], Color.BRIGHT_MAGENTA)
+                choice = input(f"{Color.BRIGHT_MAGENTA}Selecciona opción (1-5): {Color.RESET}").strip()
                 
                 if choice == "1":
-                    print_colored("\nProveedores disponibles: gemini, local, openai, groq, deepseek", Color.CYAN)
-                    new_provider = input("Nuevo proveedor: ").strip().lower()
-                    if new_provider in {"gemini", "local", "openai", "groq", "deepseek"}:
-                        active_provider = new_provider
-                        print_colored(f"[*] Proveedor cambiado a: {new_provider}", Color.GREEN)
-                    else:
-                        print_colored("[!] Proveedor no válido", Color.YELLOW)
+                    p = input("Nuevo proveedor (gemini, local, openai, groq, deepseek): ").strip().lower()
+                    if p in {"gemini", "local", "openai", "groq", "deepseek"}:
+                        active_provider = p
+                        print_colored(f"[✓] Proveedor cambiado a: {p}", Color.GREEN)
                 elif choice == "2":
-                    print_colored("\nIngresa el nombre del modelo:", Color.CYAN)
-                    new_model = input("Nuevo modelo: ").strip()
-                    if new_model:
-                        active_model = new_model
-                        print_colored(f"[*] Modelo cambiado a: {new_model}", Color.GREEN)
-                    else:
-                        print_colored("[!] Nombre de modelo vacío", Color.YELLOW)
+                    m = input("Nuevo modelo: ").strip()
+                    if m:
+                        active_model = m
+                        print_colored(f"[✓] Modelo cambiado a: {m}", Color.GREEN)
                 elif choice == "3":
-                    print_colored("\nNúmero de iteraciones (1-8):", Color.CYAN)
-                    new_iterations_input = input("Nuevas iteraciones: ").strip()
-                    if new_iterations_input.isdigit() and 1 <= int(new_iterations_input) <= 8:
-                        active_iterations = int(new_iterations_input)
-                        print_colored(f"[*] Iteraciones cambiadas a: {active_iterations}", Color.GREEN)
-                    else:
-                        print_colored("[!] Valor inválido, rango 1-8", Color.YELLOW)
+                    it = input("Iteraciones (1-8): ").strip()
+                    if it.isdigit() and 1 <= int(it) <= 8:
+                        active_iterations = int(it)
+                        print_colored(f"[✓] Iteraciones cambiadas a: {it}", Color.GREEN)
                 elif choice == "4":
-                    print_colored("\nIngresa la API Key:", Color.CYAN)
-                    api_key = input("API Key: ").strip()
-                    if api_key:
-                        print_colored("[*] API Key guardada en sesión actual", Color.GREEN)
-                    else:
-                        print_colored("[!] API Key vacía", Color.YELLOW)
-                elif choice == "5":
-                    print_colored("[*] Panel cancelado", Color.MAGENTA)
-                else:
-                    print_colored("[!] Opción no válida", Color.YELLOW)
-                print_divider(Color.BRIGHT_BLACK)
+                    ag = input("Agente (Architect, Developer, Auditor): ").strip()
+                    if ag:
+                        active_agent = ag
+                        print_colored(f"[✓] Agente cambiado a: {ag}", Color.GREEN)
+                print_dashboard(active_provider, active_model, active_agent, active_iterations, current_workspace, len(attached_files))
             else:
-                print_colored(f"Comando desconocido: {cmd}. Escribe /help para ver los comandos disponibles.", Color.YELLOW)
+                print_colored(f"[!] Comando desconocido: {cmd}. Escribe /help para ver los comandos.", Color.YELLOW)
+            print()
             continue
 
         # Handle file references like @filename
@@ -353,33 +349,36 @@ async def interactive_shell() -> None:
                 else:
                     print_colored(f"[!] Archivo no encontrado: {filepath}", Color.YELLOW)
 
-        print_colored(f"\n[{active_agent}] Analizando instrucción con {active_provider} ({active_model})...", Color.BLUE)
-        if referenced_content:
-            print_colored(f"[*] Incluyendo {len(attached_files)} referencia(s) de archivos en la consulta.", Color.BLUE)
-        
-        # Actually call the provider to get a real response
+        # Call the provider with animated spinner
         try:
             settings = Settings()
-            provider = get_provider(ProviderName(active_provider.lower()), settings, api_key=getattr(settings, f'{active_provider.lower()}_api_key', None))
-            response = await provider.complete(prompt, active_model, effort=None if active_iterations < 3 else "high")
-            print_colored(f"\nRespuesta del Agente ({active_agent}):", Color.BRIGHT_CYAN)
-            print(response)
+            provider_instance = get_provider(ProviderName(active_provider.lower()), settings, api_key=getattr(settings, f'{active_provider.lower()}_api_key', None))
+            
+            async def call_llm():
+                full_prompt = referenced_content + "\n\n" + prompt if referenced_content else prompt
+                return await provider_instance.complete(full_prompt, active_model, effort=None if active_iterations < 3 else "high")
+
+            response = await animate_spinner(call_llm(), f"KSPR I ({active_agent}) procesando con {active_provider}:{active_model}...")
+            
+            # Print response in decorated box
+            response_lines = response.splitlines()
+            print_box(f"KSPR I · {active_agent} ({active_provider}:{active_model})", response_lines if response_lines else [response], Color.BRIGHT_CYAN)
             if attached_files:
-                print_colored(f"Archivos considerados en la memoria de sesión: {list(attached_files.keys())}", Color.WHITE)
+                print_colored(f"[*] Contexto activo: {list(attached_files.keys())}", Color.DIM)
         except ProviderError as e:
-            print_colored(f"\nError de proveedor: {e}", Color.RED)
-            print_colored("Intentando con modo local de demostración...", Color.YELLOW)
+            print_colored(f"\n[!] Error de proveedor: {e}", Color.RED)
+            print_colored("[*] Intentando fallback con modo local...", Color.YELLOW)
             local_provider = get_provider(ProviderName.local, settings)
             response = await local_provider.complete(prompt, 'kspr-local')
-            print_colored(f"\nRespuesta del Agente ({active_agent} - local):", Color.BRIGHT_CYAN)
-            print(response)
+            print_box(f"KSPR I · {active_agent} (Fallback Local)", response.splitlines(), Color.YELLOW)
         except Exception as e:
-            print_colored(f"\nError inesperado: {e}", Color.RED)
-            print_colored("Mostrando respuesta de fallback...", Color.YELLOW)
-            print_colored(f"\nRespuesta del Agente ({active_agent}):", Color.YELLOW)
-            print_colored("KSPR I está funcionando en modo local de demostración. Conecta Gemini o un gateway compatible para obtener razonamiento LLM sobre el contexto entregado.", Color.YELLOW)
+            print_colored(f"\n[!] Error inesperado: {e}", Color.RED)
+            print_box(f"KSPR I · {active_agent} (Fallback)", [
+                "KSPR I está funcionando en modo local de demostración.",
+                "Conecta un proveedor válido para obtener razonamiento LLM completo."
+            ], Color.YELLOW)
         
-        print_divider(Color.BRIGHT_BLACK)
+        print()
 
 
 def main() -> None:
@@ -391,7 +390,7 @@ def main() -> None:
     parser.add_argument("--output", type=Path, default=Path("kspr-context"), help="Directorio de salida para los artefactos Markdown")
     parser.add_argument("--project-name", default=None, help="Nombre del proyecto para el reporte")
     parser.add_argument("--iterations", type=int, default=3, choices=range(1, 9), help="Número de iteraciones de análisis (1-8)")
-    parser.add_argument("--provider", choices=["local", "gemini"], default="gemini", help="Proveedor de IA a utilizar")
+    parser.add_argument("--provider", choices=["local", "gemini", "openai", "groq", "deepseek"], default="gemini", help="Proveedor de IA a utilizar")
     parser.add_argument("--model", default=None, help="Modelo de IA a utilizar (ej. gemini-2.5-flash)")
     args = parser.parse_args()
 
