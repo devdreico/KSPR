@@ -17,6 +17,26 @@ from kspr_engine.analyzer import analyze
 from kspr_engine.config import Settings
 from kspr_engine.models import AnalysisRequest, SourceFile
 
+__version__ = "0.1.0"
+
+KSPR_ASCII = r"""
+XXXX
+ XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+XXX         XXXXX          XXX
+XXX         XXXXX          XXX
+XXX         XXXXX          XXX
+XXX         XXXXX          XXX
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+XXXXXXXXXXXXXX  XXXXXXXXXXXXXX
+ XXXXXXXXXXXX    XXXXXXXXXXXX
+  XXXXXXXXXX      XXXXXXXXXX
+  XXXXXXXXXX      XXXXXXXXXX
+"""
+
 ALLOWED = {".py", ".js", ".jsx", ".ts", ".tsx", ".cs", ".java", ".sql", ".html", ".vue", ".php", ".md", ".txt", ".json", ".yaml", ".yml"}
 
 
@@ -102,6 +122,7 @@ async def run_batch_analysis(source: Path, git_url: str | None, output: Path, pr
 
 
 async def interactive_shell() -> None:
+    print(KSPR_ASCII)
     print("\n" + "═"*70)
     print("  KSPR CLI — OpenCode Interactive Terminal Agent (v0.1.0)")
     print("  Escribe una consulta, referencia archivos con @ o usa /help para comandos.")
@@ -111,6 +132,7 @@ async def interactive_shell() -> None:
     active_model = "gemini-2.5-flash"
     active_provider = "gemini"
     active_agent = "Architect"
+    active_iterations = 3
     attached_files: dict[str, str] = {}
 
     while True:
@@ -138,6 +160,7 @@ async def interactive_shell() -> None:
                 print("  /model [name]      Cambia o muestra el modelo de IA activo")
                 print("  /provider [name]   Cambia el proveedor ('gemini' o 'local')")
                 print("  /agent [name]      Establece el rol del agente (Architect, Developer, Auditor)")
+                print("  /iterations [n]    Cambia el número de iteraciones de análisis (1-8)")
                 print("  /context           Muestra los archivos referenciados en el workspace")
                 print("  /clear             Limpia la pantalla de la terminal")
                 print("  /exit              Sale de la sesión interactiva\n")
@@ -161,17 +184,27 @@ async def interactive_shell() -> None:
                     print(f"[*] Agente activo actualizado a: {active_agent}")
                 else:
                     print(f"[*] Agente activo: {active_agent}")
+            elif cmd == "/iterations":
+                if arg.isdigit() and 1 <= int(arg) <= 8:
+                    active_iterations = int(arg)
+                    print(f"[*] Iteraciones activas actualizadas a: {active_iterations}")
+                else:
+                    print(f"[*] Iteraciones activas: {active_iterations} (rango 1-8)")
+                    print(f"      Uso: /iterations <1-8>")
             elif cmd == "/context":
                 print(f"\nWorkspace actual: {current_workspace}")
                 print(f"Archivos adjuntos en contexto ({len(attached_files)}):")
                 for path in attached_files:
                     print(f" - @{path}")
                 print()
+            elif cmd == "/clear":
+                os.system("cls" if os.name == "nt" else "clear")
             elif cmd == "/analyze":
                 target_path = Path(arg) if arg else current_workspace
-                out_dir = current_workspace / "kspr-context"
                 print(f"[*] Iniciando análisis estático sobre {target_path}...")
-                await run_batch_analysis(target_path, None, out_dir, None, 3, active_provider, active_model)
+                await run_batch_analysis(
+                    target_path, None, target_path.parent / "kspr-context", None, active_iterations, active_provider, active_model
+                )
             else:
                 print(f"Comando desconocido: {cmd}. Escribe /help para ver los comandos disponibles.")
             continue
@@ -207,15 +240,16 @@ async def interactive_shell() -> None:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="KSPR AI - Empresarial (OpenCode-compatible CLI Engine)")
+    parser = argparse.ArgumentParser(prog="kspr", description="KSPR AI - Empresarial (OpenCode-compatible CLI Engine)")
+    parser.add_argument("-V", "--version", action="version", version=f"%(prog)s {__version__}", help="Muestra la versión y sale")
     parser.add_argument("source", type=Path, nargs="?", default=None, help="Ruta al directorio o ZIP a analizar (si se omite, abre el shell interactivo)")
     parser.add_argument("--interactive", "-i", action="store_true", help="Inicia el shell interactivo OpenCode")
     parser.add_argument("--git-url", default=None, help="Clona un repositorio Git en modo lectura para analizarlo")
-    parser.add_argument("--output", type=Path, default=Path("kspr-context"))
-    parser.add_argument("--project-name", default=None)
-    parser.add_argument("--iterations", type=int, default=3)
-    parser.add_argument("--provider", choices=["local", "gemini"], default="gemini")
-    parser.add_argument("--model", default=None)
+    parser.add_argument("--output", type=Path, default=Path("kspr-context"), help="Directorio de salida para los artefactos Markdown")
+    parser.add_argument("--project-name", default=None, help="Nombre del proyecto para el reporte")
+    parser.add_argument("--iterations", type=int, default=3, choices=range(1, 9), help="Número de iteraciones de análisis (1-8)")
+    parser.add_argument("--provider", choices=["local", "gemini"], default="gemini", help="Proveedor de IA a utilizar")
+    parser.add_argument("--model", default=None, help="Modelo de IA a utilizar (ej. gemini-2.5-flash)")
     args = parser.parse_args()
 
     if args.interactive or args.source is None:

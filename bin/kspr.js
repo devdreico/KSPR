@@ -1,14 +1,17 @@
 #!/usr/bin/env node
+// KSPR CLI - Node.js wrapper
+// Installed globally via: npm install -g kspr-ai
+// Or locally: npx kspr-ai
 
 const { spawn } = require("child_process");
 const path = require("path");
-const fs = require("fs");
 
 const pythonScript = path.join(__dirname, "..", "cli", "kspr.py");
-const args = [pythonScript, ...process.argv.slice(2)];
 
-const venvPython = path.join(__dirname, "..", ".venv", "bin", "python");
-const pythonCmd = fs.existsSync(venvPython) ? venvPython : (process.platform === "win32" ? "python" : "python3");
+// Use python3 directly (works in most environments)
+const pythonCmd = process.platform === "win32" ? "python" : "python3";
+
+const args = [pythonScript, ...process.argv.slice(2)];
 
 const child = spawn(pythonCmd, args, { stdio: "inherit" });
 

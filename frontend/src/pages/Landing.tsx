@@ -26,13 +26,13 @@ export function Landing() {
   };
 
   return (
-    <div className="app-shell">
+    <div className="app-shell" style={{ fontFamily: "'Montserrat', sans-serif" }}>
       {/* Topbar */}
       <header className="topbar">
         <div className="brand">
           <img src="/casper-ai-logo.png" alt="KSPR AI" className="brand-logo" />
           <div>
-            <strong>KSPR CLI</strong>
+            <strong style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 700 }}>KSPR CLI</strong>
             <span>Reverse Engineering AI Agent</span>
           </div>
         </div>
@@ -41,10 +41,10 @@ export function Landing() {
           <span>v0.1.0 · Terminal-First</span>
           <div className="divider" />
           <a
-            href="https://github.com"
+            href="https://github.com/devdreiortiz/KSPR"
             target="_blank"
             rel="noreferrer"
-            style={{ color: "var(--ink)", textDecoration: "none", fontWeight: 600, display: "flex", alignItems: "center", gap: 6 }}
+            style={{ color: "var(--ink)", textDecoration: "none", fontWeight: 700, display: "flex", alignItems: "center", gap: 6, fontFamily: "'Montserrat', sans-serif" }}
           >
             GitHub <ArrowRight size={13} />
           </a>
@@ -55,18 +55,18 @@ export function Landing() {
       <main>
         {/* Hero Section */}
         <section className="hero" style={{ flexDirection: "column", alignItems: "flex-start", gap: 32, paddingBottom: 40 }}>
-          <div className="section-kicker">
+          <div className="section-kicker" style={{ fontWeight: 700, fontFamily: "'Montserrat', sans-serif" }}>
             <Sparkles size={13} style={{ display: "inline", marginRight: 6 }} /> KSPR ENGINE · CLI INTERFACE
           </div>
-          <h1 style={{ maxWidth: "100%", margin: 0 }}>
-            Transforma sistemas legados en <em>mapas técnicos</em> desde la terminal.
+          <h1 style={{ maxWidth: "100%", margin: 0, fontFamily: "'Montserrat', sans-serif", fontWeight: 700 }}>
+            Transforma sistemas legados en <em style={{ fontWeight: 700 }}>mapas técnicos</em> desde la terminal.
           </h1>
-          <p style={{ maxWidth: "700px", fontSize: "17px" }}>
-            KSPR CLI es un agente agéntico de ingeniería inversa que escanea repositorios, extrae UI, rutas, eventos y dependencias de forma estática y segura, generando paquetes Markdown auditables para humanos y agentes.
+          <p style={{ maxWidth: "700px", fontSize: "17px", fontFamily: "'Montserrat', sans-serif" }}>
+            KSPR CLI es un agente de ingeniería inversa estática que escanea repositorios, extrae componentes UI, rutas HTTP, eventos y consultas SQL de forma 100% segura, generando paquetes Markdown auditables listos para humanos y agentes.
           </p>
 
-          {/* Quick Install Bar */}
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 14, marginTop: 10, width: "100%", maxWidth: "760px" }}>
+          {/* Quick Install Bar & Download Methods */}
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 14, marginTop: 10, width: "100%", maxWidth: "860px" }}>
             <div style={{
               flex: 1,
               minWidth: "280px",
@@ -81,42 +81,75 @@ export function Landing() {
               fontSize: "13px",
               boxShadow: "0 10px 30px rgba(0,0,0,0.15)"
             }}>
-              <span>pip install -e '.'</span>
+              <span>npm install -g kspr-ai</span>
               <button
-                onClick={() => copyToClipboard("pip install -e '.'", "install-cmd")}
+                onClick={() => copyToClipboard("npm install -g kspr-ai", "install-cmd")}
                 style={{ background: "transparent", border: "none", color: "#aaa", cursor: "pointer", display: "flex", alignItems: "center", gap: 4 }}
                 title="Copiar comando"
               >
                 {copiedCmd === "install-cmd" ? <Check size={14} color="#4ade80" /> : <Copy size={14} />}
-                <span style={{ fontSize: "11px" }}>{copiedCmd === "install-cmd" ? "Copiado" : "Copiar"}</span>
+                <span style={{ fontSize: "11px", fontFamily: "'Montserrat', sans-serif", fontWeight: 700 }}>{copiedCmd === "install-cmd" ? "Copiado" : "Copiar"}</span>
               </button>
             </div>
-            <a
-              href="#terminal-docs"
-              style={{
-                background: "#151515",
-                color: "#fff",
-                padding: "14px 24px",
-                borderRadius: "10px",
-                textDecoration: "none",
-                fontWeight: 600,
-                fontSize: "14px",
-                display: "flex",
-                alignItems: "center",
-                gap: 8,
-                transition: "background 0.2s"
-              }}
-            >
-              <Terminal size={16} /> Ver guía CLI
-            </a>
+            <div style={{
+              background: "#151515",
+              color: "#fff",
+              padding: "14px 20px",
+              borderRadius: "10px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              fontFamily: "'DM Mono', monospace",
+              fontSize: "13px",
+              boxShadow: "0 10px 30px rgba(0,0,0,0.15)"
+            }}>
+              <span>npx kspr-ai</span>
+              <button
+                onClick={() => copyToClipboard("npx kspr-ai", "npx-cmd")}
+                style={{ background: "transparent", border: "none", color: "#aaa", cursor: "pointer", display: "flex", alignItems: "center", gap: 4 }}
+                title="Copiar comando"
+              >
+                {copiedCmd === "npx-cmd" ? <Check size={14} color="#4ade80" /> : <Copy size={14} />}
+                <span style={{ fontSize: "11px", fontFamily: "'Montserrat', sans-serif", fontWeight: 700 }}>{copiedCmd === "npx-cmd" ? "Copiado" : "Copiar"}</span>
+              </button>
+            </div>
+          </div>
+        </section>
+
+        {/* Engineering & Agentic Flow Section */}
+        <section id="engineering-flow" style={{ marginTop: 20, marginBottom: 50, padding: "36px", background: "var(--white)", border: "1px solid var(--line)", borderRadius: "16px" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "40px" }}>
+            <div>
+              <h2 style={{ margin: "0 0 16px", fontSize: "20px", fontWeight: 700, fontFamily: "'Montserrat', sans-serif" }}>Ingeniería Inversa Estática y Segura</h2>
+              <p style={{ margin: "0 0 16px", color: "var(--muted)", fontSize: "14px", lineHeight: "1.7", fontFamily: "'Montserrat', sans-serif" }}>
+                KSPR opera mediante análisis estático puro. <strong>Nunca ejecuta el código analizado</strong>. Examina la estructura sintáctica para recuperar metadatos esenciales sin comprometer la seguridad de sistemas legados.
+              </p>
+              <ul style={{ margin: 0, paddingLeft: "20px", color: "var(--muted)", fontSize: "14px", lineHeight: "1.7", fontFamily: "'Montserrat', sans-serif" }}>
+                <li><strong>Inventario UI:</strong> Botones, formularios, enlaces y elementos de interfaz.</li>
+                <li><strong>Rutas HTTP y Endpoints:</strong> Mapeo completo de URLs y métodos de backend.</li>
+                <li><strong>Operaciones SQL y Datos:</strong> Consultas SELECT, UPDATE, INSERT y procedimientos almacenados.</li>
+                <li><strong>Dependencias:</strong> Paquetes, imports y relaciones de librerías.</li>
+              </ul>
+            </div>
+            <div>
+              <h2 style={{ margin: "0 0 16px", fontSize: "20px", fontWeight: 700, fontFamily: "'Montserrat', sans-serif" }}>Flujo Agéntico (KSPR I)</h2>
+              <p style={{ margin: "0 0 16px", color: "var(--muted)", fontSize: "14px", lineHeight: "1.7", fontFamily: "'Montserrat', sans-serif" }}>
+                El núcleo agéntico <strong>KSPR I</strong> procesa la evidencia estática recolectada en múltiples iteraciones inteligentes para contrastar hallazgos, detectar contradicciones y generar documentación estructurada de calidad empresarial.
+              </p>
+              <ol style={{ margin: 0, paddingLeft: "20px", color: "var(--muted)", fontSize: "14px", lineHeight: "1.7", fontFamily: "'Montserrat', sans-serif" }}>
+                <li><strong>Ingesta y Normalización:</strong> Lectura segura de archivos locales, ZIPs o repositorios Git.</li>
+                <li><strong>Razonamiento Iterativo:</strong> Análisis profundo por la IA con validación cruzada de evidencia.</li>
+                <li><strong>Consolidación Markdown:</strong> Exportación de paquetes modulares (Inventario UI, Flujos, Riesgos, Iteraciones).</li>
+              </ol>
+            </div>
           </div>
         </section>
 
         {/* Interactive Terminal Demo */}
         <section id="terminal-docs" style={{ marginTop: 20, marginBottom: 60 }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-            <h2 style={{ fontSize: "22px", margin: 0, fontWeight: 600 }}>Terminal de KSPR CLI</h2>
-            <div style={{ display: "flex", gap: 8 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16, flexWrap: "wrap", gap: 12 }}>
+            <h2 style={{ fontSize: "22px", margin: 0, fontWeight: 700, fontFamily: "'Montserrat', sans-serif" }}>Terminal y Metodologías CLI</h2>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
               <button
                 onClick={() => setTerminalTab("install")}
                 style={{
@@ -127,10 +160,11 @@ export function Landing() {
                   color: terminalTab === "install" ? "#fff" : "var(--ink)",
                   cursor: "pointer",
                   fontSize: "12px",
-                  fontWeight: 500
+                  fontWeight: 700,
+                  fontFamily: "'Montserrat', sans-serif"
                 }}
               >
-                1. Instalación
+                1. npm / npx
               </button>
               <button
                 onClick={() => setTerminalTab("analyze")}
@@ -142,7 +176,8 @@ export function Landing() {
                   color: terminalTab === "analyze" ? "#fff" : "var(--ink)",
                   cursor: "pointer",
                   fontSize: "12px",
-                  fontWeight: 500
+                  fontWeight: 700,
+                  fontFamily: "'Montserrat', sans-serif"
                 }}
               >
                 2. Análisis Local
@@ -157,7 +192,8 @@ export function Landing() {
                   color: terminalTab === "git" ? "#fff" : "var(--ink)",
                   cursor: "pointer",
                   fontSize: "12px",
-                  fontWeight: 500
+                  fontWeight: 700,
+                  fontFamily: "'Montserrat', sans-serif"
                 }}
               >
                 3. Repositorio Git
@@ -172,10 +208,11 @@ export function Landing() {
                   color: terminalTab === "dev" ? "#fff" : "var(--ink)",
                   cursor: "pointer",
                   fontSize: "12px",
-                  fontWeight: 500
+                  fontWeight: 700,
+                  fontFamily: "'Montserrat', sans-serif"
                 }}
               >
-                4. Desarrollo Core
+                4. Shell Interactivo
               </button>
             </div>
           </div>
@@ -201,7 +238,7 @@ export function Landing() {
                 <span style={{ width: 10, height: 10, borderRadius: "50%", background: "#ef4444", display: "inline-block" }} />
                 <span style={{ width: 10, height: 10, borderRadius: "50%", background: "#f59e0b", display: "inline-block" }} />
                 <span style={{ width: 10, height: 10, borderRadius: "50%", background: "#22c55e", display: "inline-block" }} />
-                <span style={{ marginLeft: 8, fontSize: "12px", fontFamily: "'DM Mono', monospace", color: "#a1a1aa" }}>bash - kspr@enterprise:~</span>
+                <span style={{ marginLeft: 8, fontSize: "12px", fontFamily: "'DM Mono', monospace", color: "#a1a1aa" }}>kspr@enterprise:~</span>
               </div>
               <button
                 onClick={runSimulation}
@@ -213,7 +250,8 @@ export function Landing() {
                   padding: "5px 12px",
                   borderRadius: "4px",
                   fontSize: "11px",
-                  fontFamily: "'DM Mono', monospace",
+                  fontFamily: "'Montserrat', sans-serif",
+                  fontWeight: 700,
                   cursor: runningSim ? "wait" : "pointer"
                 }}
               >
@@ -232,26 +270,26 @@ export function Landing() {
             }}>
               {terminalTab === "install" && (
                 <div>
-                  <div style={{ color: "#71717a" }}># Clonar el repositorio y configurar entorno virtual</div>
-                  <div style={{ color: "#4ade80", margin: "8px 0" }}>$ python -m venv .venv && source .venv/bin/activate</div>
-                  <div style={{ color: "#71717a", marginTop: "12px" }}># Instalar KSPR en modo editable con dependencias de desarrollo</div>
-                  <div style={{ color: "#4ade80", margin: "8px 0" }}>$ pip install -e '.[dev]'</div>
-                  <div style={{ color: "#a1a1aa", marginTop: "12px" }}>✓ KSPR Engine instalado correctamente. Ya puedes usar el comando <code style={{ color: "#f43f5e" }}>kspr</code>.</div>
+                  <div style={{ color: "#71717a" }}># Instalar KSPR globalmente desde npm</div>
+                  <div style={{ color: "#4ade80", margin: "8px 0" }}>$ npm install -g kspr-ai</div>
+                  <div style={{ color: "#71717a", marginTop: "12px" }}># O ejecución instantánea sin instalación previa con npx</div>
+                  <div style={{ color: "#4ade80", margin: "8px 0" }}>$ npx kspr-ai --help</div>
+                  <div style={{ color: "#a1a1aa", marginTop: "12px" }}>✓ Disponible con wrappers Node.js (kspr.js), Bash (kspr.sh) y Bun (kspr.bun).</div>
                 </div>
               )}
 
               {terminalTab === "analyze" && (
                 <div>
-                  <div style={{ color: "#71717a" }}># Analizar un directorio local y exportar artefactos Markdown</div>
-                  <div style={{ color: "#4ade80", margin: "8px 0" }}>$ python cli/kspr.py ./mi-proyecto --output ./kspr-context --iterations 3</div>
-                  {simStep >= 1 && <div style={{ color: "#facc15", marginTop: "6px" }}>[1/3] Ingesta segura completada: 42 archivos soportados.</div>}
-                  {simStep >= 2 && <div style={{ color: "#38bdf8", marginTop: "4px" }}>[2/3] Extracción estática de UI, rutas, SQL y dependencias...</div>}
+                  <div style={{ color: "#71717a" }}># Analizar un directorio local especificando proveedor local o gemini</div>
+                  <div style={{ color: "#4ade80", margin: "8px 0" }}>$ kspr ./mi-proyecto --output ./kspr-context --iterations 3 --provider local</div>
+                  {simStep >= 1 && <div style={{ color: "#facc15", marginTop: "6px" }}>[1/3] Ingesta segura completada: 67 archivos analizados.</div>}
+                  {simStep >= 2 && <div style={{ color: "#38bdf8", marginTop: "4px" }}>[2/3] Extracción estática de UI, rutas HTTP, SQL y dependencias...</div>}
                   {simStep >= 3 && <div style={{ color: "#a855f7", marginTop: "4px" }}>[3/3] Consolidando mapa cinético e iteraciones agénticas (3/3)...</div>}
                   {simStep >= 4 && (
                     <div style={{ color: "#4ade80", marginTop: "8px", borderTop: "1px dashed #27272a", paddingTop: "8px" }}>
-                      ✓ KSPR completó el análisis: anal_98124f<br />
-                      Archivos: 42 | UI: 14 | Flujos: 8 | Artefactos: 5<br />
-                      Salida: /workspaces/KSPR/kspr-context
+                      ✓ KSPR completó el análisis con éxito<br />
+                      Archivos analizados: 67 | Elementos UI: 1305 | Flujos: 605<br />
+                      Directorio de salida: ./kspr-context
                     </div>
                   )}
                 </div>
@@ -259,24 +297,23 @@ export function Landing() {
 
               {terminalTab === "git" && (
                 <div>
-                  <div style={{ color: "#71717a" }}># Analizar un repositorio Git remoto directamente en modo lectura</div>
-                  <div style={{ color: "#4ade80", margin: "8px 0" }}>$ python cli/kspr.py . --git-url https://github.com/org/repo.git --output ./repo-context</div>
+                  <div style={{ color: "#71717a" }}># Clonar y analizar un repositorio Git remoto de forma segura</div>
+                  <div style={{ color: "#4ade80", margin: "8px 0" }}>$ kspr . --git-url https://github.com/org/repo.git --output ./repo-context</div>
                   <div style={{ color: "#a1a1aa", marginTop: "8px" }}>Clonación superficial (--depth 1) en directorio temporal seguro sin ejecución de código.</div>
                 </div>
               )}
 
               {terminalTab === "dev" && (
                 <div>
-                  <div style={{ color: "#71717a" }}># Ejecutar el conjunto completo de pruebas unitarias (Pytest)</div>
-                  <div style={{ color: "#4ade80", margin: "8px 0" }}>$ pytest</div>
+                  <div style={{ color: "#71717a" }}># Iniciar el shell interactivo OpenCode con el logotipo ASCII</div>
+                  <div style={{ color: "#4ade80", margin: "8px 0" }}>$ kspr --interactive</div>
                   <div style={{ color: "#e2e8f0", marginTop: "6px" }}>
-                    ============================= test session starts ==============================<br />
-                    platform linux -- Python 3.14.2, pytest-9.1.1<br />
-                    collected 27 items<br />
-                    <span style={{ color: "#4ade80" }}>backend/tests/test_analyzer.py . [ 3%]</span><br />
-                    <span style={{ color: "#4ade80" }}>backend/tests/test_api.py ..... [ 22%]</span><br />
-                    <span style={{ color: "#4ade80" }}>backend/tests/test_auth.py ............ [ 66%]</span><br />
-                    <span style={{ color: "#4ade80" }}>======================== 27 passed in 7.98s ========================</span>
+                    XXXX<br/>
+                    &nbsp;XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX<br/>
+                    XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX<br/>
+                    <span style={{ color: "#38bdf8" }}>  KSPR CLI — OpenCode Interactive Terminal Agent (v0.1.0)</span><br/>
+                    <span style={{ color: "#a1a1aa" }}>  Escribe una consulta, referencia archivos con @ o usa /help para comandos.</span><br/>
+                    <span style={{ color: "#4ade80" }}>kspr (architect)&gt; /help</span>
                   </div>
                 </div>
               )}
@@ -288,24 +325,24 @@ export function Landing() {
         <section style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "24px", marginBottom: 70 }}>
           <div style={{ background: "var(--white)", border: "1px solid var(--line)", borderRadius: "12px", padding: "28px" }}>
             <Shield size={24} style={{ marginBottom: 16, color: "#151515" }} />
-            <h3 style={{ margin: "0 0 10px", fontSize: "18px", fontWeight: 600 }}>Análisis Estático Seguro</h3>
-            <p style={{ margin: 0, color: "var(--muted)", fontSize: "14px", lineHeight: "1.6" }}>
+            <h3 style={{ margin: "0 0 10px", fontSize: "18px", fontWeight: 700, fontFamily: "'Montserrat', sans-serif" }}>Análisis Estático Seguro</h3>
+            <p style={{ margin: 0, color: "var(--muted)", fontSize: "14px", lineHeight: "1.6", fontFamily: "'Montserrat', sans-serif" }}>
               KSPR nunca ejecuta el código del repositorio analizado. Extrae componentes, rutas HTTP, eventos y consultas SQL puramente por heurísticas y AST seguros.
             </p>
           </div>
 
           <div style={{ background: "var(--white)", border: "1px solid var(--line)", borderRadius: "12px", padding: "28px" }}>
             <Cpu size={24} style={{ marginBottom: 16, color: "#151515" }} />
-            <h3 style={{ margin: "0 0 10px", fontSize: "18px", fontWeight: 600 }}>Motor CLI & Backend FastAPI</h3>
-            <p style={{ margin: 0, color: "var(--muted)", fontSize: "14px", lineHeight: "1.6" }}>
+            <h3 style={{ margin: "0 0 10px", fontSize: "18px", fontWeight: 700, fontFamily: "'Montserrat', sans-serif" }}>Motor CLI & Backend FastAPI</h3>
+            <p style={{ margin: 0, color: "var(--muted)", fontSize: "14px", lineHeight: "1.6", fontFamily: "'Montserrat', sans-serif" }}>
               Diseñado para ser ejecutado desde la terminal o integrado como API FastAPI con soporte para Google Gemini y gateways OpenAI-compatibles.
             </p>
           </div>
 
           <div style={{ background: "var(--white)", border: "1px solid var(--line)", borderRadius: "12px", padding: "28px" }}>
             <FolderArchive size={24} style={{ marginBottom: 16, color: "#151515" }} />
-            <h3 style={{ margin: "0 0 10px", fontSize: "18px", fontWeight: 600 }}>Paquetes de Contexto Masivo</h3>
-            <p style={{ margin: 0, color: "var(--muted)", fontSize: "14px", lineHeight: "1.6" }}>
+            <h3 style={{ margin: "0 0 10px", fontSize: "18px", fontWeight: 700, fontFamily: "'Montserrat', sans-serif" }}>Paquetes de Contexto Masivo</h3>
+            <p style={{ margin: 0, color: "var(--muted)", fontSize: "14px", lineHeight: "1.6", fontFamily: "'Montserrat', sans-serif" }}>
               Exporta carpetas estructuradas con inventario UI, mapa de flujos, contratos, riesgos y contradicciones listos para entregar a agentes de IA.
             </p>
           </div>
@@ -313,19 +350,23 @@ export function Landing() {
 
         {/* Quick CLI Reference */}
         <section style={{ background: "var(--white)", border: "1px solid var(--line)", borderRadius: "12px", padding: "36px", marginBottom: 60 }}>
-          <h2 style={{ fontSize: "20px", marginTop: 0, marginBottom: 20, fontWeight: 600 }}>Referencia Rápida de Comandos CLI</h2>
+          <h2 style={{ fontSize: "20px", marginTop: 0, marginBottom: 20, fontWeight: 700, fontFamily: "'Montserrat', sans-serif" }}>Referencia Rápida de Metodologías CLI</h2>
           <div style={{ display: "grid", gap: "14px" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 16px", background: "#f8f9fa", borderRadius: "8px", border: "1px solid var(--line)" }}>
-              <code style={{ fontFamily: "'DM Mono', monospace", fontSize: "13px" }}>python cli/kspr.py &lt;source&gt; --output &lt;dir&gt;</code>
-              <span style={{ color: "var(--muted)", fontSize: "13px" }}>Analiza directorio local o archivo ZIP</span>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 16px", background: "#f8f9fa", borderRadius: "8px", border: "1px solid var(--line)", flexWrap: "wrap", gap: 8 }}>
+              <code style={{ fontFamily: "'DM Mono', monospace", fontSize: "13px" }}>npm install -g kspr-ai && kspr --help</code>
+              <span style={{ color: "var(--muted)", fontSize: "13px", fontFamily: "'Montserrat', sans-serif", fontWeight: 600 }}>Instalación global npm</span>
             </div>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 16px", background: "#f8f9fa", borderRadius: "8px", border: "1px solid var(--line)" }}>
-              <code style={{ fontFamily: "'DM Mono', monospace", fontSize: "13px" }}>python cli/kspr.py . --git-url &lt;url&gt; --iterations 3</code>
-              <span style={{ color: "var(--muted)", fontSize: "13px" }}>Clona y analiza repositorio Git remoto</span>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 16px", background: "#f8f9fa", borderRadius: "8px", border: "1px solid var(--line)", flexWrap: "wrap", gap: 8 }}>
+              <code style={{ fontFamily: "'DM Mono', monospace", fontSize: "13px" }}>npx kspr-ai ./mi-proyecto --iterations 3</code>
+              <span style={{ color: "var(--muted)", fontSize: "13px", fontFamily: "'Montserrat', sans-serif", fontWeight: 600 }}>Ejecución instantánea npx</span>
             </div>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 16px", background: "#f8f9fa", borderRadius: "8px", border: "1px solid var(--line)" }}>
-              <code style={{ fontFamily: "'DM Mono', monospace", fontSize: "13px" }}>uvicorn kspr_engine.main:app --app-dir backend --reload</code>
-              <span style={{ color: "var(--muted)", fontSize: "13px" }}>Inicia el servidor backend local FastAPI</span>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 16px", background: "#f8f9fa", borderRadius: "8px", border: "1px solid var(--line)", flexWrap: "wrap", gap: 8 }}>
+              <code style={{ fontFamily: "'DM Mono', monospace", fontSize: "13px" }}>bash bin/kspr.sh ./repo --output ./context</code>
+              <span style={{ color: "var(--muted)", fontSize: "13px", fontFamily: "'Montserrat', sans-serif", fontWeight: 600 }}>Wrapper Bash</span>
+            </div>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 16px", background: "#f8f9fa", borderRadius: "8px", border: "1px solid var(--line)", flexWrap: "wrap", gap: 8 }}>
+              <code style={{ fontFamily: "'DM Mono', monospace", fontSize: "13px" }}>bun run bin/kspr.bun --interactive</code>
+              <span style={{ color: "var(--muted)", fontSize: "13px", fontFamily: "'Montserrat', sans-serif", fontWeight: 600 }}>Wrapper Bun</span>
             </div>
           </div>
         </section>
@@ -340,7 +381,9 @@ export function Landing() {
         alignItems: "center",
         background: "rgba(243, 242, 238, .8)",
         fontSize: "12px",
-        color: "var(--muted)"
+        color: "var(--muted)",
+        fontFamily: "'Montserrat', sans-serif",
+        fontWeight: 600
       }}>
         <div>KSPR AI · Terminal-First Reverse Engineering Agent</div>
         <div>Desarrollado y operado mediante terminal y CLI</div>

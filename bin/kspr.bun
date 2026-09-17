@@ -1,0 +1,16 @@
+#!/usr/bin/env bun
+// KSPR CLI - Bun wrapper
+// Usage: bun run bin/kspr.bun [args]  or  npx kspr-ai [args]
+
+const { spawn } = require("bun");
+const path = require("path");
+const fs = require("fs");
+
+const pythonScript = path.join(__dirname, "..", "cli", "kspr.py");
+const args = ["python3", pythonScript, ...Bun.args];
+
+const child = spawn(args, { stdio: "inherit" });
+
+child.on("exit", (code) => {
+  process.exit(code !== null ? code : 0);
+});
