@@ -20,13 +20,15 @@ from kspr_engine.providers import get_provider, ProviderName, ProviderError
 
 __version__ = "0.1.0"
 
-KSPR_ASCII = "\n".join(("▒ ▒ ▒ ▒ ▒ ▒ ▒ ▒ ▒ ▒ ▒  ▒ ▒ ▒ ▒ ▒ ▒  ▒ ▒ ▒ ▒ ▒  ▒ ▒ ▒ ▒ ▒ ▒  ▒ ▒ ▒ ▒ ▒  ▒ ▒ ▒ ▒      ▒ ▒ ▒",
- " ▒ ▒  ▒ ▒ ▒ ▒  ▒ ▒ ▒ ▒  ▒ ▒ ▒▒▒ ▒  ▒ ▒ ▒  ▒▒ ▒▒ ▒▒▒ ▒▒▒  ▒ ▒▒▒ ▒ ▒  ▒ ▒ ▒▒▒▒▒ ▒ ▒  ▒▒▒ ▒",
- " ▒ ▒ ▒ ▒ ▒  ▒ ▒ ▒ ▒ ▒▒ ▒ ▒ ▒ ▒ ▒ ▒ ▒ ▒   ▒  ▒ ▒ ▒ ▒ ▒▒▒  ▒ ▒ ▒ ▒ ▒▒▒▒▒ ▒▒▒ ▒▒ ▒ ▒▒▒ ▒ ▒",
- " ▒  ▒  ▒  ▒     ▒  ▒ ▒    ▒▒    ▒ ▒ ▒ ▒ ▒  ▒ ▒ ▒ ▒ ▒  ▒ ▒ ▒ ▒ ▒ ▒  ▒ ▒ ▒ ▒ ▒    ▒▒▒    ▒ ▒",
- " ▒      ▒        ▒ ▒        ▒   ▒    ▒ ▒      ▒▒▒ ▒ ▒ ▒ ▒▒ ▒ ▒ ▒ ▒  ▒ ▒ ▒▒▒ ▒ ▒ ▒▒ ▒ ▒ ▒▒",
- " ▒ ▒ ▒ ▒  ▒   ▒ ▒ ▒ ▒  ▒ ▒ ▒ ▒ ▒ ▒ ▒▒ ▒ ▒ ▒ ▒  ▒ ▒ ▒ ▒ ▒  ▒ ▒ ▒ ▒ ▒  ▒▒▒ ▒ ▒ ▒ ▒ ▒ ▒ ▒  ▒",
- "  ▒ ▒ ▒ ▒ ▒  ▒ ▒ ▒▒▒ ▒ ▒▒ ▒ ▒ ▒▒▒  ▒▒▒ ▒ ▒ ▒ ▒  ▒ ▒ ▒ ▒ ▒  ▒ ▒ ▒ ▒ ▒ ▒  ▒ ▒ ▒ ▒  ▒ ▒"))
+KSPR_ASCII = "\n".join(("▒▒▒▒▒▒▒▒▒▒▒▒ ▒▒ ▒▒ ▒▒▒▒▒▒▒▒▒ ▒▒▒▒▒  ",
+ "▒   ▒   ▒  ▒▒▒  ▒▒▒  ▒   ▒▒   ▒▒",
+ "▒▒▒▒▒▒▒▒▒  ▒▒ ▒   ▒▒ ▒▒▒▒▒▒▒▒▒▒  ",
+ "▒▒▒   ▒▒▒  ▒▒  ▒▒▒▒▒ ▒▒   ▒▒  ▒▒",
+ " ▒▒▒ ▒ ▒▒▒ ▒▒▒ ▒▒▒  ▒▒▒ ▒ ▒▒▒▒  ",
+ "  ▒▒▒ ▒  █ █  █ █ █  █ █  █ █ █  ",
+ "   █ █   █ █ █ █ █ █  █ █  █ █ █  ",
+ "    █    █ █  █ █  █  █ █  █ █  █",
+ "     █    █ █  █ █ █  █  █  █ █"))
 
 ALLOWED = {".py", ".js", ".jsx", ".ts", ".tsx", ".cs", ".java", ".sql", ".html", ".vue", ".php", ".md", ".txt", ".json", ".yaml", ".yml"}
 
@@ -199,7 +201,8 @@ async def interactive_shell() -> None:
                 )
             elif cmd == "/ctrlk" or cmd == "ctrl+k":
                 # Show the configuration panel
-                await show_config_panel(active_provider, active_model, active_iterations)
+                print("\nPanel Ctrl+K no completamente implementado en esta versión")
+                print("Opciones: 1=Cambiar proveedor, 2=Cambiar modelo, 3=Cambiar esfuerzo, ESC=Salir")
                 continue
             else:
                 print(f"Comando desconocido: {cmd}. Escribe /help para ver los comandos disponibles.")
@@ -250,67 +253,6 @@ async def interactive_shell() -> None:
             print("KSPR I está funcionando en modo local de demostración. Conecta Gemini o un gateway compatible para obtener razonamiento LLM sobre el contexto entregado.")
         
         print()
-        
-
-async def show_config_panel(current_provider: str, current_model: str, current_iterations: int) -> None:
-    """Muestra un panel de opciones de configuración al presionar Ctrl+K."""
-    options = [
-        "1. Cambiar proveedor",
-        f"   Proveedor actual: {current_provider}",
-        "2. Cambiar modelo",
-        f"   Modelo actual: {current_model}",
-        "3. Cambiar esfuerzo",
-        f"   Esfuerzo actual: {current_iterations} iteraciones",
-        "4. Agregar API Key",
-        "5. Salir del panel (ESC)",
-    ]
-
-    print("\n" + "="*60)
-    print("  PANEL DE CONFIGURACIÓN RÁPIDA (Ctrl+K)")
-    print("="*60)
-    for option in options:
-        print(option)
-    print("="*60 + "\n")
-    print("Selecciona una opción (1-5) o presiona ESC para cancelar.")
-
-    # Read user choice - in non-interactive mode, we'll just show the panel
-    # and handle the selection in the main loop
-    choice = input("\nOpción: ").strip()
-    
-    if choice == "1":
-        print("\nProveedores disponibles: gemini, local, openai, groq, deepseek")
-        new_provider = input("Nuevo proveedor: ").strip().lower()
-        if new_provider in {"gemini", "local", "openai", "groq", "deepseek"}:
-            # Return the new provider to the caller
-            print(f"[*] Proveedor cambiado a: {new_provider}")
-        else:
-            print("[!] Proveedor no válido")
-    elif choice == "2":
-        print("\nIngresa el nombre del modelo:")
-        new_model = input("Nuevo modelo: ").strip()
-        if new_model:
-            print(f"[*] Modelo cambiado a: {new_model}")
-        else:
-            print("[!] Nombre de modelo vacío")
-    elif choice == "3":
-        print("\nNúmero de iteraciones (1-8):")
-        new_iterations_input = input("Nuevas iteraciones: ").strip()
-        if new_iterations_input.isdigit() and 1 <= int(new_iterations_input) <= 8:
-            new_iterations = int(new_iterations_input)
-            print(f"[*] Iteraciones cambiadas a: {new_iterations}")
-        else:
-            print("[!] Valor inválido, rango 1-8")
-    elif choice == "4":
-        print("\nIngresa la API Key:")
-        api_key = input("API Key: ").strip()
-        if api_key:
-            print("[*] API Key guardada en sesión actual")
-        else:
-            print("[!] API Key vacía")
-    elif choice == "5":
-        print("[*] Panel cancelado")
-    else:
-        print("[!] Opción no válida")
 
 
 def main() -> None:
