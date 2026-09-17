@@ -16,6 +16,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "backend"))
 from kspr_engine.analyzer import analyze
 from kspr_engine.config import Settings
 from kspr_engine.models import AnalysisRequest, SourceFile
+from kspr_engine.providers import get_provider, ProviderName, ProviderError
 
 __version__ = "0.1.0"
 
@@ -226,12 +227,29 @@ async def interactive_shell() -> None:
         if referenced_content:
             print(f"[*] Incluyendo {len(attached_files)} referencia(s) de archivos en la consulta.")
         
-        # Simulate agent intelligent response based on prompt & context
-        print(f"\nRespuesta del Agente ({active_agent}):")
-        print(f"He procesado tu solicitud: '{prompt}'. Como agente KSPR operando en modo estático seguro, analizo la evidencia estructural del repositorio sin ejecutar código y ofrezco directrices técnicas precisas.")
-        if attached_files:
-            print(f"Archivos considerados en la memoria de sesión: {list(attached_files.keys())}")
-print()
+        # Actually call the provider to get a real response
+        try:
+            settings = Settings()
+            provider = get_provider(ProviderName(active_provider.lower()), settings, api_key=getattr(settings, f'{active_provider.lower()}_api_key', None))
+            response = await provider.complete(prompt, active_model, effort=None if active_iterations < 3 else "high")
+            print(f"\nRespuesta del Agente ({active_agent}):")
+            print(response)
+            if attached_files:
+                print(f"Archivos considerados en la memoria de sesión: {list(attached_files.keys())}")
+        except ProviderError as e:
+            print(f"\nError de proveedor: {e}")
+            print("Intentando con modo local de demostración...")
+            local_provider = get_provider(ProviderName.local, settings)
+            response = await local_provider.complete(prompt, 'kspr-local')
+            print(f"\nRespuesta del Agente ({active_agent} - local):")
+            print(response)
+        except Exception as e:
+            print(f"\nError inesperado: {e}")
+            print("Mostrando respuesta de fallback...")
+            print(f"\nRespuesta del Agente ({active_agent}):")
+            print("KSPR I está funcionando en modo local de demostración. Conecta Gemini o un gateway compatible para obtener razonamiento LLM sobre el contexto entregado.")
+        
+        print()
         
 
 async def show_config_panel(current_provider: str, current_model: str, current_iterations: int) -> None:
