@@ -317,7 +317,6 @@ async def interactive_shell() -> None:
     current_workspace = Path(config.get("current_workspace", Path.cwd()))
     active_model = config.get("active_model", "gemini-2.5-flash")
     active_provider = config.get("active_provider", "gemini")
-    active_agent = config.get("active_agent", "INSPECT")
     active_iterations = config.get("active_iterations", 3)
     attached_files: dict[str, str] = {}
     indexed_models: dict[str, list[dict[str, Any]]] = config.get("indexed_models", {})
@@ -328,7 +327,6 @@ async def interactive_shell() -> None:
         cfg = load_local_config()
         cfg["active_model"] = active_model
         cfg["active_provider"] = active_provider
-        cfg["active_agent"] = active_agent
         cfg["active_iterations"] = active_iterations
         cfg["indexed_models"] = indexed_models
         cfg["current_workspace"] = str(current_workspace)
@@ -336,15 +334,6 @@ async def interactive_shell() -> None:
 
     print_dashboard(active_provider, active_model, active_agent, active_iterations, current_workspace, len(attached_files), tokens_used, max_tokens)
     print()
-
-    agents_cycle = ["INSPECT", "DEVELOPER"]
-
-    def toggle_agent() -> str:
-        nonlocal active_agent
-        idx = (agents_cycle.index(active_agent.upper()) + 1) % len(agents_cycle) if active_agent.upper() in agents_cycle else 0
-        active_agent = agents_cycle[idx]
-        persist_state()
-        return active_agent
 
     def get_input_with_tab() -> str:
         """Lee input permitiendo alternar agentes con la tecla TAB."""
@@ -372,7 +361,6 @@ async def interactive_shell() -> None:
             while True:
                 ch = sys.stdin.read(1)
                 if ch == '\t': # TAB key pressed
-                    toggle_agent()
                     # Redraw top box border with new agent
                     sys.stdout.write(f"\r\033[A\033[K")
                     print_colored(f"┌─ [ Input · {active_agent.lower()} @ {active_provider} (Presiona TAB para alternar agente) ] " + "─" * max(0, width - len(active_agent) - len(active_provider) - 45) + "┐", Color.MID_GRAY)
@@ -426,13 +414,11 @@ async def interactive_shell() -> None:
                     "/model [name/num]  - Muestra o selecciona un modelo indexado",
                     "/analyze [path]    - Ejecuta el análisis estático",
                     "/provider [name]   - Cambia el proveedor activo",
-                    "/agent [name]      - INSPECT (Plan Mode) o DEVELOPER (Build Mode)",
                     "/iterations [n]    - Cambia iteraciones de análisis (1-8)",
                     "/context           - Muestra los archivos en contexto",
                     "/clear             - Limpia la pantalla y redibuja el dashboard",
                     "/update            - Actualiza KSPR a la última versión",
                     "/exit              - Sale de la sesión interactiva",
-                    "[TAB]              - Alterna instantáneamente entre INSPECT y DEVELOPER"
                 ], Color.WHITE)
             elif cmd == "/clear":
                 os.system("cls" if os.name == "nt" else "clear")
@@ -546,14 +532,6 @@ async def interactive_shell() -> None:
                     persist_state()
                 else:
                     print_colored(f"[!] Proveedor activo actual: {active_provider} (opciones: gemini, local, openai, groq, deepseek)", Color.LIGHT_GRAY)
-                print_dashboard(active_provider, active_model, active_agent, active_iterations, current_workspace, len(attached_files), tokens_used, max_tokens)
-            elif cmd == "/agent":
-                if arg.upper() in {"INSPECT", "DEVELOPER"}:
-                    active_agent = arg.upper()
-                    print_colored(f"[✓] Agente activo actualizado a: {active_agent}", Color.WHITE)
-                    persist_state()
-                else:
-                    print_colored(f"[!] Agente activo actual: {active_agent} (opciones: INSPECT, DEVELOPER)", Color.LIGHT_GRAY)
                 print_dashboard(active_provider, active_model, active_agent, active_iterations, current_workspace, len(attached_files), tokens_used, max_tokens)
             elif cmd == "/iterations":
                 if arg.isdigit() and 1 <= int(arg) <= 8:
@@ -684,8 +662,6 @@ async def interactive_shell() -> None:
             provider_instance = get_provider(ProviderName(active_provider.lower()), settings, api_key=getattr(settings, f'{active_provider.lower()}_api_key', None))
             
             async def call_llm():
-                agent_context = f"[MODO AGENTE: {active_agent}] - {'Plan Mode (INSPECT): Análisis estructural y estático' if active_agent == 'INSPECT' else 'Build Mode (DEVELOPER): Generación de código y refactorización'}\n\n"
-                full_prompt = agent_context + (referenced_content + "\n\n" + prompt if referenced_content else prompt)
                 return await provider_instance.complete(full_prompt, active_model, effort=None if active_iterations < 3 else "high")
 
             (response, latency) = await animate_spinner(call_llm(), f"KSPR I ({active_agent}) procesando con {active_provider}:{active_model}...")
