@@ -526,12 +526,12 @@ async def interactive_shell() -> None:
                     print_colored("[*] Consejo: Ejecuta /api para indexar automáticamente los modelos de tu proveedor.", Color.MID_GRAY)
                 print_dashboard(active_provider, active_model, active_iterations, current_workspace, len(attached_files), tokens_used, max_tokens)
             elif cmd == "/provider":
-                if arg in {"gemini", "local", "openai", "groq", "deepseek"}:
+                if arg in {"gemini", "local", "openai", "groq", "deepseek", "anthropic", "openrouter", "opencode-zen"}:
                     active_provider = arg
                     print_colored(f"[✓] Proveedor activo actualizado a: {active_provider}", Color.WHITE)
                     persist_state()
                 else:
-                    print_colored(f"[!] Proveedor activo actual: {active_provider} (opciones: gemini, local, openai, groq, deepseek)", Color.LIGHT_GRAY)
+                    print_colored(f"[!] Proveedor activo actual: {active_provider} (opciones: gemini, local, openai, groq, deepseek, anthropic, openrouter, opencode-zen)", Color.LIGHT_GRAY)
                 print_dashboard(active_provider, active_model, active_iterations, current_workspace, len(attached_files), tokens_used, max_tokens)
             elif cmd == "/iterations":
                 if arg.isdigit() and 1 <= int(arg) <= 8:
@@ -555,17 +555,20 @@ async def interactive_shell() -> None:
                     ], Color.WHITE)
                     print()
                     continue
-                providers_list = ["gemini", "openai", "groq", "deepseek", "local"]
+                providers_list = ["gemini", "openai", "groq", "deepseek", "anthropic", "openrouter", "opencode-zen", "local"]
                 print_box("API & Provider Configuration", [
                     "Selecciona el proveedor para configurar su API Key e indexar modelos:",
-                    " 1. gemini   (Google Generative AI)",
-                    " 2. openai   (OpenAI GPT-4 / GPT-3.5)",
-                    " 3. groq     (Groq Llama / Mixtral)",
-                    " 4. deepseek (Deepseek Chat / Reasoner)",
-                    " 5. local    (Modo local sin API Key)"
+                    " 1. gemini       (Google Generative AI)",
+                    " 2. openai       (OpenAI GPT-4 / GPT-3.5)",
+                    " 3. groq         (Groq Llama / Mixtral)",
+                    " 4. deepseek     (Deepseek Chat / Reasoner)",
+                    " 5. anthropic    (Anthropic Claude)",
+                    " 6. openrouter   (OpenRouter AI Gateway)",
+                    " 7. opencode-zen (OpenCode Zen Gateway)",
+                    " 8. local        (Modo local sin API Key)"
                 ], Color.WHITE)
                 
-                prov_choice = arg.strip().lower() if arg else input(f"{Color.WHITE}Elige proveedor (1-5 o nombre): {Color.RESET}").strip().lower()
+                prov_choice = arg.strip().lower() if arg else input(f"{Color.WHITE}Elige proveedor (1-8 o nombre): {Color.RESET}").strip().lower()
                 
                 selected_prov = active_provider
                 if prov_choice in {"1", "gemini"}:
@@ -576,10 +579,18 @@ async def interactive_shell() -> None:
                     selected_prov = "groq"
                 elif prov_choice in {"4", "deepseek"}:
                     selected_prov = "deepseek"
-                elif prov_choice in {"5", "local"}:
+                elif prov_choice in {"5", "anthropic"}:
+                    selected_prov = "anthropic"
+                elif prov_choice in {"6", "openrouter"}:
+                    selected_prov = "openrouter"
+                elif prov_choice in {"7", "opencode-zen", "opencode_zen", "opencode"}:
+                    selected_prov = "opencode-zen"
+                elif prov_choice in {"8", "local"}:
                     selected_prov = "local"
                 elif prov_choice in providers_list:
                     selected_prov = prov_choice
+                elif prov_choice == "opencode_zen":
+                    selected_prov = "opencode-zen"
                 
                 if selected_prov == "local":
                     print_colored("[✓] El proveedor local no requiere API Key.", Color.WHITE)

@@ -11,6 +11,9 @@ class ProviderName(StrEnum):
     openai = "openai"
     groq = "groq"
     deepseek = "deepseek"
+    anthropic = "anthropic"
+    openrouter = "openrouter"
+    opencode_zen = "opencode-zen"
     openai_compatible = "openai-compatible"
 
 

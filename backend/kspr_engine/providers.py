@@ -557,6 +557,109 @@ class DeepseekProvider(ModelProvider):
         return data
 
 
+class AnthropicProvider(ModelProvider):
+    """Adapter for Anthropic Claude API."""
+
+    name = ProviderName.anthropic
+
+    def __init__(self, settings: Settings, api_key: str | None = None, base_url: str | None = None):
+        self.settings = settings
+        self.api_key = api_key or settings.anthropic_api_key or os.getenv("KSPR_ANTHROPIC_API_KEY") or os.getenv("ANTHROPIC_API_KEY")
+        self.base_url = base_url or settings.anthropic_base_url
+
+    def _require_key(self) -> str:
+        key = self.api_key
+        if not key:
+            raise ProviderError("Configura una API Key de Anthropic para el proveedor anthropic.")
+        return key
+
+    def _headers(self) -> dict[str, str]:
+        return {
+            "x-api-key": self._require_key(),
+            "anthropic-version": "2023-06-01",
+            "Content-Type": "application/json",
+        }
+
+    async def complete(self, prompt: str, model: str, effort: str | None = None) -> str:
+        url = self.base_url.rstrip("/") + "/messages"
+        max_tokens = 8192 if effort == "high" else 4096
+        payload: dict[str, Any] = {
+            "model": model,
+            "max_tokens": max_tokens,
+            "system": KSPR_I_SYSTEM_PROMPT,
+            "messages": [{"role": "user", "content": prompt}],
+        }
+        async with httpx.AsyncClient(timeout=180) as client:
+            response = await client.post(url, headers=self._headers(), json=payload)
+        data = self._response_data(response)
+        try:
+            return "".join(block.get("text", "") for block in data.get("content", [])).strip()
+        except (KeyError, IndexError, TypeError) as exc:
+            raise ProviderError("Anthropic no devolvió texto utilizable.") from exc
+
+    async def list_models(self) -> list[dict[str, Any]]:
+        return [
+            {"id": "claude-3-5-sonnet-20241022", "name": "Claude 3.5 Sonnet", "description": "Anthropic high intelligence model"},
+            {"id": "claude-3-5-haiku-20241022", "name": "Claude 3.5 Haiku", "description": "Anthropic fast model"},
+            {"id": "claude-3-opus-20240229", "name": "Claude 3 Opus", "description": "Anthropic powerful model"},
+        ]
+
+    @staticmethod
+    def _response_data(response: httpx.Response) -> dict[str, Any]:
+        try:
+            data = response.json()
+        except json.JSONDecodeError as exc:
+            raise ProviderError(f"Anthropic devolvió una respuesta no válida ({response.status_code}).") from exc
+        if response.is_error:
+            detail = data.get("error", {}).get("message", response.text[:300])
+            raise ProviderError(f"Anthropic respondió {response.status_code}: {detail}")
+        return data
+
+
+class OpenRouterProvider(OpenAICompatibleProvider):
+    """Adapter for OpenRouter API."""
+
+    name = ProviderName.openrouter
+
+    def __init__(self, settings: Settings, api_key: str | None = None, base_url: str | None = None):
+        super().__init__(
+            settings,
+            api_key=api_key or settings.openrouter_api_key or os.getenv("KSPR_OPENROUTER_API_KEY") or os.getenv("OPENROUTER_API_KEY"),
+            base_url=base_url or settings.openrouter_base_url,
+        )
+
+    def _require_key(self) -> str:
+        key = self.api_key
+        if not key:
+            raise ProviderError("Configura una API Key de OpenRouter para el proveedor openrouter.")
+        return key
+
+    def _headers(self) -> dict[str, str]:
+        headers = super()._headers()
+        headers["HTTP-Referer"] = "https://kspr.ai"
+        headers["X-Title"] = "KSPR AI"
+        return headers
+
+
+class OpenCodeZenProvider(OpenAICompatibleProvider):
+    """Adapter for OpenCode Zen API."""
+
+    name = ProviderName.opencode_zen
+
+    def __init__(self, settings: Settings, api_key: str | None = None, base_url: str | None = None):
+        super().__init__(
+            settings,
+            api_key=api_key or settings.opencode_zen_api_key or os.getenv("KSPR_OPENCODE_ZEN_API_KEY") or os.getenv("OPENCODE_ZEN_API_KEY"),
+            base_url=base_url or settings.opencode_zen_base_url,
+        )
+
+    def _require_key(self) -> str:
+        key = self.api_key
+        if not key:
+            raise ProviderError("Configura una API Key de OpenCode Zen para el proveedor opencode-zen.")
+        return key
+
+
 def get_provider(
     name: ProviderName | str,
     settings: Settings,
@@ -575,8 +678,12 @@ def get_provider(
         return GroqProvider(settings, api_key=api_key, base_url=base_url)
     if provider_id == ProviderName.deepseek.value:
         return DeepseekProvider(settings, api_key=api_key, base_url=base_url)
+    if provider_id == ProviderName.anthropic.value:
+        return AnthropicProvider(settings, api_key=api_key, base_url=base_url)
+    if provider_id == ProviderName.openrouter.value:
+        return OpenRouterProvider(settings, api_key=api_key, base_url=base_url)
+    if provider_id == ProviderName.opencode_zen.value:
+        return OpenCodeZenProvider(settings, api_key=api_key, base_url=base_url)
     if provider_id == ProviderName.openai_compatible.value:
         return OpenAICompatibleProvider(settings, api_key=api_key, base_url=base_url)
-    # Los proveedores declarados por el usuario en la configuración portable
-    # siguen el contrato /chat/completions sin exigir cambios de código.
     return OpenAICompatibleProvider(settings, api_key=api_key, base_url=base_url)
