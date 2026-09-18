@@ -50,9 +50,23 @@ class TerminalUI:
         print()
 
     @staticmethod
-    def print_session_banner(session_id: str, provider: str, model: str, workspace: Path, attached_count: int, tokens_used: int, max_tokens: int) -> None:
+    def print_session_banner(*args: Any, **kwargs: Any) -> None:
+        # Flexible signature support for 6 or 7 positional arguments or kwargs
+        if len(args) == 6:
+            session_id = time.strftime("%Y%m%d_%H%M%S")
+            provider, model, workspace, attached_count, tokens_used, max_tokens = args
+        elif len(args) == 7:
+            session_id, provider, model, workspace, attached_count, tokens_used, max_tokens = args
+        else:
+            session_id = kwargs.get("session_id", time.strftime("%Y%m%d_%H%M%S"))
+            provider = kwargs.get("provider", "gemini")
+            model = kwargs.get("model", "gemini-2.5-flash")
+            workspace = kwargs.get("workspace", Path.cwd())
+            attached_count = kwargs.get("attached_count", 0)
+            tokens_used = kwargs.get("tokens_used", 1250)
+            max_tokens = kwargs.get("max_tokens", 128000)
+
         width = min(TerminalUI.get_width() - 2, 90)
-        horizontal = "─" * (width - 2)
         
         pct = int((tokens_used / max_tokens) * 100) if max_tokens > 0 else 0
         filled = int((pct / 100) * 14)
@@ -63,7 +77,7 @@ class TerminalUI:
             ws_str = "..." + ws_str[-27:]
 
         print()
-        TerminalUI.print_colored(f"┌─ KSPR I  │  sess: {session_id}  │  {provider}:{model}  " + "─" * max(0, width - len(session_id) - len(provider) - len(model) - 34) + "┐", TerminalTheme.GRAPHITE)
+        TerminalUI.print_colored(f"┌─ KSPR I  │  sess: {session_id}  │  {provider}:{model}  " + "─" * max(0, width - len(str(session_id)) - len(str(provider)) - len(str(model)) - 34) + "┐", TerminalTheme.GRAPHITE)
         TerminalUI.print_colored(f"│  ctx: [{bar}] {tokens_used // 1000}k/{max_tokens // 1000}k ({pct}%)  │  dir: {ws_str:<24}  │  files: {attached_count:<2}  │", TerminalTheme.SILVER)
         TerminalUI.print_colored(f"└─ tips: [@] attach   [/] cmds   [/decompilate] tree   [^C] exit " + "─" * max(0, width - 67) + "┘", TerminalTheme.GRAPHITE)
         print()
