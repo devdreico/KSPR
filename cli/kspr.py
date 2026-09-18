@@ -143,7 +143,7 @@ def tokens_weight(tokens: int) -> str:
     return str(tokens)
 
 
-def print_dashboard(provider: str, model: str, iterations: int, workspace: Path, attached_count: int, tokens_used: int, max_tokens: int) -> None:
+def print_dashboard(provider: str, model: str, workspace: Path, attached_count: int, tokens_used: int, max_tokens: int) -> None:
     width = min(get_terminal_width() - 2, 86)
     horizontal = "─" * (width - 2)
     
@@ -157,7 +157,7 @@ def print_dashboard(provider: str, model: str, iterations: int, workspace: Path,
 
     print()
     print_colored(f"┌{horizontal}┐", Color.MID_GRAY)
-    print_colored(f"│ {Color.WHITE}{Color.BOLD}KSPR CLI v0.1.0{Color.RESET} │ {Color.LIGHT_GRAY}Provider:{Color.RESET} {provider:<8} │ {Color.LIGHT_GRAY}Model:{Color.RESET} {model:<16} │ {Color.LIGHT_GRAY}Iter:{Color.RESET} {iterations} │", Color.MID_GRAY)
+    print_colored(f"│ {Color.WHITE}{Color.BOLD}KSPR CLI v0.1.0{Color.RESET} │ {Color.LIGHT_GRAY}Provider:{Color.RESET} {provider:<8} │ {Color.LIGHT_GRAY}Model:{Color.RESET} {model:<16} │", Color.MID_GRAY)
     print_colored(f"│ {Color.LIGHT_GRAY}Agent:{Color.RESET} KSPR I     │ {Color.LIGHT_GRAY}Workdir:{Color.RESET} 📁 {workspace_str:<29} │ {Color.LIGHT_GRAY}Files:{Color.RESET} {attached_count:<2} │", Color.MID_GRAY)
     print_colored(f"│ {Color.LIGHT_GRAY}Context:{Color.RESET} [{bar}] {tokens_weight(tokens_used)}/{tokens_weight(max_tokens)} ({pct}%)" + " " * max(0, width - 48 - len(tokens_weight(tokens_used)) - len(tokens_weight(max_tokens))) + " │", Color.MID_GRAY)
     print_colored(f"└{horizontal}┘", Color.MID_GRAY)
@@ -323,22 +323,37 @@ async def interactive_shell() -> None:
     current_workspace = Path(config.get("current_workspace", Path.cwd()))
     active_model = config.get("active_model", "gemini-2.5-flash")
     active_provider = config.get("active_provider", "gemini")
-    active_iterations = config.get("active_iterations", 3)
     attached_files: dict[str, str] = {}
     indexed_models: dict[str, list[dict[str, Any]]] = config.get("indexed_models", {})
     tokens_used = 1250
     max_tokens = 128000
+    session_id = time.strftime("%Y%m%d_%H%M%S")
+    session_history: list[dict[str, str]] = []
 
     def persist_state() -> None:
         cfg = load_local_config()
         cfg["active_model"] = active_model
         cfg["active_provider"] = active_provider
-        cfg["active_iterations"] = active_iterations
         cfg["indexed_models"] = indexed_models
         cfg["current_workspace"] = str(current_workspace)
         save_local_config(cfg)
 
-    print_dashboard(active_provider, active_model, active_iterations, current_workspace, len(attached_files), tokens_used, max_tokens)
+    def save_session() -> None:
+        sessions_dir = CONFIG_DIR / "sessions"
+        sessions_dir.mkdir(parents=True, exist_ok=True)
+        session_file = sessions_dir / f"{session_id}.json"
+        session_data = {
+            "id": session_id,
+            "provider": active_provider,
+            "model": active_model,
+            "workspace": str(current_workspace),
+            "history": session_history,
+            "files": list(attached_files.keys()),
+            "tokens_used": tokens_used,
+        }
+        session_file.write_text(json.dumps(session_data, ensure_ascii=False, indent=2), encoding="utf-8")
+
+    print_dashboard(active_provider, active_model, current_workspace, len(attached_files), tokens_used, max_tokens)
     print()
 
     def get_input_with_tab() -> str:
@@ -413,8 +428,10 @@ async def interactive_shell() -> None:
                     "/project             - Local project management (New / Existing)",
                     "/model [name/num]    - Show or select an indexed model",
                     "/provider [name]     - Switch active provider",
-                    "/iterations [n]      - Set analysis iterations (1-8)",
                     "/context             - Show attached files in context",
+                    "/compact             - Compact context and token usage",
+                    "/new                 - Start a fresh session",
+                    "/sessions            - Browse and restore saved sessions",
                     "/clear               - Clear screen and redraw dashboard",
                     "/update              - Update KSPR to latest version",
                     "/exit                - Exit interactive session",
@@ -422,7 +439,7 @@ async def interactive_shell() -> None:
             elif cmd == "/clear":
                 os.system("cls" if os.name == "nt" else "clear")
                 print_header()
-                print_dashboard(active_provider, active_model, active_iterations, current_workspace, len(attached_files), tokens_used, max_tokens)
+                print_dashboard(active_provider, active_model, current_workspace, len(attached_files), tokens_used, max_tokens)
                 print()
             elif cmd == "/login":
                 print_box("KSPR Authentication Gateway", [
@@ -492,7 +509,7 @@ async def interactive_shell() -> None:
                             print_colored(f"[✓] Workspace vinculado exitosamente a: {target_dir}", Color.WHITE)
                         else:
                             print_colored("[!] La ruta especificada no es un directorio válido.", Color.LIGHT_GRAY)
-                print_dashboard(active_provider, active_model, active_iterations, current_workspace, len(attached_files), tokens_used, max_tokens)
+                print_dashboard(active_provider, active_model, current_workspace, len(attached_files), tokens_used, max_tokens)
             elif cmd == "/model":
                 if arg:
                     if active_provider in indexed_models and arg.isdigit():
@@ -523,7 +540,7 @@ async def interactive_shell() -> None:
                 else:
                     print_colored(f"[*] Modelo activo actual: {active_model}", Color.LIGHT_GRAY)
                     print_colored("[*] Consejo: Ejecuta /api para indexar automáticamente los modelos de tu proveedor.", Color.MID_GRAY)
-                print_dashboard(active_provider, active_model, active_iterations, current_workspace, len(attached_files), tokens_used, max_tokens)
+                print_dashboard(active_provider, active_model, current_workspace, len(attached_files), tokens_used, max_tokens)
             elif cmd == "/provider":
                 if arg in {"gemini", "local", "openai", "groq", "deepseek", "anthropic", "openrouter", "opencode-zen"}:
                     active_provider = arg
@@ -531,20 +548,84 @@ async def interactive_shell() -> None:
                     persist_state()
                 else:
                     print_colored(f"[!] Proveedor activo actual: {active_provider} (opciones: gemini, local, openai, groq, deepseek, anthropic, openrouter, opencode-zen)", Color.LIGHT_GRAY)
-                print_dashboard(active_provider, active_model, active_iterations, current_workspace, len(attached_files), tokens_used, max_tokens)
-            elif cmd == "/iterations":
-                if arg.isdigit() and 1 <= int(arg) <= 8:
-                    active_iterations = int(arg)
-                    print_colored(f"[✓] Iteraciones activas actualizadas a: {active_iterations}", Color.WHITE)
-                    persist_state()
-                else:
-                    print_colored(f"[*] Iteraciones activas actuales: {active_iterations} (rango 1-8)", Color.LIGHT_GRAY)
-                print_dashboard(active_provider, active_model, active_iterations, current_workspace, len(attached_files), tokens_used, max_tokens)
+                print_dashboard(active_provider, active_model, current_workspace, len(attached_files), tokens_used, max_tokens)
             elif cmd == "/context":
                 lines = [f"Workspace: {current_workspace}", f"Archivos adjuntos ({len(attached_files)}):"]
                 for path in attached_files:
                     lines.append(f" - @{path}")
                 print_box("Active Context", lines, Color.WHITE)
+            elif cmd == "/compact":
+                if session_history:
+                    save_session()
+                    before_tokens = tokens_used
+                    compacted_history = []
+                    seen = set()
+                    for entry in reversed(session_history):
+                        key = entry.get("prompt", "")
+                        if key not in seen:
+                            seen.add(key)
+                            compacted_history.append(entry)
+                    session_history.clear()
+                    session_history.extend(reversed(compacted_history))
+                    tokens_used = max(1250, tokens_used - len(compacted_history) * 50)
+                    print_colored(f"[✓] Context compacted. Tokens: {before_tokens} → {tokens_used}", Color.WHITE)
+                    print_colored(f"    Session saved and deduplicated ({len(compacted_history)} unique entries).", Color.LIGHT_GRAY)
+                else:
+                    tokens_used = 1250
+                    attached_files.clear()
+                    print_colored("[✓] Context cleared. Starting fresh token count.", Color.WHITE)
+                print_dashboard(active_provider, active_model, current_workspace, len(attached_files), tokens_used, max_tokens)
+            elif cmd == "/new":
+                if session_history:
+                    save_session()
+                    print_colored(f"[✓] Session {session_id} saved.", Color.WHITE)
+                session_id = time.strftime("%Y%m%d_%H%M%S")
+                session_history.clear()
+                attached_files.clear()
+                tokens_used = 1250
+                print_colored(f"[✓] New session started: {session_id}", Color.WHITE)
+                print_dashboard(active_provider, active_model, current_workspace, len(attached_files), tokens_used, max_tokens)
+            elif cmd == "/sessions":
+                sessions_dir = CONFIG_DIR / "sessions"
+                if not sessions_dir.is_dir():
+                    print_colored("[!] No saved sessions found.", Color.LIGHT_GRAY)
+                else:
+                    session_files = sorted(sessions_dir.glob("*.json"), reverse=True)
+                    if not session_files:
+                        print_colored("[!] No saved sessions found.", Color.LIGHT_GRAY)
+                    else:
+                        session_lines = []
+                        for sf in session_files[:20]:
+                            try:
+                                data = json.loads(sf.read_text(encoding="utf-8"))
+                                sid = data.get("id", sf.stem)
+                                prov = data.get("provider", "?")
+                                model = data.get("model", "?")
+                                hist_len = len(data.get("history", []))
+                                files_len = len(data.get("files", []))
+                                session_lines.append(f" {sid}  |  {prov}:{model}  |  {hist_len} messages  |  {files_len} files")
+                            except Exception:
+                                session_lines.append(f" {sf.stem}  |  (unreadable)")
+                        print_box("Saved Sessions", session_lines, Color.WHITE)
+                        sel = input(f"{Color.WHITE}Enter session ID to restore (or press Enter to cancel): {Color.RESET}").strip()
+                        if sel:
+                            target = sessions_dir / f"{sel}.json"
+                            if target.is_file():
+                                data = json.loads(target.read_text(encoding="utf-8"))
+                                session_history.clear()
+                                session_history.extend(data.get("history", []))
+                                tokens_used = data.get("tokens_used", 1250)
+                                for fp in data.get("files", []):
+                                    fpath = current_workspace / fp
+                                    if fpath.is_file():
+                                        try:
+                                            attached_files[fp] = fpath.read_text(encoding="utf-8", errors="replace")
+                                        except Exception:
+                                            pass
+                                print_colored(f"[✓] Session {sel} restored ({len(session_history)} messages).", Color.WHITE)
+                            else:
+                                print_colored(f"[!] Session {sel} not found.", Color.LIGHT_GRAY)
+                print_dashboard(active_provider, active_model, current_workspace, len(attached_files), tokens_used, max_tokens)
             elif cmd == "/api":
                 cfg = load_local_config()
                 if not cfg.get("unlocked", False):
@@ -636,7 +717,7 @@ async def interactive_shell() -> None:
                             print_colored(f"[!] No se pudieron indexar modelos automáticamente: {ex}", Color.LIGHT_GRAY)
                     else:
                         print_colored("[!] API Key no modificada (vacía).", Color.MID_GRAY)
-                print_dashboard(active_provider, active_model, active_iterations, current_workspace, len(attached_files), tokens_used, max_tokens)
+                print_dashboard(active_provider, active_model, current_workspace, len(attached_files), tokens_used, max_tokens)
             else:
                 print_colored(f"[!] Unknown command: {cmd}. Type /help to see available commands.", Color.MID_GRAY)
             print()
@@ -673,6 +754,8 @@ async def interactive_shell() -> None:
             (response, latency) = await animate_spinner(call_llm(), f"KSPR I processing with {active_provider}:{active_model}...")
             
             tokens_used += len(response.encode()) // 3
+            session_history.append({"role": "user", "content": prompt})
+            session_history.append({"role": "assistant", "content": response})
             print_response_box(f"KSPR I ({active_provider}:{active_model})", response, latency=latency)
             if attached_files:
                 print_colored(f"[*] Contexto activo: {list(attached_files.keys())}", Color.MID_GRAY)
@@ -706,7 +789,7 @@ async def interactive_shell() -> None:
             print_colored("  → Run /provider to switch providers.", Color.LIGHT_GRAY)
             print_colored("  → Run /model to switch models.", Color.LIGHT_GRAY)
         
-        print_dashboard(active_provider, active_model, active_iterations, current_workspace, len(attached_files), tokens_used, max_tokens)
+        print_dashboard(active_provider, active_model, current_workspace, len(attached_files), tokens_used, max_tokens)
         print()
 
 
@@ -723,8 +806,7 @@ def main() -> None:
     parser.add_argument("--git-url", default=None, help="Clona un repositorio Git en modo lectura para analizarlo")
     parser.add_argument("--output", type=Path, default=Path("kspr-context"), help="Directorio de salida para los artefactos Markdown")
     parser.add_argument("--project-name", default=None, help="Nombre del proyecto para el reporte")
-    parser.add_argument("--iterations", type=int, default=3, choices=range(1, 9), help="Número de iteraciones de análisis (1-8)")
-    parser.add_argument("--provider", choices=["local", "gemini", "openai", "groq", "deepseek"], default="gemini", help="Proveedor de IA a utilizar")
+    parser.add_argument("--provider", choices=["local", "gemini", "openai", "groq", "deepseek", "anthropic", "openrouter", "opencode-zen"], default="gemini", help="Proveedor de IA a utilizar")
     parser.add_argument("--model", default=None, help="Modelo de IA a utilizar (ej. gemini-2.5-flash)")
     args = parser.parse_args()
 
@@ -748,7 +830,7 @@ def main() -> None:
                 git_url=args.git_url,
                 output=args.output,
                 project_name=args.project_name,
-                iterations=args.iterations,
+                iterations=3,
                 provider=args.provider,
                 model=args.model,
             )
