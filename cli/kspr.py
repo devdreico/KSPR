@@ -25,6 +25,7 @@ from kspr_engine.plugin_manager import PluginManager
 from kspr_engine.capabilities import CapabilityManager
 from kspr_engine.skills import SkillsManager
 from kspr_engine.decompiler import DecompilerEngine, CONTEXT_TREES_DIR
+from kspr_terminal_ui import TerminalTheme, TerminalUI
 
 __version__ = "0.1.0"
 
@@ -155,139 +156,22 @@ def list_prompts_data() -> list[dict]:
     return list(data["prompts"].values())
 
 
-class Color:
-    """High-contrast monochrome and grayscale ANSI color codes."""
-    RESET = "\033[0m"
-    BOLD = "\033[1m"
-    DIM = "\033[2m"
-    UNDERLINE = "\033[4m"
-    INVERSE = "\033[7m"
-    
-    WHITE = "\033[97m"         # Bright white for titles and primary focus
-    LIGHT_GRAY = "\033[37m"    # Normal readable text
-    MID_GRAY = "\033[90m"      # Borders, dividers, metadata
-    DARK_CHARCOAL = "\033[2m"  # Dim background accents
-    BLACK = "\033[30m"
+Color = TerminalTheme
+print_colored = TerminalUI.print_colored
+get_terminal_width = TerminalUI.get_width
 
 
-KSPR_ASCII = [
-    "░                             ",
-    " ░░░░░░░░░░                              ",
-    "░░░░░░░░░░   ░░  ░░ ░░░░░░ ░░░░░░  ░░░░░ ",
-    "░   ░░   ░   ░░ ░░  ░░░░░  ░░   ░ ░░   ░░",
-    "░░░░░░░░░░   ░░░░     ░░░░ ░░░░░░ ░░░░░░ ",
-    "░░░░  ░░░░   ░░ ░░░ ░░░░░░ ░░░    ░░   ░░"
-]
-
-ALLOWED = {".py", ".js", ".jsx", ".ts", ".tsx", ".cs", ".java", ".sql", ".html", ".vue", ".php", ".md", ".txt", ".json", ".yaml", ".yml", ".pdf", ".csv", ".toml", ".ini", ".xml", ".db", ".sqlite"}
-
-
-def print_colored(text: str, color: Color, bold: bool = False) -> None:
-    prefix = Color.BOLD if bold else ""
-    print(f"{color}{prefix}{text}{Color.RESET}")
-
-
-def get_terminal_width() -> int:
-    try:
-        return os.get_terminal_size().columns
-    except OSError:
-        return 80
-
-
-def print_box(title: str, lines: list[str], color: Color = Color.WHITE) -> None:
-    width = min(max(len(title) + 4, max((len(l) for l in lines), default=40) + 4), get_terminal_width() - 2)
-    horizontal = "─" * (width - 2)
-    
-    print()
-    print_colored(f"┌─ {title} " + "─" * max(0, width - len(title) - 4) + "┐", color)
-    for line in lines:
-        padding = max(0, width - len(line) - 4)
-        print_colored(f"│  {line}" + " " * padding + "│", Color.LIGHT_GRAY)
-    print_colored(f"└{horizontal}┘", color)
-    print()
+def print_box(title: str, lines: list[str], color: Any = None) -> None:
+    TerminalUI.print_box(title, lines)
 
 
 def print_header() -> None:
-    print()
-    for line in KSPR_ASCII:
-        print_colored(line, Color.WHITE, True)
-    print()
+    pass
 
 
-def tokens_weight(tokens: int) -> str:
-    if tokens >= 1000:
-        return f"{tokens / 1000:.1f}k"
-    return str(tokens)
-
-
-def print_dashboard(provider: str, model: str, workspace: Path, attached_count: int, tokens_used: int, max_tokens: int) -> None:
-    width = min(get_terminal_width() - 2, 86)
-    horizontal = "─" * (width - 2)
-    
-    pct = int((tokens_used / max_tokens) * 100) if max_tokens > 0 else 0
-    filled = int((pct / 100) * 16)
-    bar = "█" * filled + "░" * (16 - filled)
-    
-    workspace_str = str(workspace)
-    if len(workspace_str) > 34:
-        workspace_str = "..." + workspace_str[-31:]
-
-    print()
-    print_colored(f"┌{horizontal}┐", Color.MID_GRAY)
-    print_colored(f"│ {Color.WHITE}{Color.BOLD}KSPR CLI v0.1.0{Color.RESET} │ {Color.LIGHT_GRAY}Provider:{Color.RESET} {provider:<8} │ {Color.LIGHT_GRAY}Model:{Color.RESET} {model:<16} │", Color.MID_GRAY)
-    print_colored(f"│ {Color.LIGHT_GRAY}Agent:{Color.RESET} KSPR I     │ {Color.LIGHT_GRAY}Workdir:{Color.RESET} 📁 {workspace_str:<29} │ {Color.LIGHT_GRAY}Files:{Color.RESET} {attached_count:<2} │", Color.MID_GRAY)
-    print_colored(f"│ {Color.LIGHT_GRAY}Context:{Color.RESET} [{bar}] {tokens_weight(tokens_used)}/{tokens_weight(max_tokens)} ({pct}%)" + " " * max(0, width - 48 - len(tokens_weight(tokens_used)) - len(tokens_weight(max_tokens))) + " │", Color.MID_GRAY)
-    print_colored(f"└{horizontal}┘", Color.MID_GRAY)
-    print()
-
-
-async def animate_spinner(task_coro, message: str) -> tuple[Any, float]:
-    spinners = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"]
-    idx = 0
-    start_time = time.time()
-    
-    task = asyncio.create_task(task_coro)
-    
-    sys.stdout.write("\033[?25l")
-    try:
-        while not task.done():
-            elapsed = time.time() - start_time
-            sys.stdout.write(f"\r{Color.WHITE}{spinners[idx]} {message} {Color.MID_GRAY}[ {elapsed:.1f}s ]{Color.RESET}")
-            sys.stdout.flush()
-            idx = (idx + 1) % len(spinners)
-            await asyncio.sleep(0.08)
-        sys.stdout.write("\r\033[K")
-        elapsed = time.time() - start_time
-        return await task, elapsed
-    finally:
-        sys.stdout.write("\033[?25h")
-        sys.stdout.flush()
-
-
-def print_response_box(title: str, text: str | list[str], latency: float = 0.0) -> None:
-    if isinstance(text, list):
-        lines = text
-    else:
-        lines = text.splitlines()
-        if not lines:
-            lines = [text]
-    width = min(max(len(title) + 12, max((len(l) for l in lines), default=40) + 4), get_terminal_width() - 2)
-    horizontal = "─" * (width - 2)
-    
-    lat_str = f" [ {latency:.2f}s ]" if latency > 0 else ""
-    header_title = f"{title}{lat_str}"
-    
-    print()
-    print_colored(f"┌─ {header_title} " + "─" * max(0, width - len(header_title) - 3) + "┐", Color.WHITE)
-    for line in lines:
-        while len(line) > width - 4:
-            chunk = line[:width - 4]
-            line = line[width - 4:]
-            print_colored(f"│  {chunk}  │", Color.LIGHT_GRAY)
-        padding = max(0, width - len(line) - 4)
-        print_colored(f"│  {line}" + " " * padding + "│", Color.LIGHT_GRAY)
-    print_colored(f"└{horizontal}┘", Color.WHITE)
-    print()
+print_dashboard = TerminalUI.print_session_banner
+animate_spinner = TerminalUI.animate_spinner
+print_response_box = TerminalUI.print_response
 
 
 # ---- Collect functions ----
@@ -1232,19 +1116,18 @@ async def interactive_shell() -> None:
                 # Check if response is a tool call
                 if isinstance(response, dict) and "tool_calls" in response:
                     tool_calls = response["tool_calls"]
-                    print_colored(f"[⚡] KSPR I requests {len(tool_calls)} tool call(s)", Color.WHITE)
+                    TerminalUI.print_colored(f"  ● KSPR I requests {len(tool_calls)} tool call(s)", TerminalTheme.WHITE)
 
                     # Add assistant message with tool calls to conversation
                     conversation_messages.append({"role": "assistant", "content": None, "tool_calls": tool_calls})
 
-                    for tc in tool_calls:
-                        fn_name = tc.get("function", {}).get("name", tc.get("function", {}).get("name", ""))
-                        fn_args = tc.get("function", {}).get("arguments", tc.get("function", {}).get("arguments", {}))
+                    for idx, tc in enumerate(tool_calls, 1):
+                        fn_name = tc.get("function", {}).get("name", "")
+                        fn_args = tc.get("function", {}).get("arguments", {})
                         tc_id = tc.get("id", "")
 
-                        print_colored(f"  ├─ Calling: {fn_name}({json.dumps(fn_args, ensure_ascii=False)[:100]})", Color.MID_GRAY)
-
-                        # Execute tool via MCP or plugin
+                        t_start = time.time()
+                        # Execute tool via MCP or plugin or capability
                         tool_result = None
                         if mcp_manager:
                             tool_result = asyncio.run(mcp_manager.execute_tool(fn_name, fn_args) if asyncio.iscoroutinefunction(mcp_manager.execute_tool) else _sync_execute(mcp_manager, fn_name, fn_args))
@@ -1252,11 +1135,11 @@ async def interactive_shell() -> None:
                             tool_result = plugin_manager.execute_tool(fn_name, fn_args)
                         if tool_result is None:
                             tool_result = f"Tool '{fn_name}' not found."
+                        t_dur = (time.time() - t_start) * 1000
 
-                        truncated_result = str(tool_result)[:2000]
-                        print_colored(f"  └─ Result: {truncated_result[:120]}{'...' if len(truncated_result) > 120 else ''}", Color.MID_GRAY)
+                        TerminalUI.print_tool_step(fn_name, fn_args, str(tool_result), t_dur)
 
-                        conversation_messages.append({"role": "tool", "content": truncated_result, "tool_call_id": tc_id})
+                        conversation_messages.append({"role": "tool", "content": str(tool_result)[:2000], "tool_call_id": tc_id})
 
                     # Rebuild prompt with tool results
                     full_prompt = _build_messages_prompt(conversation_messages)
