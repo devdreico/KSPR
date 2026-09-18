@@ -123,3 +123,37 @@ class OAuthLoginRequest(BaseModel):
     email: str = Field(min_length=5, max_length=100)
     username: str | None = Field(default=None, max_length=50)
 
+
+class MCPTool(BaseModel):
+    name: str
+    description: str = ""
+    input_schema: dict[str, Any] = Field(default_factory=dict)
+    server: str = ""
+
+
+class MCPToolCall(BaseModel):
+    tool_name: str
+    arguments: dict[str, Any] = Field(default_factory=dict)
+
+
+class MCPToolResult(BaseModel):
+    tool_name: str
+    result: Any = None
+    error: str | None = None
+
+
+class PluginInfo(BaseModel):
+    name: str
+    dir_name: str = ""
+    version: str = "0.1.0"
+    description: str = ""
+    tools: list[MCPTool] = Field(default_factory=list)
+    enabled: bool = True
+
+
+class MCPServerConfig(BaseModel):
+    type: str = "remote"
+    url: str | None = None
+    command: list[str] = Field(default_factory=list)
+    enabled: bool = True
+

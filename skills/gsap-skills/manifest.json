@@ -1,0 +1,28 @@
+{
+  "version": "1.0.0",
+  "name": "gsap-skills",
+  "description": "Default skills bundle for KSPR I",
+  "skills": {
+    "cli-anything-default": {
+      "name": "cli-anything-default",
+      "description": "Guide for using KSPR Capability Layer",
+      "version": "0.1.0",
+      "skill_path": "cli-anything-default/SKILL.md",
+      "enabled": true
+    },
+    "code-analysis": {
+      "name": "code-analysis",
+      "description": "Code quality analysis tools",
+      "version": "0.1.0",
+      "skill_path": "code-analysis/SKILL.md",
+      "enabled": true
+    },
+    "security-audit": {
+      "name": "security-audit",
+      "description": "Source code security audit tools",
+      "version": "0.1.0",
+      "skill_path": "security-audit/SKILL.md",
+      "enabled": true
+    }
+  }
+}

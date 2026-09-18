@@ -18,14 +18,21 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "backend"))
 
 from kspr_engine.analyzer import analyze
 from kspr_engine.config import Settings
-from kspr_engine.models import AnalysisRequest, SourceFile
+from kspr_engine.models import AnalysisRequest, SourceFile, MCPServerConfig
 from kspr_engine.providers import get_provider, ProviderName, ProviderError
+from kspr_engine.mcp_client import MCPManager
+from kspr_engine.plugin_manager import PluginManager
+from kspr_engine.capabilities import CapabilityManager
+from kspr_engine.skills import SkillsManager
 
 __version__ = "0.1.0"
 
 CONFIG_DIR = Path.home() / ".kspr"
 CONFIG_FILE = CONFIG_DIR / "config.json"
 PROJECTS_FILE = CONFIG_DIR / "projects.json"
+MCP_SERVERS_FILE = CONFIG_DIR / "mcp_servers.json"
+PLUGINS_DIR = Path.home() / ".kspr" / "plugins"
+PROMPTS_FILE = CONFIG_DIR / "prompts.json"
 
 
 def load_local_config() -> dict[str, Any]:
@@ -76,6 +83,75 @@ def save_projects(projects: list[dict[str, str]]) -> None:
         PROJECTS_FILE.write_text(json.dumps(projects, ensure_ascii=False, indent=2), encoding="utf-8")
     except Exception as e:
         print(f"[!] No se pudo guardar la lista de proyectos: {e}")
+
+
+def load_mcp_servers() -> dict[str, dict]:
+    if MCP_SERVERS_FILE.is_file():
+        try:
+            return json.loads(MCP_SERVERS_FILE.read_text(encoding="utf-8"))
+        except Exception:
+            return {}
+    return {}
+
+
+def save_mcp_servers(servers: dict[str, dict]) -> None:
+    try:
+        CONFIG_DIR.mkdir(parents=True, exist_ok=True)
+        MCP_SERVERS_FILE.write_text(json.dumps(servers, ensure_ascii=False, indent=2), encoding="utf-8")
+    except Exception as e:
+        print(f"[!] Could not save MCP servers: {e}")
+
+
+def load_prompts() -> dict:
+    if PROMPTS_FILE.is_file():
+        try:
+            return json.loads(PROMPTS_FILE.read_text(encoding="utf-8"))
+        except Exception:
+            pass
+    return {"version": "1.0.0", "prompts": {}}
+
+
+def save_prompts(data: dict) -> None:
+    try:
+        CONFIG_DIR.mkdir(parents=True, exist_ok=True)
+        PROMPTS_FILE.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+    except Exception as e:
+        print(f"[!] Could not save prompts: {e}")
+
+
+def add_prompt(name: str, content: str, description: str = "", tags: list[str] | None = None) -> dict:
+    data = load_prompts()
+    from datetime import datetime, timezone
+    now = datetime.now(timezone.utc).isoformat()
+    data["prompts"][name] = {
+        "name": name,
+        "description": description,
+        "content": content,
+        "created_at": now,
+        "updated_at": now,
+        "tags": tags or [],
+    }
+    save_prompts(data)
+    return data["prompts"][name]
+
+
+def remove_prompt(name: str) -> bool:
+    data = load_prompts()
+    if name in data["prompts"]:
+        del data["prompts"][name]
+        save_prompts(data)
+        return True
+    return False
+
+
+def get_prompt(name: str) -> dict | None:
+    data = load_prompts()
+    return data["prompts"].get(name)
+
+
+def list_prompts_data() -> list[dict]:
+    data = load_prompts()
+    return list(data["prompts"].values())
 
 
 class Color:
@@ -309,6 +385,29 @@ async def run_batch_analysis(source: Path, git_url: str | None, output: Path, pr
 
 # ---- Interactive Shell ----
 
+def _sync_execute(manager: MCPManager, name: str, arguments: dict) -> str:
+    """Synchronous wrapper to execute MCP tool from inside an async context."""
+    import concurrent.futures
+    import asyncio as _aio
+
+    async def _run():
+        return await manager.execute_tool(name, arguments)
+
+    # Create a new event loop in a thread to avoid conflict with the running one
+    with concurrent.futures.ThreadPoolExecutor(max_workers=1) as pool:
+        future = pool.submit(_aio.run, _run())
+        return str(future.result(timeout=30))
+
+
+def _build_messages_prompt(messages: list[dict[str, Any]]) -> str:
+    parts = []
+    for m in messages:
+        role = m.get("role", "")
+        content = m.get("content", "")
+        if content:
+            parts.append(f"[{role}]: {content}")
+    return "\n".join(parts)
+
 async def interactive_shell() -> None:
     print_header()
     
@@ -428,6 +527,11 @@ async def interactive_shell() -> None:
                     "/project             - Local project management (New / Existing)",
                     "/model [name/num]    - Show or select an indexed model",
                     "/provider [name]     - Switch active provider",
+                    "/mcp [action]        - Configure and manage MCP servers",
+                    "/plugins [action]    - Install and manage plugins",
+                    "/capabilities [act]  - Discover and manage CLI capabilities",
+                    "/prompts [action]    - Manage saved prompts (add/select/remove/info)",
+                    "/skills [action]     - View and manage loaded skill bundles",
                     "/context             - Show attached files in context",
                     "/compact             - Compact context and token usage",
                     "/new                 - Start a fresh session",
@@ -554,6 +658,292 @@ async def interactive_shell() -> None:
                 for path in attached_files:
                     lines.append(f" - @{path}")
                 print_box("Active Context", lines, Color.WHITE)
+            elif cmd == "/mcp":
+                mcp_args = arg.strip().split() if arg else []
+                mcp_action = mcp_args[0] if mcp_args else ""
+                if not mcp_action:
+                    servers_data = load_mcp_servers()
+                    if not servers_data:
+                        print_colored("[!] No MCP servers configured.", Color.LIGHT_GRAY)
+                        print_colored("    Usage: /mcp add <name> <url|command>", Color.MID_GRAY)
+                    else:
+                        lines = []
+                        for sname, sconf in servers_data.items():
+                            status = "active" if sconf.get("enabled", True) else "inactive"
+                            url_or_cmd = sconf.get("url", "") or " ".join(sconf.get("command", []))
+                            lines.append(f" {sname}  |  {sconf.get('type', 'remote')}  |  {url_or_cmd}  |  {status}")
+                        print_box("MCP Servers", lines, Color.WHITE)
+                elif mcp_action == "add" and len(mcp_args) >= 3:
+                    sname = mcp_args[1]
+                    target = mcp_args[2]
+                    servers_data = load_mcp_servers()
+                    if target.startswith("http://") or target.startswith("https://"):
+                        servers_data[sname] = {"type": "remote", "url": target, "enabled": True}
+                    else:
+                        servers_data[sname] = {"type": "local", "command": [target] + mcp_args[3:], "enabled": True}
+                    save_mcp_servers(servers_data)
+                    print_colored(f"[✓] MCP server '{sname}' added.", Color.WHITE)
+                elif mcp_action == "remove" and len(mcp_args) >= 2:
+                    servers_data = load_mcp_servers()
+                    if mcp_args[1] in servers_data:
+                        del servers_data[mcp_args[1]]
+                        save_mcp_servers(servers_data)
+                        print_colored(f"[✓] MCP server '{mcp_args[1]}' removed.", Color.WHITE)
+                    else:
+                        print_colored(f"[!] MCP server '{mcp_args[1]}' not found.", Color.LIGHT_GRAY)
+                elif mcp_action in {"enable", "disable"} and len(mcp_args) >= 2:
+                    servers_data = load_mcp_servers()
+                    if mcp_args[1] in servers_data:
+                        servers_data[mcp_args[1]]["enabled"] = mcp_action == "enable"
+                        save_mcp_servers(servers_data)
+                        print_colored(f"[✓] MCP server '{mcp_args[1]}' {mcp_action}d.", Color.WHITE)
+                    else:
+                        print_colored(f"[!] MCP server '{mcp_args[1]}' not found.", Color.LIGHT_GRAY)
+                elif mcp_action == "test" and len(mcp_args) >= 2:
+                    servers_data = load_mcp_servers()
+                    sname = mcp_args[1]
+                    if sname not in servers_data:
+                        print_colored(f"[!] MCP server '{sname}' not found.", Color.LIGHT_GRAY)
+                    else:
+                        print_colored(f"[*] Testing MCP server '{sname}'...", Color.LIGHT_GRAY)
+                        mgr = MCPManager({sname: MCPServerConfig(**servers_data[sname])})
+                        connected = asyncio.run(mgr.connect_all())
+                        if connected:
+                            tools = mgr.get_tools_sync()
+                            print_colored(f"[✓] Connected. {len(tools)} tools available.", Color.WHITE)
+                        else:
+                            print_colored(f"[!] Failed to connect to '{sname}'.", Color.LIGHT_GRAY)
+                elif mcp_action == "tools":
+                    servers_data = load_mcp_servers()
+                    if not servers_data:
+                        print_colored("[!] No MCP servers configured.", Color.LIGHT_GRAY)
+                    else:
+                        mgr = MCPManager({k: MCPServerConfig(**v) for k, v in servers_data.items()})
+                        asyncio.run(mgr.connect_all())
+                        tools = mgr.get_tools_sync()
+                        if tools:
+                            tool_lines = [f" {t.name}  |  {t.server}  |  {t.description[:50]}" for t in tools]
+                            print_box("MCP Tools", tool_lines, Color.WHITE)
+                        else:
+                            print_colored("[!] No tools available from connected MCP servers.", Color.LIGHT_GRAY)
+                else:
+                    print_colored("[!] Usage: /mcp [add|remove|enable|disable|test|tools] [args]", Color.LIGHT_GRAY)
+                print_dashboard(active_provider, active_model, current_workspace, len(attached_files), tokens_used, max_tokens)
+            elif cmd == "/plugins":
+                pm = PluginManager(PLUGINS_DIR)
+                plugin_args = arg.strip().split() if arg else []
+                plugin_action = plugin_args[0] if plugin_args else ""
+                if not plugin_action:
+                    plugins = pm.scan_plugins()
+                    if not plugins:
+                        print_colored("[!] No plugins installed.", Color.LIGHT_GRAY)
+                        print_colored(f"    Plugins directory: {PLUGINS_DIR}", Color.MID_GRAY)
+                    else:
+                        lines = []
+                        for p in plugins:
+                            status = "enabled" if p.enabled else "disabled"
+                            lines.append(f" {p.name}  |  v{p.version}  |  {len(p.tools)} tools  |  {status}")
+                        print_box("Installed Plugins", lines, Color.WHITE)
+                elif plugin_action == "load":
+                    loaded = pm.load_all()
+                    print_colored(f"[✓] Loaded {loaded} plugin(s).", Color.WHITE)
+                elif plugin_action == "tools":
+                    pm.load_all()
+                    tools = pm.get_tools()
+                    if tools:
+                        tool_lines = [f" {t.name}  |  {t.server}  |  {t.description[:50]}" for t in tools]
+                        print_box("Plugin Tools", tool_lines, Color.WHITE)
+                    else:
+                        print_colored("[!] No tools from loaded plugins.", Color.LIGHT_GRAY)
+                elif plugin_action == "info" and len(plugin_args) >= 2:
+                    pm.load_all()
+                    info = pm.get_plugin_info(plugin_args[1])
+                    if info:
+                        print_box(f"Plugin: {info.name}", [
+                            f"Version: {info.version}",
+                            f"Description: {info.description}",
+                            f"Tools: {len(info.tools)}",
+                        ], Color.WHITE)
+                    else:
+                        print_colored(f"[!] Plugin '{plugin_args[1]}' not found.", Color.LIGHT_GRAY)
+                else:
+                    print_colored("[!] Usage: /plugins [load|tools|info] [args]", Color.LIGHT_GRAY)
+                print_dashboard(active_provider, active_model, current_workspace, len(attached_files), tokens_used, max_tokens)
+            elif cmd == "/capabilities":
+                cap_manager = CapabilityManager()
+                cap_manager.initialize()
+                cap_args = arg.strip().split() if arg else []
+                cap_action = cap_args[0] if cap_args else ""
+                if not cap_action:
+                    caps = cap_manager.list_capabilities()
+                    if not caps:
+                        print_colored("[!] No capabilities discovered.", Color.LIGHT_GRAY)
+                        print_colored("    Install CLI-Anything harnesses to add capabilities.", Color.MID_GRAY)
+                    else:
+                        lines = []
+                        for c in caps:
+                            lines.append(f" {c.id}  |  {c.name}  |  {c.source_type}  |  {c.description[:40]}")
+                        print_box("Capabilities", lines, Color.WHITE)
+                elif cap_action == "search" and len(cap_args) >= 2:
+                    query = " ".join(cap_args[1:])
+                    results = cap_manager.search(query)
+                    if results:
+                        lines = [f" {c.id}  |  {c.name}  |  {c.description[:50]}" for c in results]
+                        print_box(f"Search: {query}", lines, Color.WHITE)
+                    else:
+                        print_colored(f"[!] No capabilities matching '{query}'.", Color.LIGHT_GRAY)
+                elif cap_action == "info" and len(cap_args) >= 2:
+                    cap = cap_manager.get(cap_args[1])
+                    if cap:
+                        print_box(f"Capability: {cap.name}", [
+                            f"ID: {cap.id}",
+                            f"Source: {cap.source}",
+                            f"Type: {cap.source_type}",
+                            f"Category: {cap.category}",
+                            f"Version: {cap.version}",
+                            f"Installed: {cap.installed}",
+                            f"Returns JSON: {cap.returns_json}",
+                            f"Description: {cap.description}",
+                        ], Color.WHITE)
+                    else:
+                        print_colored(f"[!] Capability '{cap_args[1]}' not found.", Color.LIGHT_GRAY)
+                elif cap_action == "run" and len(cap_args) >= 2:
+                    cap_id = cap_args[1]
+                    result = cap_manager.execute(cap_id, {}, prefer_json=True)
+                    if result.success:
+                        print_colored(f"[✓] Execution successful ({result.duration_ms:.0f}ms)", Color.WHITE)
+                        if result.parsed_output:
+                            print(json.dumps(result.parsed_output, ensure_ascii=False, indent=2)[:2000])
+                        else:
+                            print(result.stdout[:2000])
+                    else:
+                        print_colored(f"[!] Execution failed: {result.error_message}", Color.LIGHT_GRAY)
+                elif cap_action == "refresh":
+                    caps = cap_manager.refresh()
+                    print_colored(f"[✓] Refreshed. {len(caps)} capabilities found.", Color.WHITE)
+                else:
+                    print_colored("[!] Usage: /capabilities [search|info|run|refresh] [args]", Color.LIGHT_GRAY)
+                print_dashboard(active_provider, active_model, current_workspace, len(attached_files), tokens_used, max_tokens)
+            elif cmd == "/prompts":
+                prompt_args = arg.strip().split() if arg else []
+                prompt_action = prompt_args[0] if prompt_args else ""
+                if not prompt_action:
+                    prompts = list_prompts_data()
+                    if not prompts:
+                        print_colored("[!] No saved prompts. Use /prompts add <name> to create one.", Color.LIGHT_GRAY)
+                    else:
+                        lines = []
+                        for p in prompts:
+                            tags = ", ".join(p.get("tags", []))
+                            lines.append(f" {p['name']:<20} {p.get('description', '')[:40]} [{tags}]")
+                        print_box("Saved Prompts", lines, Color.WHITE)
+                elif prompt_action == "add" and len(prompt_args) >= 2:
+                    pname = prompt_args[1]
+                    if get_prompt(pname):
+                        print_colored(f"[!] Prompt '{pname}' already exists.", Color.LIGHT_GRAY)
+                    else:
+                        print_colored(f"Creating prompt '{name}'. Type content (empty line to finish):", Color.WHITE)
+                        lines_list = []
+                        while True:
+                            try:
+                                line = input(f"{Color.WHITE}> {Color.RESET}")
+                            except (EOFError, KeyboardInterrupt):
+                                break
+                            if line == "":
+                                break
+                            lines_list.append(line)
+                        content = "\n".join(lines_list)
+                        if not content.strip():
+                            print_colored("[!] Empty prompt. Cancelled.", Color.LIGHT_GRAY)
+                        else:
+                            desc = input(f"{Color.WHITE}Description (optional): {Color.RESET}").strip()
+                            tags_str = input(f"{Color.WHITE}Tags (comma separated, optional): {Color.RESET}").strip()
+                            tags = [t.strip() for t in tags_str.split(",") if t.strip()] if tags_str else []
+                            add_prompt(pname, content, desc, tags)
+                            print_colored(f"[✓] Prompt '{pname}' created.", Color.WHITE)
+                elif prompt_action == "select":
+                    if len(prompt_args) >= 2:
+                        pname = prompt_args[1]
+                        prompt_data = get_prompt(pname)
+                        if prompt_data:
+                            print_colored(f"[✓] Prompt '{pname}' selected.", Color.WHITE)
+                            return ("PROMPT_INJECT", prompt_data["content"])
+                        else:
+                            print_colored(f"[!] Prompt '{pname}' not found.", Color.LIGHT_GRAY)
+                    else:
+                        prompts = list_prompts_data()
+                        if not prompts:
+                            print_colored("[!] No prompts to select.", Color.LIGHT_GRAY)
+                        else:
+                            print_colored("Select a prompt:", Color.WHITE)
+                            for i, p in enumerate(prompts, 1):
+                                print_colored(f"  {i}. {p['name']}", Color.WHITE)
+                            try:
+                                choice = int(input(f"{Color.WHITE}Number: {Color.RESET}")) - 1
+                                if 0 <= choice < len(prompts):
+                                    selected = prompts[choice]
+                                    return ("PROMPT_INJECT", selected["content"])
+                                else:
+                                    print_colored("[!] Invalid selection.", Color.LIGHT_GRAY)
+                            except (ValueError, IndexError, EOFError):
+                                print_colored("[!] Invalid selection.", Color.LIGHT_GRAY)
+                elif prompt_action == "remove" and len(prompt_args) >= 2:
+                    if remove_prompt(prompt_args[1]):
+                        print_colored(f"[✓] Prompt '{prompt_args[1]}' removed.", Color.WHITE)
+                    else:
+                        print_colored(f"[!] Prompt '{prompt_args[1]}' not found.", Color.LIGHT_GRAY)
+                elif prompt_action == "info" and len(prompt_args) >= 2:
+                    prompt_data = get_prompt(prompt_args[1])
+                    if prompt_data:
+                        print_box(f"Prompt: {prompt_data['name']}", [
+                            f"Description: {prompt_data.get('description', '')}",
+                            f"Tags: {', '.join(prompt_data.get('tags', []))}",
+                            f"Created: {prompt_data.get('created_at', '')}",
+                            f"Content preview: {prompt_data['content'][:200]}...",
+                        ], Color.WHITE)
+                    else:
+                        print_colored(f"[!] Prompt '{prompt_args[1]}' not found.", Color.LIGHT_GRAY)
+                else:
+                    print_colored("[!] Usage: /prompts [add|select|remove|info] [args]", Color.LIGHT_GRAY)
+                print_dashboard(active_provider, active_model, current_workspace, len(attached_files), tokens_used, max_tokens)
+            elif cmd == "/skills":
+                skills_manager = SkillsManager()
+                skills_args = arg.strip().split() if arg else []
+                skills_action = skills_args[0] if skills_args else ""
+                if not skills_action:
+                    bundles = skills_manager.list_bundles()
+                    if not bundles:
+                        print_colored("[!] No skill bundles loaded.", Color.LIGHT_GRAY)
+                    else:
+                        lines = []
+                        for b in bundles:
+                            status = "[on]" if b.enabled else "[off]"
+                            lines.append(f" {status} {b.name:<25} v{b.version}  {b.description[:40]}")
+                        print_box("Skills", lines, Color.WHITE)
+                elif skills_action == "info" and len(skills_args) >= 2:
+                    bundle = skills_manager.get_bundle(skills_args[1])
+                    if bundle:
+                        print_box(f"Skill: {bundle.name}", [
+                            f"Description: {bundle.description}",
+                            f"Version: {bundle.version}",
+                            f"Path: {bundle.skill_path}",
+                            f"Enabled: {bundle.enabled}",
+                        ], Color.WHITE)
+                    else:
+                        print_colored(f"[!] Skill '{skills_args[1]}' not found.", Color.LIGHT_GRAY)
+                elif skills_action == "context":
+                    context = skills_manager.get_skill_context()
+                    if context:
+                        print_colored("Injected LLM context:", Color.WHITE)
+                        print(context[:3000])
+                    else:
+                        print_colored("[!] No skill context available.", Color.LIGHT_GRAY)
+                elif skills_action == "load":
+                    skills_manager.reload()
+                    print_colored(f"[✓] Reloaded {len(skills_manager.list_bundles())} skill bundles.", Color.WHITE)
+                else:
+                    print_colored("[!] Usage: /skills [info|context|load] [args]", Color.LIGHT_GRAY)
+                print_dashboard(active_provider, active_model, current_workspace, len(attached_files), tokens_used, max_tokens)
             elif cmd == "/compact":
                 if session_history:
                     save_session()
@@ -743,20 +1133,82 @@ async def interactive_shell() -> None:
 
         full_prompt = prompt + referenced_content
 
-        # Call the provider with animated spinner & latency tracking
         try:
             settings = Settings()
             provider_instance = get_provider(ProviderName(active_provider.lower()), settings, api_key=getattr(settings, f'{active_provider.lower()}_api_key', None))
-            
-            async def call_llm():
-                return await provider_instance.complete(full_prompt, active_model)
 
-            (response, latency) = await animate_spinner(call_llm(), f"KSPR I processing with {active_provider}:{active_model}...")
-            
-            tokens_used += len(response.encode()) // 3
+            # Collect tools from MCP and plugins
+            mcp_manager = None
+            plugin_manager = None
+            all_tool_schemas: list[dict[str, Any]] = []
+
+            servers_data = load_mcp_servers()
+            if servers_data:
+                mcp_manager = MCPManager({k: MCPServerConfig(**v) for k, v in servers_data.items()})
+                asyncio.run(mcp_manager.connect_all())
+                all_tool_schemas.extend(mcp_manager.get_tool_schemas())
+
+            plugin_manager = PluginManager(PLUGINS_DIR)
+            plugin_manager.load_all()
+            all_tool_schemas.extend(plugin_manager.get_tool_schemas())
+
+            # Collect capabilities
+            cap_manager = CapabilityManager()
+            cap_manager.initialize()
+            all_tool_schemas.extend(cap_manager.get_schemas_for_llm())
+
+            # Tool calling loop (max 10 iterations)
+            conversation_messages = [{"role": "user", "content": full_prompt}]
+            max_tool_iterations = 10
+            final_response = ""
+
+            for _iteration in range(max_tool_iterations):
+                async def call_llm():
+                    return await provider_instance.complete(full_prompt, active_model, tools=all_tool_schemas if all_tool_schemas else None)
+
+                (response, latency) = await animate_spinner(call_llm(), f"KSPR I processing with {active_provider}:{active_model}...")
+
+                # Check if response is a tool call
+                if isinstance(response, dict) and "tool_calls" in response:
+                    tool_calls = response["tool_calls"]
+                    print_colored(f"[⚡] KSPR I requests {len(tool_calls)} tool call(s)", Color.WHITE)
+
+                    # Add assistant message with tool calls to conversation
+                    conversation_messages.append({"role": "assistant", "content": None, "tool_calls": tool_calls})
+
+                    for tc in tool_calls:
+                        fn_name = tc.get("function", {}).get("name", tc.get("function", {}).get("name", ""))
+                        fn_args = tc.get("function", {}).get("arguments", tc.get("function", {}).get("arguments", {}))
+                        tc_id = tc.get("id", "")
+
+                        print_colored(f"  ├─ Calling: {fn_name}({json.dumps(fn_args, ensure_ascii=False)[:100]})", Color.MID_GRAY)
+
+                        # Execute tool via MCP or plugin
+                        tool_result = None
+                        if mcp_manager:
+                            tool_result = asyncio.run(mcp_manager.execute_tool(fn_name, fn_args) if asyncio.iscoroutinefunction(mcp_manager.execute_tool) else _sync_execute(mcp_manager, fn_name, fn_args))
+                        if tool_result is None and plugin_manager:
+                            tool_result = plugin_manager.execute_tool(fn_name, fn_args)
+                        if tool_result is None:
+                            tool_result = f"Tool '{fn_name}' not found."
+
+                        truncated_result = str(tool_result)[:2000]
+                        print_colored(f"  └─ Result: {truncated_result[:120]}{'...' if len(truncated_result) > 120 else ''}", Color.MID_GRAY)
+
+                        conversation_messages.append({"role": "tool", "content": truncated_result, "tool_call_id": tc_id})
+
+                    # Rebuild prompt with tool results
+                    full_prompt = _build_messages_prompt(conversation_messages)
+                    continue
+
+                # No tool calls — final response
+                final_response = response
+                break
+
+            tokens_used += len(final_response.encode()) // 3
             session_history.append({"role": "user", "content": prompt})
-            session_history.append({"role": "assistant", "content": response})
-            print_response_box(f"KSPR I ({active_provider}:{active_model})", response, latency=latency)
+            session_history.append({"role": "assistant", "content": final_response})
+            print_response_box(f"KSPR I ({active_provider}:{active_model})", final_response, latency=latency)
             if attached_files:
                 print_colored(f"[*] Contexto activo: {list(attached_files.keys())}", Color.MID_GRAY)
         except ProviderError as e:

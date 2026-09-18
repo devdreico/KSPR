@@ -19,21 +19,33 @@ class ProviderError(RuntimeError):
 class ModelProvider:
     name: ProviderName
 
-    async def complete(self, prompt: str, model: str, effort: str | None = None) -> str:
+    async def complete(
+        self,
+        prompt: str,
+        model: str,
+        effort: str | None = None,
+        tools: list[dict] | None = None,
+    ) -> str | dict[str, Any]:
         raise NotImplementedError
 
     async def complete_stream(self, prompt: str, model: str, on_delta, effort: str | None = None) -> str:
         """Fallback for providers without a streaming adapter."""
         response = await self.complete(prompt, model, effort=effort)
+        if isinstance(response, dict):
+            response = response.get("text", str(response))
         if response:
             await on_delta(response)
         return response
+
+    def _tools_payload(self, tools: list[dict] | None) -> dict:
+        """No-op by default. Providers override per protocol."""
+        return {}
 
 
 class LocalProvider(ModelProvider):
     name = ProviderName.local
 
-    async def complete(self, prompt: str, model: str, effort: str | None = None) -> str:
+    async def complete(self, prompt: str, model: str, effort: str | None = None, tools: list[dict] | None = None) -> str | dict[str, Any]:
         if "hola" in prompt.lower() or "preséntate" in prompt.lower() or "presentate" in prompt.lower():
             return "Hola, soy KSPR I, el modelo de ingeniería inversa agentica de KSPR. Estoy listo para estudiar la evidencia y devolverte un contexto técnico auditable."
         return "KSPR I está funcionando en modo local de demostración. Conecta Gemini o un gateway compatible para obtener razonamiento LLM sobre el contexto entregado."
@@ -71,19 +83,28 @@ class GeminiProvider(ModelProvider):
         authorization = {"Authorization": "Bearer " + key} if self.auth_mode == "bearer" else {"x-goog-api-key": key}
         return {**authorization, "Content-Type": "application/json"}
 
-    async def complete(self, prompt: str, model: str, effort: str | None = None) -> str:
+    async def complete(self, prompt: str, model: str, effort: str | None = None, tools: list[dict] | None = None) -> str | dict[str, Any]:
         url = self.settings.gemini_base_url.rstrip("/") + f"/models/{model}:generateContent"
         tokens = 32768 if effort == "high" else (4096 if effort == "low" else 8192)
         full_text = f"{KSPR_I_SYSTEM_PROMPT}\n\n[INSTRUCCIÓN DEL USUARIO]:\n{prompt}"
-        payload = {
+        payload: dict[str, Any] = {
             "contents": [{"role": "user", "parts": [{"text": full_text}]}],
             "generationConfig": {"temperature": 0.0, "maxOutputTokens": tokens},
         }
+        if tools:
+            payload["tools"] = {"functionDeclarations": tools}
         async with httpx.AsyncClient(timeout=180) as client:
             response = await client.post(url, headers=self._headers(), json=payload)
         data = self._response_data(response)
         try:
-            return "".join(part.get("text", "") for part in data["candidates"][0]["content"]["parts"]).strip()
+            candidate = data["candidates"][0]["content"]
+            parts = candidate.get("parts", [])
+            text_parts = [p.get("text", "") for p in parts if "text" in p]
+            func_parts = [p.get("functionCall", {}) for p in parts if "functionCall" in p]
+            if func_parts:
+                fc = func_parts[0]
+                return {"tool_calls": [{"id": fc.get("name", ""), "function": {"name": fc.get("name", ""), "arguments": fc.get("args", {})}}]}
+            return "".join(text_parts).strip()
         except (KeyError, IndexError, TypeError) as exc:
             raise ProviderError("Gemini no devolvió texto utilizable.") from exc
 
@@ -192,7 +213,7 @@ class OpenAICompatibleProvider(ModelProvider):
     def _headers(self) -> dict[str, str]:
         return {"Authorization": "Bearer " + self._require_key(), "Content-Type": "application/json"}
 
-    async def complete(self, prompt: str, model: str, effort: str | None = None) -> str:
+    async def complete(self, prompt: str, model: str, effort: str | None = None, tools: list[dict] | None = None) -> str | dict[str, Any]:
         url = self.base_url.rstrip("/") + "/chat/completions"
         payload: dict[str, Any] = {
             "model": model,
@@ -201,11 +222,19 @@ class OpenAICompatibleProvider(ModelProvider):
         }
         if effort and effort in {"low", "medium", "high"}:
             payload["reasoning_effort"] = effort
+        if tools:
+            payload["tools"] = tools
         async with httpx.AsyncClient(timeout=180) as client:
             response = await client.post(url, headers=self._headers(), json=payload)
         data = self._response_data(response)
         try:
-            return data["choices"][0]["message"]["content"].strip()
+            msg = data["choices"][0]["message"]
+            if msg.get("tool_calls"):
+                return {"tool_calls": [
+                    {"id": tc["id"], "function": {"name": tc["function"]["name"], "arguments": tc["function"].get("arguments", {})}}
+                    for tc in msg["tool_calls"]
+                ]}
+            return msg.get("content", "").strip()
         except (KeyError, IndexError, TypeError, AttributeError) as exc:
             raise ProviderError("El proveedor compatible no devolvió texto utilizable.") from exc
 
@@ -288,7 +317,7 @@ class OpenAIProvider(ModelProvider):
     def _headers(self) -> dict[str, str]:
         return {"Authorization": "Bearer " + self._require_key(), "Content-Type": "application/json"}
 
-    async def complete(self, prompt: str, model: str, effort: str | None = None) -> str:
+    async def complete(self, prompt: str, model: str, effort: str | None = None, tools: list[dict] | None = None) -> str | dict[str, Any]:
         url = self.base_url.rstrip("/") + "/chat/completions"
         payload: dict[str, Any] = {
             "model": model,
@@ -297,11 +326,19 @@ class OpenAIProvider(ModelProvider):
         }
         if effort and effort in {"low", "medium", "high"}:
             payload["reasoning_effort"] = effort
+        if tools:
+            payload["tools"] = tools
         async with httpx.AsyncClient(timeout=180) as client:
             response = await client.post(url, headers=self._headers(), json=payload)
         data = self._response_data(response)
         try:
-            return data["choices"][0]["message"]["content"].strip()
+            msg = data["choices"][0]["message"]
+            if msg.get("tool_calls"):
+                return {"tool_calls": [
+                    {"id": tc["id"], "function": {"name": tc["function"]["name"], "arguments": tc["function"].get("arguments", {})}}
+                    for tc in msg["tool_calls"]
+                ]}
+            return msg.get("content", "").strip()
         except (KeyError, IndexError, TypeError, AttributeError) as exc:
             raise ProviderError("El proveedor OpenAI no devolvió texto utilizable.") from exc
 
@@ -384,7 +421,7 @@ class GroqProvider(ModelProvider):
     def _headers(self) -> dict[str, str]:
         return {"Authorization": "Bearer " + self._require_key(), "Content-Type": "application/json"}
 
-    async def complete(self, prompt: str, model: str, effort: str | None = None) -> str:
+    async def complete(self, prompt: str, model: str, effort: str | None = None, tools: list[dict] | None = None) -> str | dict[str, Any]:
         url = self.base_url.rstrip("/") + "/chat/completions"
         payload: dict[str, Any] = {
             "model": model,
@@ -393,11 +430,19 @@ class GroqProvider(ModelProvider):
         }
         if effort and effort in {"low", "medium", "high"}:
             payload["reasoning_effort"] = effort
+        if tools:
+            payload["tools"] = tools
         async with httpx.AsyncClient(timeout=180) as client:
             response = await client.post(url, headers=self._headers(), json=payload)
         data = self._response_data(response)
         try:
-            return data["choices"][0]["message"]["content"].strip()
+            msg = data["choices"][0]["message"]
+            if msg.get("tool_calls"):
+                return {"tool_calls": [
+                    {"id": tc["id"], "function": {"name": tc["function"]["name"], "arguments": tc["function"].get("arguments", {})}}
+                    for tc in msg["tool_calls"]
+                ]}
+            return msg.get("content", "").strip()
         except (KeyError, IndexError, TypeError, AttributeError) as exc:
             raise ProviderError("El proveedor Groq no devolvió texto utilizable.") from exc
 
@@ -480,7 +525,7 @@ class DeepseekProvider(ModelProvider):
     def _headers(self) -> dict[str, str]:
         return {"Authorization": "Bearer " + self._require_key(), "Content-Type": "application/json"}
 
-    async def complete(self, prompt: str, model: str, effort: str | None = None) -> str:
+    async def complete(self, prompt: str, model: str, effort: str | None = None, tools: list[dict] | None = None) -> str | dict[str, Any]:
         url = self.base_url.rstrip("/") + "/chat/completions"
         payload: dict[str, Any] = {
             "model": model,
@@ -489,11 +534,19 @@ class DeepseekProvider(ModelProvider):
         }
         if effort and effort in {"low", "medium", "high"}:
             payload["reasoning_effort"] = effort
+        if tools:
+            payload["tools"] = tools
         async with httpx.AsyncClient(timeout=180) as client:
             response = await client.post(url, headers=self._headers(), json=payload)
         data = self._response_data(response)
         try:
-            return data["choices"][0]["message"]["content"].strip()
+            msg = data["choices"][0]["message"]
+            if msg.get("tool_calls"):
+                return {"tool_calls": [
+                    {"id": tc["id"], "function": {"name": tc["function"]["name"], "arguments": tc["function"].get("arguments", {})}}
+                    for tc in msg["tool_calls"]
+                ]}
+            return msg.get("content", "").strip()
         except (KeyError, IndexError, TypeError, AttributeError) as exc:
             raise ProviderError("El proveedor Deepseek no devolvió texto utilizable.") from exc
 
@@ -580,7 +633,7 @@ class AnthropicProvider(ModelProvider):
             "Content-Type": "application/json",
         }
 
-    async def complete(self, prompt: str, model: str, effort: str | None = None) -> str:
+    async def complete(self, prompt: str, model: str, effort: str | None = None, tools: list[dict] | None = None) -> str | dict[str, Any]:
         url = self.base_url.rstrip("/") + "/messages"
         max_tokens = 8192 if effort == "high" else 4096
         payload: dict[str, Any] = {
@@ -589,11 +642,22 @@ class AnthropicProvider(ModelProvider):
             "system": KSPR_I_SYSTEM_PROMPT,
             "messages": [{"role": "user", "content": prompt}],
         }
+        if tools:
+            payload["tools"] = [
+                {"name": t.get("function", {}).get("name", t.get("name", "")), "description": t.get("function", {}).get("description", t.get("description", "")), "input_schema": t.get("function", {}).get("parameters", t.get("input_schema", {}))}
+                for t in tools
+            ]
         async with httpx.AsyncClient(timeout=180) as client:
             response = await client.post(url, headers=self._headers(), json=payload)
         data = self._response_data(response)
         try:
-            return "".join(block.get("text", "") for block in data.get("content", [])).strip()
+            content = data.get("content", [])
+            text_parts = [block.get("text", "") for block in content if block.get("type") == "text"]
+            tool_use = [block for block in content if block.get("type") == "tool_use"]
+            if tool_use:
+                tu = tool_use[0]
+                return {"tool_calls": [{"id": tu.get("id", ""), "function": {"name": tu.get("name", ""), "arguments": tu.get("input", {})}}]}
+            return "".join(text_parts).strip()
         except (KeyError, IndexError, TypeError) as exc:
             raise ProviderError("Anthropic no devolvió texto utilizable.") from exc
 

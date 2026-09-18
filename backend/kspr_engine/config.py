@@ -31,6 +31,9 @@ class Settings(BaseSettings):
     jwt_secret_key: str = "kspr-secret-default-key-change-in-production"
     jwt_algorithm: str = "HS256"
     jwt_expiration_minutes: int = 1440
+    mcp_servers: str = '{}'
+    plugins_dir: str = '~/.kspr/plugins'
+    plugins_enabled: str = 'true'
 
     model_config = SettingsConfigDict(env_prefix="KSPR_", env_file=".env", extra="ignore")
 
