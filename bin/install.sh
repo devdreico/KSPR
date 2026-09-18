@@ -14,12 +14,29 @@ INSTALL_DIR="${KSPR_INSTALL_DIR:-$HOME/.kspr}"
 BIN_DIR="${KSPR_BIN_DIR:-$HOME/.local/bin}"
 
 echo "[*] Clonando/Actualizando KSPR en $INSTALL_DIR..."
-if [ -d "$INSTALL_DIR" ]; then
+mkdir -p "$INSTALL_DIR"
+if [ -d "$INSTALL_DIR/.git" ]; then
     cd "$INSTALL_DIR"
-    git pull origin main || true
+    git fetch origin main || true
+    git reset --hard origin/main || true
 else
-    git clone https://github.com/devdreiortiz/KSPR.git "$INSTALL_DIR"
+    git clone https://github.com/devdreiortiz/KSPR.git "$INSTALL_DIR" || true
     cd "$INSTALL_DIR"
+    git checkout main || true
+    git pull origin main || true
+fi
+
+# Garantizar la existencia de la carpeta cli y los scripts críticos
+mkdir -p "$INSTALL_DIR/cli"
+
+if [ ! -f "$INSTALL_DIR/cli/kspr.py" ]; then
+    echo "[*] Descargando kspr.py..."
+    curl -fsSL https://raw.githubusercontent.com/devdreiortiz/KSPR/main/cli/kspr.py -o "$INSTALL_DIR/cli/kspr.py"
+fi
+
+if [ ! -f "$INSTALL_DIR/cli/kspr_terminal_ui.py" ]; then
+    echo "[*] Descargando kspr_terminal_ui.py..."
+    curl -fsSL https://raw.githubusercontent.com/devdreiortiz/KSPR/main/cli/kspr_terminal_ui.py -o "$INSTALL_DIR/cli/kspr_terminal_ui.py"
 fi
 
 echo "[*] Creando entorno virtual aislado (venv)..."
@@ -29,13 +46,22 @@ echo "[*] Instalando dependencias en el entorno virtual..."
 "$INSTALL_DIR/.venv/bin/pip" install --upgrade pip
 if [ -f "$INSTALL_DIR/pyproject.toml" ]; then
     "$INSTALL_DIR/.venv/bin/pip" install "$INSTALL_DIR"
+else
+    "$INSTALL_DIR/.venv/bin/pip" install fastapi httpx pydantic pydantic-settings python-multipart uvicorn passlib bcrypt PyJWT
 fi
 
-echo "[*] Creando script ejecutable en $BIN_DIR/kspr..."
+echo "[*] Creando script ejecutable autofix en $BIN_DIR/kspr..."
 mkdir -p "$BIN_DIR"
 cat << 'EOF' > "$BIN_DIR/kspr"
 #!/usr/bin/env bash
-exec "$HOME/.kspr/.venv/bin/python" "$HOME/.kspr/cli/kspr.py" "$@"
+INSTALL_DIR="${KSPR_INSTALL_DIR:-$HOME/.kspr}"
+if [ ! -f "$INSTALL_DIR/cli/kspr.py" ]; then
+    echo "[*] Reparando KSPR CLI automáticamente..."
+    mkdir -p "$INSTALL_DIR/cli"
+    curl -fsSL https://raw.githubusercontent.com/devdreiortiz/KSPR/main/cli/kspr.py -o "$INSTALL_DIR/cli/kspr.py"
+    curl -fsSL https://raw.githubusercontent.com/devdreiortiz/KSPR/main/cli/kspr_terminal_ui.py -o "$INSTALL_DIR/cli/kspr_terminal_ui.py"
+fi
+exec "$INSTALL_DIR/.venv/bin/python" "$INSTALL_DIR/cli/kspr.py" "$@"
 EOF
 
 chmod +x "$BIN_DIR/kspr"
