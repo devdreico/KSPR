@@ -27,7 +27,7 @@ python3 -m venv "$INSTALL_DIR/.venv"
 
 echo "[*] Instalando dependencias en el entorno virtual..."
 "$INSTALL_DIR/.venv/bin/pip" install --upgrade pip
-"$INSTALL_DIR/.venv/bin/pip" install -e "$INSTALL_DIR"
+"$INSTALL_DIR/.venv/bin/pip" install "$INSTALL_DIR"
 
 echo "[*] Creando script ejecutable en $BIN_DIR/kspr..."
 mkdir -p "$BIN_DIR"
