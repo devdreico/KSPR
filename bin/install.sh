@@ -27,7 +27,9 @@ python3 -m venv "$INSTALL_DIR/.venv"
 
 echo "[*] Instalando dependencias en el entorno virtual..."
 "$INSTALL_DIR/.venv/bin/pip" install --upgrade pip
-"$INSTALL_DIR/.venv/bin/pip" install "$INSTALL_DIR"
+if [ -f "$INSTALL_DIR/pyproject.toml" ]; then
+    "$INSTALL_DIR/.venv/bin/pip" install "$INSTALL_DIR"
+fi
 
 echo "[*] Creando script ejecutable en $BIN_DIR/kspr..."
 mkdir -p "$BIN_DIR"
