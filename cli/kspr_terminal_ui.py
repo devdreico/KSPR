@@ -11,6 +11,8 @@ from typing import Any
 
 class TerminalTheme:
     """Strict grayscale and monochrome ANSI theme for professional CLI UI."""
+    LIGHT_GRAY = "[37m"
+    MID_GRAY = "[90m"
     RESET = "\033[0m"
     BOLD = "\033[1m"
     DIM = "\033[2m"
