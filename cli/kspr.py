@@ -24,6 +24,7 @@ from kspr_engine.mcp_client import MCPManager
 from kspr_engine.plugin_manager import PluginManager
 from kspr_engine.capabilities import CapabilityManager
 from kspr_engine.skills import SkillsManager
+from kspr_engine.decompiler import DecompilerEngine, CONTEXT_TREES_DIR
 
 __version__ = "0.1.0"
 
@@ -532,6 +533,8 @@ async def interactive_shell() -> None:
                     "/capabilities [act]  - Discover and manage CLI capabilities",
                     "/prompts [action]    - Manage saved prompts (add/select/remove/info)",
                     "/skills [action]     - View and manage loaded skill bundles",
+                    "/decompilate         - Index multiple files/links and generate Context Trees",
+                    "/trees               - List generated Context Trees paths",
                     "/context             - Show attached files in context",
                     "/compact             - Compact context and token usage",
                     "/new                 - Start a fresh session",
@@ -943,6 +946,64 @@ async def interactive_shell() -> None:
                     print_colored(f"[✓] Reloaded {len(skills_manager.list_bundles())} skill bundles.", Color.WHITE)
                 else:
                     print_colored("[!] Usage: /skills [info|context|load] [args]", Color.LIGHT_GRAY)
+                print_dashboard(active_provider, active_model, current_workspace, len(attached_files), tokens_used, max_tokens)
+            elif cmd == "/decompilate":
+                print_box("KSPR Decompiler — Indexación Multi-Fuente", [
+                    "Añade archivos (PDF, imágenes .jpg/.png/.heif, .txt, .md) o enlaces web.",
+                    "Introduce una ruta o URL por línea. Presiona Enter vacío para terminar y compilar."
+                ], Color.WHITE)
+                sources = []
+                while True:
+                    try:
+                        src_input = input(f"{Color.WHITE}Fuente (archivo o URL) [Enter para terminar]: {Color.RESET}").strip()
+                    except (EOFError, KeyboardInterrupt):
+                        break
+                    if not src_input:
+                        break
+                    sources.append(src_input)
+                    print_colored(f"[+] Indexado: {src_input} (Total: {len(sources)})", Color.LIGHT_GRAY)
+
+                if not sources:
+                    print_colored("[!] No se seleccionaron fuentes. Operación cancelada.", Color.LIGHT_GRAY)
+                else:
+                    action_confirm = input(f"{Color.WHITE}¿Iniciar DECOMPILE con {len(sources)} fuentes? (Escribe DECOMPILE): {Color.RESET}").strip()
+                    if action_confirm == "DECOMPILE":
+                        print_colored("[*] Ingestionando y analizando fuentes con KSPR I...", Color.LIGHT_GRAY)
+                        decompiler = DecompilerEngine()
+                        ingested = [decompiler.ingest_source(s) for s in sources]
+                        
+                        # Build prompt for model to generate Context Tree
+                        combined_text = "\n\n".join([f"SOURCE: {item['source']}\n{item.get('content', '')}" for item in ingested if item.get('success')])
+                        
+                        try:
+                            settings = Settings()
+                            provider_instance = get_provider(ProviderName(active_provider.lower()), settings, api_key=getattr(settings, f'{active_provider.lower()}_api_key', None))
+                            prompt_text = f"Analiza la siguiente informacion recopilada de multiples fuentes y genera un Arbol de Contexto (Context Tree) estructurado. Identifica el concepto central y explica detalladamente hasta el mas minimo detalle en archivos tematicos markdown (.md).\n\n{combined_text}"
+                            
+                            async def run_decompile_complete():
+                                return await provider_instance.complete(prompt_text, active_model)
+                            
+                            response, latency = asyncio.run(run_decompile_complete())
+                            tree_path = decompiler.generate_context_trees(ingested, str(response))
+                            print_colored(f"[✓] Context Tree generado exitosamente en: {tree_path}", Color.WHITE)
+                        except Exception as e:
+                            print_colored(f"[!] Error ejecutando análisis IA: {e}. Generando estructura estándar...", Color.LIGHT_GRAY)
+                            tree_path = decompiler.generate_context_trees(ingested, "# Analisis Generado\n\nInformacion recopilada de fuentes.")
+                            print_colored(f"[✓] Context Tree generado en: {tree_path}", Color.WHITE)
+                    else:
+                        print_colored("[!] Operación DECOMPILE cancelada.", Color.LIGHT_GRAY)
+                print_dashboard(active_provider, active_model, current_workspace, len(attached_files), tokens_used, max_tokens)
+            elif cmd == "/trees":
+                decompiler = DecompilerEngine()
+                trees = decompiler.list_trees()
+                if not trees:
+                    print_colored("[!] No hay Context Trees creados. Usa /decompilate para crear uno.", Color.LIGHT_GRAY)
+                else:
+                    lines = []
+                    for t in trees:
+                        files_str = ", ".join(t["files"])
+                        lines.append(f" Concepto: {t['concept']}  |  Ruta: {t['path']}  |  Archivos: [{files_str}]")
+                    print_box("Context Trees", lines, Color.WHITE)
                 print_dashboard(active_provider, active_model, current_workspace, len(attached_files), tokens_used, max_tokens)
             elif cmd == "/compact":
                 if session_history:

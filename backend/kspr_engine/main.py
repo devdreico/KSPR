@@ -33,6 +33,7 @@ from .models import (
 )
 from .providers import GeminiProvider, ProviderError, get_provider
 from .repository import SupabaseRepository, UserRepository
+from .decompiler import DecompilerEngine
 
 settings = get_settings()
 app = FastAPI(title=settings.app_name, version="0.1.0", description="KSPR AI - Empresarial (Powered by KSPR Engine).")
@@ -330,3 +331,69 @@ async def gemini_status(
         x_gemini_api_key=x_gemini_api_key,
         x_kspr_auth_mode=x_kspr_auth_mode,
     )
+
+
+@app.post("/api/v1/decompilate")
+async def decompilate_sources(
+    files: list[UploadFile] = File(default=[]),
+    links: str | None = Query(default=None),
+    provider: str = Query(default="gemini"),
+    model: str = Query(default="gemini-2.5-flash"),
+    x_kspr_api_key: str | None = Header(default=None, alias="X-KSPR-API-Key"),
+    x_kspr_base_url: str | None = Header(default=None, alias="X-KSPR-Base-URL"),
+    x_kspr_auth_mode: str = Header(default="api_key", alias="X-KSPR-Auth-Mode"),
+) -> dict:
+    """Ingests multiple files/links, runs AI analysis, and builds Context Trees."""
+    decompiler = DecompilerEngine()
+    ingested = []
+
+    # Save uploaded files to staging
+    for file in files:
+        raw = await file.read()
+        stage_path = decompiler.staging_dir / file.filename
+        stage_path.write_bytes(raw)
+        res = decompiler.ingest_source(str(stage_path))
+        ingested.append(res)
+
+    # Ingest links if provided
+    if links:
+        for link in links.split(","):
+            link_clean = link.strip()
+            if link_clean:
+                res = decompiler.ingest_source(link_clean)
+                ingested.append(res)
+
+    combined_text = "\n\n".join([f"SOURCE: {item['source']}\n{item.get('content', '')}" for item in ingested if item.get('success')])
+
+    try:
+        adapter = get_provider(
+            provider,
+            settings,
+            api_key=x_kspr_api_key,
+            base_url=x_kspr_base_url,
+            auth_mode=x_kspr_auth_mode,
+        )
+        prompt_text = f"Analiza la siguiente informacion recopilada de multiples fuentes y genera un Arbol de Contexto (Context Trees) estructurado. Identifica el concepto central y explica detalladamente hasta el mas minimo detalle en archivos tematicos markdown (.md).\n\n{combined_text}"
+        response = await adapter.complete(prompt_text, model)
+        analysis_text = str(response)
+    except Exception:
+        analysis_text = "# Analisis Consolidado\n\nInformacion recopilada y estructurada por KSPR Decompiler."
+
+    tree_path = decompiler.generate_context_trees(ingested, analysis_text)
+    trees = decompiler.list_trees()
+
+    return {
+        "status": "success",
+        "tree_path": str(tree_path),
+        "concept": tree_path.name,
+        "files": [f.name for f in tree_path.glob("*.md")],
+        "all_trees": trees,
+    }
+
+
+@app.get("/api/v1/trees")
+async def list_context_trees() -> dict:
+    """Lists all generated Context Trees."""
+    decompiler = DecompilerEngine()
+    return {"trees": decompiler.list_trees()}
+
