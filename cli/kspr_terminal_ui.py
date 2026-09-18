@@ -1,3 +1,14 @@
+from __future__ import annotations
+
+import asyncio
+import json
+import os
+import sys
+import time
+from pathlib import Path
+from typing import Any
+
+
 class TerminalTheme:
     """Strict grayscale and monochrome ANSI theme for professional CLI UI."""
     RESET = "\033[0m"
@@ -54,7 +65,7 @@ class TerminalUI:
         print()
         TerminalUI.print_colored(f"┌─ KSPR I  │  sess: {session_id}  │  {provider}:{model}  " + "─" * max(0, width - len(session_id) - len(provider) - len(model) - 34) + "┐", TerminalTheme.GRAPHITE)
         TerminalUI.print_colored(f"│  ctx: [{bar}] {tokens_used // 1000}k/{max_tokens // 1000}k ({pct}%)  │  dir: {ws_str:<24}  │  files: {attached_count:<2}  │", TerminalTheme.SILVER)
-        TerminalUI.print_colored(f"└─ tips: [@] attach   [/] commands   [/decompilate] context tree   [^C] exit " + "─" * max(0, width - 73) + "┘", TerminalTheme.GRAPHITE)
+        TerminalUI.print_colored(f"└─ tips: [@] attach   [/] cmds   [/decompilate] tree   [^C] exit " + "─" * max(0, width - 67) + "┘", TerminalTheme.GRAPHITE)
         print()
 
     @staticmethod
