@@ -324,7 +324,6 @@ async def interactive_shell() -> None:
     active_model = config.get("active_model", "gemini-2.5-flash")
     active_provider = config.get("active_provider", "gemini")
     active_iterations = config.get("active_iterations", 3)
-    active_effort = config.get("active_effort", "default")
     attached_files: dict[str, str] = {}
     indexed_models: dict[str, list[dict[str, Any]]] = config.get("indexed_models", {})
     tokens_used = 1250
@@ -335,7 +334,6 @@ async def interactive_shell() -> None:
         cfg["active_model"] = active_model
         cfg["active_provider"] = active_provider
         cfg["active_iterations"] = active_iterations
-        cfg["active_effort"] = active_effort
         cfg["indexed_models"] = indexed_models
         cfg["current_workspace"] = str(current_workspace)
         save_local_config(cfg)
@@ -414,8 +412,6 @@ async def interactive_shell() -> None:
                     "/api                 - Configure providers, API Keys and index models",
                     "/project             - Local project management (New / Existing)",
                     "/model [name/num]    - Show or select an indexed model",
-                    "/model-effort [lvl]  - Set inference effort: default, low, medium, high",
-                    "/analyze [path]      - Run static analysis",
                     "/provider [name]     - Switch active provider",
                     "/iterations [n]      - Set analysis iterations (1-8)",
                     "/context             - Show attached files in context",
@@ -544,19 +540,6 @@ async def interactive_shell() -> None:
                 else:
                     print_colored(f"[*] Iteraciones activas actuales: {active_iterations} (rango 1-8)", Color.LIGHT_GRAY)
                 print_dashboard(active_provider, active_model, active_iterations, current_workspace, len(attached_files), tokens_used, max_tokens)
-            elif cmd == "/model-effort":
-                valid_efforts = ["default", "low", "medium", "high"]
-                if arg and arg.strip().lower() in valid_efforts:
-                    active_effort = arg.strip().lower()
-                    print_colored(f"[✓] Model effort set to: {active_effort}", Color.WHITE)
-                    persist_state()
-                elif arg:
-                    print_colored(f"[!] Invalid effort level: \"{arg}\". Options: default, low, medium, high", Color.LIGHT_GRAY)
-                else:
-                    print_colored(f"[*] Current model effort: {active_effort}", Color.LIGHT_GRAY)
-                    print_colored("    Options: default, low, medium, high", Color.MID_GRAY)
-                    print_colored("    Usage: /model-effort [level]", Color.MID_GRAY)
-                print_dashboard(active_provider, active_model, active_iterations, current_workspace, len(attached_files), tokens_used, max_tokens)
             elif cmd == "/context":
                 lines = [f"Workspace: {current_workspace}", f"Archivos adjuntos ({len(attached_files)}):"]
                 for path in attached_files:
@@ -654,14 +637,8 @@ async def interactive_shell() -> None:
                     else:
                         print_colored("[!] API Key no modificada (vacía).", Color.MID_GRAY)
                 print_dashboard(active_provider, active_model, active_iterations, current_workspace, len(attached_files), tokens_used, max_tokens)
-            elif cmd == "/analyze":
-                target_path = Path(arg) if arg else current_workspace
-                print_colored(f"[*] Iniciando análisis estático sobre {target_path}...", Color.LIGHT_GRAY)
-                await run_batch_analysis(
-                    target_path, None, target_path.parent / "kspr-context", None, active_iterations, active_provider, active_model
-                )
             else:
-                print_colored(f"[!] Comando desconocido: {cmd}. Escribe /help para ver los comandos.", Color.MID_GRAY)
+                print_colored(f"[!] Unknown command: {cmd}. Type /help to see available commands.", Color.MID_GRAY)
             print()
             continue
 
@@ -691,8 +668,7 @@ async def interactive_shell() -> None:
             provider_instance = get_provider(ProviderName(active_provider.lower()), settings, api_key=getattr(settings, f'{active_provider.lower()}_api_key', None))
             
             async def call_llm():
-                effort = None if active_effort == "default" else active_effort
-                return await provider_instance.complete(full_prompt, active_model, effort=effort)
+                return await provider_instance.complete(full_prompt, active_model)
 
             (response, latency) = await animate_spinner(call_llm(), f"KSPR I processing with {active_provider}:{active_model}...")
             
