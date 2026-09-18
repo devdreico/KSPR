@@ -1,0 +1,5004 @@
+{
+  "codes": {
+    "KSPR-D8TX-LP79-QBFP": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-0B3R-4EEY-NWTU": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-PVG5-ZPJM-4QLM": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-DXV5-3NLE-ZO0S": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-IN7J-I9ID-SWHU": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-H2U2-DJFF-3PEV": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-PVDC-1FX5-FXCI": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-KUBQ-75YR-WAVV": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-DF53-ZYE1-SH8F": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-T4Z0-3NRT-3V4M": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-ULLN-Q6HA-DQPS": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-M55C-KXXX-27A9": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-CLKB-MIDG-H2EM": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-7E3M-VAUE-B668": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-A8NG-BMHB-471L": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-SSZ3-U3AC-BH7X": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-T21I-PJ7H-FPO1": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-WBRZ-Y9O6-S26O": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-AJH9-K1HB-9BHA": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-EKJ0-QA70-MIS2": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-0TU3-UCFB-CO0S": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-O39N-EOQQ-LLMM": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-QQPO-0DW8-CU5R": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-C313-9K0R-V6L3": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-USTP-GRNM-5CXN": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-EXAV-ZQQY-17M0": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-GIOK-QI88-BD28": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-N6EJ-K8PX-M9G8": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-CRDL-IEL0-E6AE": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-COHZ-4AFM-COG2": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-3DJE-DAT1-0SPO": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-COR0-YAAR-271C": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-DUKY-1Y7J-WSIO": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-ICGJ-3W8P-2O3Z": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-PPV9-CV41-9AMT": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-4L58-MA31-C4ZM": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-UL1M-ZSLK-F4LU": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-HS3Y-PN3Y-AMMH": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-ULBD-840P-LPMJ": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-LRE8-IDN3-6ZGX": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-AA8O-019F-T4S4": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-WZT6-L37Q-JPIV": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-LQLX-Q7BR-SPTY": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-CUXP-XLVY-Y1LI": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-Q5EF-FT3R-AYTS": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-G941-C8BM-AUWZ": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-SLJ7-SAY5-SXR2": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-LH3J-H0Y1-9IGE": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-5RPC-BCA4-773W": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-QCVZ-IFDC-8SYV": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-MB3S-Q5BT-4CZO": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-OE0C-T2ER-SR4O": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-MOQL-8X4Z-MJEO": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-U0HV-D2ON-R11R": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-WZYG-NR6D-3MO2": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-Y8J4-R1M5-X0H6": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-G3MX-1NRX-0RS5": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-IT7K-P4A4-5F99": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-TKFZ-NOPL-TIOE": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-UU8L-9R0T-IWHH": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-MWYI-NQCF-N0R4": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-K147-523F-XSF7": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-ONPN-U5MH-6QKC": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-EDEJ-1QHD-UREY": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-7RJR-W72K-P17N": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-MQ4J-03E6-63LL": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-DJG9-MCHH-Y209": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-7YA1-OZEJ-V172": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-BT25-HHHX-AOAD": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-VMYH-XA76-3LQY": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-24QE-5BW9-8UUK": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-TWMY-DBHE-6AH4": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-IU7M-JWOK-QT6O": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-5KRZ-SQO2-DNBE": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-KP8O-W9C2-NJDG": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-M03N-R8RY-E0T4": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-Q3TH-UB4G-ZBTN": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-JPYF-KUP2-WVJ1": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-CZA1-UV71-I3TH": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-DQ6I-WV2J-LNMZ": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-TZA3-IWQM-WWBT": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-IOKJ-Q57O-95LR": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-EWV7-U2KY-Y4Q2": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-CN2O-AFQP-ZXRG": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-E7GZ-6YHY-2HIE": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-XURE-GGR6-0BRH": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-5VL2-JT0Z-9G1W": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-ZOH8-UKEI-PP6H": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-9KET-XSVZ-57QJ": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-P8IR-38N7-QQGS": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-I97P-C509-4N8H": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-17GP-3R6A-Q5RL": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-EKPU-TOH5-REV5": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-TWV9-053H-ME71": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-TAW2-OIQ4-I8DJ": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-IS3U-NZ4G-LXH8": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-14ID-P1Z8-EGYP": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-3HTB-SXBP-1QEX": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-BY9N-GOYI-QPWA": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-6Q2J-EIHJ-QWUZ": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-NOBY-IUAQ-Z4R6": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-79M2-DIN1-QV17": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-85IJ-N4BE-GB5P": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-JGP8-3E2Z-A46F": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-B3HL-K36H-CR40": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-DGEO-DRYM-EBSV": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-OBQ2-GW6L-7IFC": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-3IZE-9BFE-F9HA": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-J8GS-80FP-E8OD": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-MVNX-WE2H-90I9": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-QGS1-GDB9-A3M1": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-S0CI-YOHG-0CTY": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-B49Q-KKAJ-PDON": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-P03W-P8ZA-O5Y7": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-R652-B22Z-RN3X": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-HN85-I6OR-L3OY": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-KNC0-7L59-7H6N": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-7LI8-U3QS-3X2E": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-MZ41-1C89-QA46": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-TZXY-QAL9-PN6W": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-A4FR-GIP1-JOZT": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-514Z-RX72-V95J": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-EWYW-1SW1-MLQL": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-BXO2-YZLS-QQBS": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-IUJS-7MZR-CBZZ": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-JQD6-VFIV-QT4A": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-M7CP-6GZO-W799": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-BT9U-TQPA-KA9U": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-UIQI-I1A7-RJJL": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-4NHA-MJET-3I0W": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-O5GB-D3M5-B09I": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-W8K0-LTA2-9NKX": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-6LSU-RF6L-4NCF": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-EZQX-67VO-LOHO": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-5PZL-JF96-T556": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-NY0G-WQ5N-5OZS": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-ETHV-D5VW-W7FM": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-TB8O-KJN7-K3XS": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-UNR5-VOU4-EVEP": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-SN2A-FRZV-00JD": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-HLY1-R956-EPVY": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-W4L7-46L5-U9L1": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-H097-9CAV-NEEV": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-EHOZ-NBMW-U9GR": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-YW67-NWOX-RZKF": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-83F6-C8TZ-MLOD": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-QEAH-M68N-DQFV": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-Z854-DWDS-EC0W": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-T5WU-SQWP-5U4Y": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-C8TS-E9TY-L56V": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-S0J2-RQHY-JRGH": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-Q72Q-SZKB-1TIA": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-1BZO-RSUU-134D": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-C5LH-N6F5-8PYP": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-RJO0-8WMW-FPZ4": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-4TJT-H66O-LJYY": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-ZGFK-GHDR-FAJ2": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-X2MX-516F-13NN": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-WBB0-9433-WXU1": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-P0VC-VAY2-089B": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-3N1G-6ATI-RD8J": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-IS33-J3AO-QOG5": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-DHZ1-MX9K-6E57": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-1E41-J9GP-R3OI": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-TKCW-FCKG-P1QL": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-TMOY-7K3H-VEUO": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-EZ4G-UM9M-UZQL": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-TCU9-MUZ2-50HO": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-2F4M-W927-6G0A": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-SL2X-WUDZ-2XP1": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-0LUK-6HA3-MYV3": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-V3SB-MRO6-ODGD": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-DNDH-JKIX-KRSA": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-9WGH-TQIG-SAHW": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-A791-1SGW-5UME": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-L557-DMS3-5YIF": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-2EHX-YEJI-CPMR": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-YYV6-8EXQ-4GPO": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-EUS2-JVDT-XLD2": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-FUB0-W7B8-JFG4": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-VMFV-J816-H8KN": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-74ZZ-41R2-9OT7": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-0QCA-VZ05-RUQ4": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-EY7L-2E49-8D5S": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-86TS-8WFT-SDUY": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-2G3S-S0LH-SBTZ": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-TFYA-TWG2-RGV8": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-3809-X3WR-HR65": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-JKGG-KIPT-6E0K": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-37E4-YHF9-0E3B": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-1YUB-8YIB-LPRZ": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-DIBL-378G-TH9I": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-INUJ-G3V4-BKFZ": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-8T4R-G6RI-95D2": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-HJG4-Z3GA-A7RW": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-KTX8-EITR-15OX": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-CZLY-5MQO-RZK7": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-TRX9-GMJT-F83D": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-HKWH-8BVE-CWQE": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-GVY2-TE40-0L2G": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-DYL7-TRN7-VVTF": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-H7MJ-OCSS-G8JL": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-HPW4-HGAZ-DOKQ": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-WH3S-68TQ-Q9HX": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-3W8K-RL1C-M4WM": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-A6ZV-EWOX-4CON": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-BWRH-IDAY-J5BM": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-BMZ5-9024-F3ET": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-GJNS-TVJV-E39R": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-TN1D-GBCZ-8Y98": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-CLP3-5VC6-8OCC": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-VGBG-AFTN-QHU1": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-V3JE-HQYJ-1CYD": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-MDW3-G9H3-R6VO": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-ETSM-RT5D-75FL": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-PIV0-L0ES-OJAZ": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-RE9A-4K3V-PQDD": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-LQRI-XOKN-E154": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-KJB8-JI1P-O8HJ": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-731L-9590-YONO": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-KT82-6XZY-MR4J": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-TND1-I7L7-02XH": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-UCZK-RM6J-IO2N": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-PX46-U92V-VYBS": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-CHV5-9F2Y-ERJU": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-6DFQ-5HNY-DFJM": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-CQHJ-Y4MH-C5U9": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-P6A2-E01Z-4ZD3": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-DKAW-7DNE-V539": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-TOY6-HTRX-0STD": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-GSRW-13SG-2595": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-FN65-RAQ1-IT7S": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-ODNH-2COB-46R1": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-YSQJ-NFAB-01TC": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-SOCI-PAZ8-FM7H": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-MBVX-O34M-WWP0": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-0B6B-XAJW-C1H8": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-ZJS4-WDUF-B571": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-8ILO-W3LW-EJPX": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-AT3G-GS1F-M124": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-7314-E7PI-ER60": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-6ZGK-YRVW-CUPZ": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-CE46-IPYG-7G94": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-3Q9R-6QZS-SW5P": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-6NST-P4DZ-HDLO": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-JCL7-G455-WZQV": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-ARYK-JGKH-DKN8": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-MKZ2-V0KH-REQK": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-Z8SH-SLP5-VM3S": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-TTVT-PUOA-G53F": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-V2V4-57PP-465G": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-Z9MY-WC19-3PS2": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-F2H8-ZAY0-IEAR": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-WJ0Q-4TEP-L2S5": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-I7NT-XR2L-GTL6": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-2CF1-H1G1-PRWQ": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-2IS5-7YT0-CWC2": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-WMHW-YG14-FUIH": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-O9IG-ZZBT-TAUW": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-ISH9-2EH1-M1J1": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-183G-93M4-ZCCX": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-FX9Y-A0M1-9CDP": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-5J7R-OEYH-OOPF": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-ELUI-24D0-CSMK": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-JII9-OV34-TGR4": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-PY9N-GP9M-4M8B": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-ABAG-XGPC-BSAY": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-EREK-IHR6-NIS4": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-SAQV-WI9O-TU4P": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-RLA6-TQA0-JL1V": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-UQIZ-9DNH-AJZM": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-I0RQ-AT6P-Q3XM": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-WKXQ-IP9M-C2YF": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-O95B-O5FN-TSVB": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-30C1-RUE4-EG7W": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-S0T3-IT3F-R9P4": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-E0D4-ESAM-7WFM": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-3GKK-Z8WQ-4814": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-X75B-5GT1-N7XZ": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-9BKJ-IIB2-XY2H": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-3CNH-FEA8-GJL2": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-AHU5-C6DO-DUHB": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-V2AU-LIAS-VGEA": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-MW8Y-WZ4Y-AWFZ": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-PODI-DP07-GWND": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-795W-9IJJ-RJIZ": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-0VPV-79HR-LE8F": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-20O1-5X7F-KZC4": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-3MW8-TOXU-RTPQ": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-43VV-JMSS-XNSP": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-N807-RVL4-RXLG": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-2UAB-EPI1-GR85": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-HHYD-EECB-PU91": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-F2B9-2E9O-CPDZ": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-U8SE-H1U7-QUBV": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-D2QU-HQSU-SHLR": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-VT1Y-4SDZ-PIVP": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-0RTL-KPBE-PV9K": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-JO6B-TPT4-XW0A": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-CDV5-E4SB-2D9S": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-4OUV-WW79-92FP": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-FDHT-QGT8-A9DK": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-TN6O-IPV8-9CWM": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-2AFI-ZVU7-T6UT": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-64DV-XBTR-VGGE": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-0NTY-X6H7-ITD2": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-2TIL-WCRY-DD7G": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-6PQL-ULC7-3F3B": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-0V2V-152P-3XU3": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-Y53O-XRD1-FFK3": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-T3N8-W6WY-WNYY": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-JMMG-R60X-LGGX": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-8W0Y-LNRI-MV4Z": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-PXR2-Y75W-E846": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-UTZD-FT8O-5T1R": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-3244-KBAB-H7YS": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-DAYD-U8JR-V001": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-PODC-J6OA-D5AS": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-UQQL-L883-NJBW": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-TWXV-EKKU-HTJW": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-UKFD-7HHT-GKLC": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-W9JH-9DE2-VRKF": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-HVAN-BNMZ-FLYP": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-SK3J-ETT3-JBW1": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-5VVB-OVK2-QY5F": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-LCDM-VZWH-DEUD": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-1QD6-JN1P-JDNP": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-TM6L-KJT3-X8BF": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-J1MW-DO0K-9T8C": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-VLSG-PU6N-6KI7": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-BZNU-SRS8-G0X7": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-4LLE-EJMZ-O9GY": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-AKBF-57AT-AP3Z": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-VN55-SP2Q-HH2W": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-8GV3-A1WB-REXC": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-6ZOQ-FGAD-YP8B": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-9DUS-L4QY-H1MD": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-HGX1-QII3-3T8T": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-RUG6-PRZT-3WXS": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-BMWK-BD6H-SYHM": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-4O1C-ADR9-MBZB": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-IDSY-BAHJ-5GW4": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-40VD-D73I-7AT1": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-G6G6-0YNG-6YZX": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-7U1D-TODB-8YA1": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-VZR1-OBSP-I8QL": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-XNLR-AQO7-5WF2": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-F8P6-18NX-WLD7": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-6HBP-1BJY-8AG7": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-61CW-S5LZ-3E51": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-24DL-2NDE-7KBJ": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-2FQ9-7RL6-H7T6": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-YYFZ-ZFDD-UP29": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-PT8D-58HS-M1SD": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-LHS1-T9SK-X97R": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-0MVJ-CX5I-A5V9": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-KWKL-ZMPH-4RDE": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-GWNQ-EVDZ-6GDI": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-ISZ8-UBVC-RCZ4": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-8EGT-ZENV-DRCS": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-EJLD-AQ1A-14YU": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-0KIO-4OLO-WNQM": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-B7X4-3MAF-U0GR": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-U6KZ-9MEZ-PZOD": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-LARJ-LJWR-H2GT": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-O5F9-UQD4-9FL3": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-L36U-9UB8-NQT5": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-ZV68-4K3V-H9EK": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-Q226-CCZ1-86IV": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-VFUR-ANYN-NQMM": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-V3ZG-2R70-FO6B": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-SXNK-J1M7-XW20": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-LC4X-7WMG-GZQ9": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-YK7T-CEJW-7P2W": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-O3B8-XTWO-W2WV": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-Q51Z-J7IW-AI5R": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-CSMX-WHZT-HDB2": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-FUC6-PLBU-C6WE": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-5RYN-W9MF-F8JC": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-2JO6-2M0N-OJ3L": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-IFTI-SHHP-1N9S": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-QPPG-3B1R-EJ5J": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-84SX-GUIP-HWK5": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-6N10-YZN9-PLTE": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-3AX2-CLAF-TJ9D": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-LOGU-8H3D-FOYA": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-8923-BLH9-R38C": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-I7X2-A8A0-QZQA": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-O6E5-HBQQ-XHQT": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-1062-Y3OQ-X1HU": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-1FCG-POQD-UVLS": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-I8L9-16W9-TGPF": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-2MEE-V1NM-OA4U": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-WKAN-8STD-CAM2": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-6C4B-PH4L-ATB2": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-QF9V-3I0O-345X": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-M49N-EWDH-9UTJ": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-IWHE-1TJJ-AWZF": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-CQQP-1BHD-N0JG": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-8MFN-UA1Q-04OW": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-JUED-B775-XW9K": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-SW32-68NX-VEER": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-XO7Q-2WEB-PRE3": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-WM9A-BC5F-75E0": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-1SKA-HA3J-16XF": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-DEE6-YVC7-M9A4": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-NQLC-REE8-3USY": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-XW3F-GP5P-8BZL": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-G16X-BG94-JMVI": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-15WB-CMCI-O0EB": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-J6R1-WJE1-UAV1": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-1JK8-Y9FM-YWKV": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-RIRQ-B9JV-1HAF": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-FQY6-YRLA-A367": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-KYY3-XWHW-V03Y": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-D9RM-BB3V-S878": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-H9U8-JR8V-VUY9": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-3KWR-JBY2-E857": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-4JSB-G26W-GQKX": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-32VP-IZU0-RWQP": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-B4FU-TNNI-FW21": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-14LD-QXD7-Q3Y5": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-UBXS-E4HD-M7BI": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-I67H-M9PA-L4NL": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-D974-6GT0-66LU": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-7M84-24MU-F869": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-YB5A-AG4X-7VCQ": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-SYJT-49TP-6VV3": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-L09R-E8GW-I4N5": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-S0P0-IDPX-CBZO": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-K453-CQ4Q-9FKY": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-R9A6-72ZD-91QC": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-ONTJ-KY07-JBI7": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-NHVV-4QHA-0LN4": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-81Z8-P20X-RXZV": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-J9HU-82GI-477H": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-ONON-FAVT-XUCS": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-9YGO-BXFS-IANA": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-SNUH-B2OP-QTPF": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-VXME-6QX4-RZK9": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-4Z5W-DQSA-Y3M3": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-AT59-X64P-M96N": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-1N7U-MF8F-QOEP": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-L6K4-ZYH7-CPXU": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-M0TR-B2SC-BO6N": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-PTHM-MIYL-4QC9": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-FAKU-28CU-29IR": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-BSM4-0JIE-SLHD": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-IO0O-1B5L-Y5J9": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-3UZA-T1QM-PC2U": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-3B97-7ZPX-TU8O": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-TKSC-THUT-NCQF": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-ZLQD-55TY-Q4R7": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-IFM3-QD2V-KG2H": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-7ESE-91RQ-A95H": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-NLUY-4IEG-BY7X": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-WSBI-RFLZ-642P": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-ONRR-I5X2-FTB1": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-4899-OTIS-VJ1X": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-IZOU-DZ51-CJCR": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-WFPT-H384-14N4": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-OY4A-K3ZZ-IUZN": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-GUNE-AHWV-MV71": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-HJVA-6AI9-G3VI": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-WR6Y-PLH0-4FPU": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-HT7H-L4ZO-0R6U": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-7VHB-9DKV-QXCU": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-A21M-IN14-4I5K": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-RC67-5N2T-SGKP": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-UBE3-0LHV-2SM8": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-KZP9-04GB-XSB9": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-S0U3-5LMQ-M2HK": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-LUY6-3FBF-SYRI": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-R7KR-A8V5-OOGS": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-FXJC-RA0K-CAIJ": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-0HTJ-8U0K-SYGH": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-VS4K-3OGS-FHWY": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-4AA8-F23H-XTYH": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-CXOH-U4JB-K7D6": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-TKFX-N05V-PGW7": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-P2CU-K9BB-H3QB": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-PS08-17MV-RQYU": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-KU2X-FPKQ-TIFV": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-BF46-SIRP-0QOW": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-ANUN-U0AP-3YGJ": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-RVL5-CDGR-IL54": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-4FIY-UQHN-UFKV": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-KJ26-1RBA-XMVC": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-PO1P-KS14-P1ED": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-BRMT-WXPO-PD64": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-FOGJ-9IHM-C4AZ": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-XBPW-83CQ-LVTU": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-6D8H-AY24-ZTM7": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-AXZC-M5KO-AN4O": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-RDOS-846O-KFRK": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-PLX6-6TRM-YU97": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-NXC9-4YJ0-B6Y7": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-L4Y8-AE11-CZF0": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-VMTM-3LXK-UOWC": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-T4AK-MK7M-IW74": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-RKOV-NFB6-GHAP": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-XS6A-11HN-V1B9": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-W1CO-C6J5-EJUK": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-9P2U-PDYS-2T0M": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-71EY-UHLQ-084N": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-YKCF-SXAM-IVMH": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-PYXE-9EPK-7ZBZ": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-J8C9-LLWY-CQ9V": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-ULMF-4ORP-2H8X": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-2848-E74Y-F0BM": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-AY2Y-3NMI-CLVJ": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-3QT1-X7AP-S0IV": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-ELM2-17ZY-J5FR": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-63ZY-Z0P4-86KM": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-MICK-0FL4-CPS0": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-FLLL-H4WU-T2FZ": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-91M6-43R8-QAGC": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-Q8K0-EFS0-6NYD": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-QERK-GLPT-7YND": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-MG1S-PNMF-7BMV": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-7ZHG-RUVJ-KE99": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-QEFJ-P2KA-OMNH": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-RFQI-02E8-72ON": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-M58V-DDBK-U5MO": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-VH3F-BE7Y-ZB7E": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-YEI6-16VA-WIMW": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-U1XH-HBMW-W3O9": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-E5FH-IY7I-T8JV": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-MDPO-WBEF-JA31": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-0WQF-RBRI-QKG7": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-1H8U-SSXM-DXIK": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-F7SU-ERUD-0ZDE": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-370H-ZADE-6O5X": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-14TN-1UV6-0LDF": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-Y2LJ-3V8H-CUP0": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-RJ4D-IAYL-54RM": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-WNFA-DR1T-DP1H": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-WPJP-0OW3-OWEA": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-UAZK-K4BV-ELUL": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-H1R3-SELS-ID3D": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-9ZKO-XZMH-EKY4": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-5500-7F1Z-YYTB": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-U7AM-WORB-F3Q3": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-RM5T-G038-1417": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-694Z-KGUK-XFMA": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-YLT2-IMHG-UXSI": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-8B22-AYE5-BJV8": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-KZTT-4JR1-1R69": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-MD35-G0TR-1LKH": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-6BG6-PDND-7DSW": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-0OIY-ISI3-5A8H": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-VXGS-3QC8-PV7J": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-5YVU-FO7M-0MDU": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-GTLE-XP7I-8YBU": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-I9UR-K83V-QM8E": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-C6YG-RDOJ-TNY0": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-14ZB-5CSZ-LG74": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-U5XT-3G1S-PT1J": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-VNZA-4SEL-OXL9": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-K6U9-7A54-DVRZ": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-0QUE-U1PT-LSLD": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-IG4X-KIVA-5FCC": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-7XRP-LIM0-1JWB": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-AU97-NC7M-SVF9": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-70IE-PUUZ-9N9E": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-49Q0-B16V-M5P5": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-R7LB-AI6V-6AKR": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-OI4E-U8PM-PV5M": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-98V8-99BP-D3T7": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-B80N-IPUP-IEK2": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-Q2EJ-UZCN-NOMC": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-LVB0-8Y8L-7JRR": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-36BN-WBAJ-O482": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-88BN-2Y4W-8T19": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-BNSV-NUBN-H6W7": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-YG7E-44D0-AL94": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-4A60-EM0S-480A": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-EIRV-YDTJ-6W35": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-8EJ7-JALY-DX92": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-34OH-UNSO-2CRN": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-GII4-YATJ-STU0": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-2WE0-PBKK-82WJ": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-UHQD-KV5S-VTZ2": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-VVQ0-0UUH-I6I2": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-V0EI-8WNM-88DY": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-OPE9-YBZT-4L48": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-318G-YTYX-022S": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-GKXL-94GS-QO45": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-87ER-JCA6-US0Y": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-S97B-VSAK-KK18": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-Q78X-BPIK-2HS6": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-H4J5-0EHD-QF6G": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-2ZEU-BT5D-0UIS": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-Y6CB-GK71-2PHB": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-E52H-7ZI3-BQ3X": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-1RKJ-8F3C-3TRO": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-6S8S-P65H-NSE9": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-9DH6-4G0L-9GW5": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-5B5G-T0DK-GR7F": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-4OPK-P89L-W6MG": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-KBQU-IGDP-LUMJ": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-3CT6-CDWE-FCI7": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-GHXP-4HN6-N48W": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-XWEH-2LXR-SWM6": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-O1AJ-1197-W368": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-6YY2-U838-G4OD": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-QRPO-VP36-VQIC": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-T3TB-3FCI-L1ED": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-2HLM-V1TG-LNFZ": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-6JRU-EP64-G5WG": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-ALDS-EJXX-EU7X": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-0K1H-CRDS-2XV7": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-GQ9A-18K4-RD48": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-TPD0-6KDX-D09V": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-YWXS-3BCX-UQE3": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-NWL7-98I6-KGD0": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-486Z-UC3M-5PVZ": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-0R56-QXZ2-PUIZ": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-ENXN-3MW0-P37A": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-KUJL-8J5N-69MN": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-0CN9-6WT5-D6JO": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-9RCJ-CLC2-RZ5J": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-WFEJ-00TD-CQ2A": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-KCXT-5SCL-MUWQ": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-S92O-AFR2-H3GH": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-VJ4O-LZL8-N5J0": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-95IR-ZPA1-44L6": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-KJ01-3H01-DTJZ": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-N3XP-9D0B-2O80": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-YFE9-9104-BIT3": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-R4QM-TUTE-1H4A": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-OAGH-SCR7-FQNF": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-KD4D-F5BY-73L9": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-1UER-HXKY-EL0X": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-R80N-R5HM-J66C": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-Q0QY-WZHX-HUMU": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-A3DB-HKDQ-WSJN": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-IEBH-WB5B-UIG7": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-JRPK-IV72-VR4E": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-X19C-QZ2K-LQ3P": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-59S4-0UPW-P13U": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-4YC7-FFSG-ROKL": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-F3EZ-WDQC-TOVU": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-GTKC-CXTI-F6AU": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-UQJK-VDIF-DCO0": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-VYGH-WYEL-OOG5": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-5HDE-GUHR-NZVE": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-G86L-1AX3-JP4V": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-0ZVR-4QNY-TACO": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-N1K2-8IF5-LG41": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-FE1M-6LUH-NRCK": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-W5XL-FRFZ-LFFM": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-VXR8-YV9W-OZVZ": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-FQCJ-1417-RB1R": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-OFR0-AXUG-3JAY": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-Z96H-C6LO-GJHX": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-S2EX-JTFA-AEF2": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-8GO6-VZN1-G3LT": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-7S6D-7ZLC-RM8I": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-V49A-MPLI-7UM0": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-ACZS-2621-YDJ6": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-O0OY-DZQ9-M5AL": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-2DRI-8LVU-I6AZ": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-1B0P-QN9T-WZP3": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-3QBW-YUND-60TU": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-62YY-GCDE-DG3C": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-27KW-4Z39-F302": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-8WJL-9T55-U3S8": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-HEHC-HBI0-3A9S": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-3UJ7-I48Z-Q607": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-AAJO-G8RQ-JDT7": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-3ZD8-3QTG-RZN7": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-066C-VIZW-4MLY": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-105O-FP87-00JC": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-DNAN-RQ3X-QVPV": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-KTZT-5MBU-AKBN": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-NJGN-BMNF-8D72": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-JMQ6-238S-JPEG": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-0BDK-F36U-BQXT": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-5A0Q-OVZ5-ZMN8": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-VKF3-66VF-LI89": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-DUFC-55ZW-KHTO": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-ON3F-AZY8-7PHC": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-K3AM-1DC9-WQMR": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-8I7C-MRVA-TNH0": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-5WFZ-IXDF-O5AA": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-FLR7-V2X5-91F8": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-8QDH-3A34-FMAJ": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-17HL-C4QT-IX69": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-VI1F-QD2W-NCWT": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-BCHA-TL2R-5TEL": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-VMQG-VALU-45JO": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-KOB3-C08K-SJN5": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-3OAB-J75J-CSDV": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-YK8K-J0V1-LFMZ": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-29GH-8G68-GVOK": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-P0SE-N5TZ-YZQG": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-77XM-G7HP-3N7O": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-4UYF-KD0X-05Y0": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-P31S-HW4K-WISM": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-03DH-28NA-LYF2": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-4803-NEOX-8QZJ": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-XQG8-UG2F-N4IM": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-9W1T-3X3U-7W67": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-Y6T0-JJZ1-4IIU": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-AB5J-XHG1-ISSD": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-73CP-Y5F5-O67R": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-HV7Q-WMY9-0XNM": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-PBYR-XICV-QK8X": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-RFW7-8U2O-OMTU": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-LK5D-6FJY-5ZRQ": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-H2QQ-26Y0-9U6F": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-22KH-2UGK-P40S": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-I429-4Q09-IZ5E": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-L62Q-JRKY-2QN3": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-1KQB-3234-3MHW": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-ZQNX-PRMY-IKVU": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-T8J3-HBY3-B3Q5": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-OT8T-JF7T-IC6G": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-1XQT-GH8F-AL11": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-9YW3-GJSY-ZOP1": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-0BF6-X0BK-QKQY": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-06HE-MVZZ-LOAL": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-49SG-4WTS-329U": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-KE7P-GZFR-GFYL": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-JZRY-G538-YE14": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-CSCR-P8U6-07OI": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-UF5X-EPSI-HRZZ": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-PECZ-UTTU-9PAC": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-5OWA-9QFC-8UPJ": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-XBO4-7AWV-AUWD": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-F9Q9-15ZA-5BT8": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-EFJM-Q5ZC-XY59": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-AV22-M2ER-TSUC": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-0T3D-3OX7-V7DX": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-BAKA-3489-G87K": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-X7DW-Q6LS-HT8Z": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-1VMR-26HN-F4UE": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-30Y3-5RNN-JYVC": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-LKB3-HVHX-8U14": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-4D1K-JXLR-NZ0W": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-IENY-W6MJ-0DVD": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-JH7Q-XG4X-JMBM": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-VX2J-YQDN-SRJK": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-W8CA-5CDF-I7ZT": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-33LY-D6ED-7BE1": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-IW2F-IGH8-RKMS": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-M2C6-JN2E-22NT": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-AQ2B-3747-9X99": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-36SQ-AEM8-6O9U": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-5AOD-I4IP-XWKA": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-GUTP-XCKF-SRLP": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-9JKE-6B6D-L6HH": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-MBFM-DPEA-ZXEE": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-HXAK-VBAQ-Q44A": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-XFUF-26QM-V38Z": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-JEEG-8CX2-5955": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-VVES-45YV-9EG7": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-ZLKP-EL4Q-JRJ5": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-WB5A-2PDZ-R8X8": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-TVI2-1H4I-J9S3": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-EVXG-7WNN-WZXK": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-1X0N-5AEO-AB47": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-9CW5-8TOZ-H0DG": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-X0YS-G0A5-ZOIR": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-J43M-23JA-QF0J": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-WPEI-FED6-CM1O": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-ALWI-AHMZ-81WL": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-SN09-Z2QO-GJM4": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-0U52-18W4-DLMX": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-90CY-SQC3-SPX1": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-TESH-W384-VEHS": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-3WX6-2M2Y-5JT6": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-64KK-Z5S5-K9N5": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-3Z55-NEQ8-MWUM": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-GGKE-YRJJ-QUM6": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-CPQI-NQ7T-HSXD": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-MP41-1RQY-DGDC": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-576J-DHU5-0Q0R": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-VB6Y-1Y6T-IX6A": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-PUKH-HS6W-5E6X": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-6NDT-0CNW-JZK0": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-A7D4-5EMQ-RUDG": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-30DD-KMWJ-N7QT": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-V6VS-Y2KR-27QW": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-CF4S-I5BF-I02M": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-UWBX-H2GX-GWY0": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-711C-F2JE-QBNO": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-PP69-V1GD-5D7G": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-TBF7-EZT8-TR7V": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-Z5JK-HPM1-NKQO": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-8NNR-6RHP-4O8C": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-JUVE-IVQ5-S9WV": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-9S31-2DDI-SU6Q": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-X0FP-2N7L-2J29": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-X9V1-5AQ9-P5C8": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-TOVP-T941-GJVI": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-0GAN-PPRD-MJ50": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-Q1OO-AX0B-4Z5I": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-F147-XDY9-HDKX": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-B4LE-AFGB-8593": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-7RH6-Z5LF-96EM": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-9ETM-MGL9-U29H": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-O3N0-2WK6-NF7C": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-FWGM-YYJ3-PYDO": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-7ZSG-OVAL-XYPB": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-1H4X-DX0N-UCM9": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-7S6D-OYT8-2E4T": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-ZST0-54IK-69XM": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-8S9R-5FKU-Y1X5": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-VCKX-71BP-7WPK": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-YXET-AWK7-2A5Y": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-0TVU-EGXH-3U53": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-QETP-8YDZ-EH7M": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-Y93N-Q2GH-X81A": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-SN1W-NRZB-ICTO": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-5DUI-OOY2-DOI3": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-SZKI-P8S2-1D3J": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-BFRY-ULB7-YSLI": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-RJ1Q-I9CG-YPM9": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-NQFU-PHRD-F34G": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-PD70-KD97-IJQF": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-4GPM-GJV9-WE8B": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-3AGU-TUCL-5PWT": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-MK62-20MI-NWQ3": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-S3OW-HRIX-6DQ6": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-J69P-ECIX-3PEM": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-X3J6-CQSJ-UT2Z": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-H5CO-63QT-BG4O": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-73XQ-E0J8-2B92": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-ZLPJ-4VLA-VYQL": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-VZHX-K3H1-S6XZ": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-F65A-WA8I-B0SG": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-TAJU-1C27-HWOF": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-29F0-XGBT-V1B4": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-97A9-AG6O-TSFJ": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-KIWB-AQR4-PK0O": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-6RZJ-8879-82GN": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-VQ6W-KPX6-5I0E": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-XV2A-WKJY-95EY": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-BVJX-LT9K-LKC6": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-ITIB-4DOG-IRPV": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-ZFNS-I27A-OHKM": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-NK8C-WK4V-JBIT": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-FS8G-EZRQ-JA0U": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-5GZB-9BVP-O0H5": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-8K7G-CT38-4PN2": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-BGI5-N5C7-0PYX": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-T8Z3-ZK18-1BQK": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-NKIR-LSIU-CGQF": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-FWY9-MVZF-M0VO": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-QRD6-NLSL-0QYN": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-75JN-HML5-52M2": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-4FXB-O74A-TY5N": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-5288-7N7K-3PY5": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-RLYF-GCHF-TVA9": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-1ZSO-73QA-X3ZR": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-NL05-FNIZ-UV26": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-879X-D12N-52ED": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-QUBX-YJ41-VYKQ": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-CZWU-743G-Z0N2": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-XBS2-GJOU-9XYV": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-ONZQ-KXY4-AA6U": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-O452-UWA0-VSJ6": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-5BP0-ACPG-ZVD9": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-NNA6-X684-PWTU": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-OLML-03U7-66R0": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-RZMP-Q52C-UPCM": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-ZBAO-AKTW-REFC": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-3L9Q-7SBP-M3F6": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-QRMP-VJ14-LLBE": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-IY0X-FAZP-78IR": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-G089-FVLM-V3S1": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-31PO-Q09P-FBKA": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-2A7S-NUUH-T9SR": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-ZAKR-UR04-VL8D": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-VEYE-QIL4-SUNC": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-R31D-318C-IU7E": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-DZIJ-MIRT-M0UO": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-WFL1-VQHH-G0U8": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-0HOV-FZ0A-J7RX": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-0SSX-KP74-4FWX": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-NAG7-EK1I-3X3X": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-92U8-G8SA-F5F1": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-WBGN-1947-KRVB": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-U70Q-9UXJ-66JL": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-QXTD-EMZH-IN12": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-G06K-5F4U-2DHT": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-AY3K-WH8Q-0CHE": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-9H6B-12LC-4A3X": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-RE3H-S0G5-RK82": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-Q7F7-9T3A-OPB0": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-VGPG-GBZN-96EK": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-KF4W-DS2U-F5C6": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-08U4-RFZG-KDVQ": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-50A7-SUOQ-FTN8": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-AUZK-G84R-1YVU": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-7Y11-B8WB-TAEZ": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-ONYA-PXAT-C3Z6": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-HRHV-VAAJ-JM0C": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-3L95-M0HO-C0E7": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-RXA6-626K-VAX1": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-1CKW-UV4C-UIBA": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-7QSB-X8J7-6QYV": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-4US9-GO6D-93HM": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-5UG7-SZ8F-I0QP": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-2HNM-JCVL-3GV7": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-MPU0-BN95-SW1K": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-1MPR-GOHF-96YS": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-1X3P-DF0V-HMGK": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-50IM-YBX5-7CTR": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-MRDU-LBCW-MKZO": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-ZYNW-S3L0-DKCH": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-Y885-YVI4-1F61": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-NJQC-29SG-6WQ0": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-IVN4-J63C-PDQ6": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-C9GY-Q87H-JF43": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-EIPB-NIM1-3MFU": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-Y4J7-ZB4D-NNI8": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-AS4E-WUNE-ZTCP": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-HALC-IIBM-GNM9": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-XWJ0-D5NX-4ZN5": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-152G-E4LK-Q7LK": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-8O8C-TEDQ-3THM": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-WDOO-Z4ZQ-8ELR": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-WPYD-E8NG-LA2S": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-O78C-D129-GJ79": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-MXCT-RO39-N8KF": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-IR9Z-6FGV-SATQ": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-BHN3-22ZP-4R0K": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-YAXE-7DC7-IIP0": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-WK3J-GB9M-0A2A": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-SFRE-17HX-4RMZ": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-FBA6-7DNX-DDHI": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-M744-1SC9-RPBN": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-UP4L-J78R-X7TY": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-78IU-YF68-FYAC": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-TUCW-X9TT-ON66": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-2O94-FU8S-WGJO": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-F1HL-XNRC-RRTI": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-ORC1-LFIN-436Y": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-9IRB-3HX7-7JB9": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-Y3PS-NY87-OGKS": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-0TIT-0YA3-MHK6": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-SCNM-VX2K-L2SS": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-9FTR-JDRP-2PZ1": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-MAYN-4H2G-IPGM": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-QK06-IZBV-7VV4": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-YHHQ-9ZV6-HB3E": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-8VHB-K8AA-DW1H": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-OTAV-RRZW-23H4": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-PQ5U-PCF8-ZTSV": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-4564-L8R4-LF3A": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-QFUM-Y4XV-PPAJ": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-2N6J-AOU8-8R7L": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-NP9W-6LI8-HJ4S": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-DU01-5NVJ-6S0X": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-OKUM-WCOT-KEJI": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-R815-G8NZ-WNK9": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-YY59-6DQZ-9UXL": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-UMRH-GSD2-5ER7": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-M7HR-UU5V-5YUT": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-190Q-7G68-V9TR": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-JP82-NYFP-1L4B": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-OWRU-WDZ0-OUQA": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-WHK9-WU3U-GGJG": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-38O1-22WY-S5QO": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-9BTG-FVIF-DHWF": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-7K5Z-3K9S-L293": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-BPIK-J2Z1-0ZE0": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-PIOT-O1IV-4OND": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-M4NW-L5P6-N8KU": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-GEA7-ZCF7-JQJU": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-VG6E-VQMU-BP5T": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-HJSA-ZDVI-DSUU": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-PW3V-5J3V-I0S4": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-XM2B-W5GA-SXHE": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-0HHN-27YI-17P2": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-OND1-KSED-BQY1": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-XER6-E632-6ICW": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-50PU-Q0MS-X6OK": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-7JES-J8NJ-SQM3": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-3RKB-O1QE-2WP2": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-AYL0-RSH2-KJON": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-VI6D-GSA2-7LDQ": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-J2DW-7GD9-5G71": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-BNMC-8QE9-UQCU": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-OHJP-0M5V-S6NT": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-8H7B-CH7M-Q487": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-TI3Y-HW3Y-0JAQ": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-97QL-RKQS-OZCD": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-8DT8-YB80-SJCB": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-2AQO-UO4J-6TO7": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-ENKS-R7MC-SEOC": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-WWF2-PW9I-FRUA": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-0OA6-QTTK-6FAD": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-ZKNL-BPVG-PF1Q": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-2ISO-H8PX-B2PN": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-76WX-ITMQ-3EPJ": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    },
+    "KSPR-X212-WTRO-UIJU": {
+      "status": "active",
+      "claimed_at": null,
+      "device_id": null
+    }
+  }
+}
