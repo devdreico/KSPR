@@ -673,7 +673,10 @@ async def interactive_shell() -> None:
             if attached_files:
                 print_colored(f"[*] Contexto activo: {list(attached_files.keys())}", Color.MID_GRAY)
         except ProviderError as e:
-            print_colored(f"\n[!] Error de proveedor: {e}", Color.WHITE)
+            msg = str(e)
+            if "API Key" in msg or "configura" in msg.lower():
+                msg = 'para usar KSPR AI con tus modelos frontier y sacar su maximo provecho inicia sesion con /login-> (pide codigo) o registrate en "https://kspr.membership.vercel.app/"'
+            print_colored(f"\n[!] Error de proveedor: {msg}", Color.WHITE)
             print_colored("[*] Intentando fallback con modo local...", Color.LIGHT_GRAY)
             local_provider = get_provider(ProviderName.local, settings)
             response, latency = await animate_spinner(local_provider.complete(prompt, 'kspr-local'), "KSPR I (Fallback Local)...")
