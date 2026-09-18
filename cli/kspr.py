@@ -59,6 +59,9 @@ def verify_license_code(code: str) -> bool:
     except Exception:
         pass
     return False
+
+
+def load_projects() -> list[dict[str, str]]:
     if PROJECTS_FILE.is_file():
         try:
             return json.loads(PROJECTS_FILE.read_text(encoding="utf-8"))
@@ -140,7 +143,7 @@ def tokens_weight(tokens: int) -> str:
     return str(tokens)
 
 
-def print_dashboard(provider: str, model: str, agent: str, iterations: int, workspace: Path, attached_count: int, tokens_used: int, max_tokens: int) -> None:
+def print_dashboard(provider: str, model: str, workspace: Path, attached_count: int, tokens_used: int, max_tokens: int) -> None:
     width = min(get_terminal_width() - 2, 86)
     horizontal = "─" * (width - 2)
     
@@ -155,7 +158,7 @@ def print_dashboard(provider: str, model: str, agent: str, iterations: int, work
     print()
     print_colored(f"┌{horizontal}┐", Color.MID_GRAY)
     print_colored(f"│ {Color.WHITE}{Color.BOLD}KSPR CLI v0.1.0{Color.RESET} │ {Color.LIGHT_GRAY}Provider:{Color.RESET} {provider:<8} │ {Color.LIGHT_GRAY}Model:{Color.RESET} {model:<16} │ {Color.LIGHT_GRAY}Iter:{Color.RESET} {iterations} │", Color.MID_GRAY)
-    print_colored(f"│ {Color.LIGHT_GRAY}Agent:{Color.RESET} {agent:<10} │ {Color.LIGHT_GRAY}Workdir:{Color.RESET} 📁 {workspace_str:<29} │ {Color.LIGHT_GRAY}Files:{Color.RESET} {attached_count:<2} │", Color.MID_GRAY)
+    print_colored(f"│ {Color.LIGHT_GRAY}Agent:{Color.RESET} KSPR I     │ {Color.LIGHT_GRAY}Workdir:{Color.RESET} 📁 {workspace_str:<29} │ {Color.LIGHT_GRAY}Files:{Color.RESET} {attached_count:<2} │", Color.MID_GRAY)
     print_colored(f"│ {Color.LIGHT_GRAY}Context:{Color.RESET} [{bar}] {tokens_weight(tokens_used)}/{tokens_weight(max_tokens)} ({pct}%)" + " " * max(0, width - 48 - len(tokens_weight(tokens_used)) - len(tokens_weight(max_tokens))) + " │", Color.MID_GRAY)
     print_colored(f"└{horizontal}┘", Color.MID_GRAY)
     print()
@@ -332,22 +335,22 @@ async def interactive_shell() -> None:
         cfg["current_workspace"] = str(current_workspace)
         save_local_config(cfg)
 
-    print_dashboard(active_provider, active_model, active_agent, active_iterations, current_workspace, len(attached_files), tokens_used, max_tokens)
+    print_dashboard(active_provider, active_model, active_iterations, current_workspace, len(attached_files), tokens_used, max_tokens)
     print()
 
     def get_input_with_tab() -> str:
-        """Lee input permitiendo alternar agentes con la tecla TAB."""
+        """Lee input del usuario."""
         if os.name == "nt":
             width = min(get_terminal_width() - 2, 86)
             horizontal = "─" * (width - 2)
-            print_colored(f"┌─ [ Input · {active_agent.lower()} @ {active_provider} ] " + "─" * max(0, width - len(active_agent) - len(active_provider) - 17) + "┐", Color.MID_GRAY)
+            print_colored(f"┌─ [ Input · kspr i @ {active_provider} ] " + "─" * max(0, width - 6 - len(active_provider) - 17) + "┐", Color.MID_GRAY)
             val = input(f"{Color.MID_GRAY}│ {Color.WHITE}❯ {Color.RESET}").strip()
             print_colored(f"└{horizontal}┘", Color.MID_GRAY)
             return val
 
         width = min(get_terminal_width() - 2, 86)
         horizontal = "─" * (width - 2)
-        print_colored(f"┌─ [ Input · {active_agent.lower()} @ {active_provider} (Presiona TAB para alternar agente) ] " + "─" * max(0, width - len(active_agent) - len(active_provider) - 45) + "┐", Color.MID_GRAY)
+        print_colored(f"┌─ [ Input · kspr i @ {active_provider} ] " + "─" * max(0, width - 6 - len(active_provider) - 17) + "┐", Color.MID_GRAY)
         sys.stdout.write(f"{Color.MID_GRAY}│ {Color.WHITE}❯ {Color.RESET}")
         sys.stdout.flush()
 
@@ -360,13 +363,7 @@ async def interactive_shell() -> None:
             tty.setraw(fd)
             while True:
                 ch = sys.stdin.read(1)
-                if ch == '\t': # TAB key pressed
-                    # Redraw top box border with new agent
-                    sys.stdout.write(f"\r\033[A\033[K")
-                    print_colored(f"┌─ [ Input · {active_agent.lower()} @ {active_provider} (Presiona TAB para alternar agente) ] " + "─" * max(0, width - len(active_agent) - len(active_provider) - 45) + "┐", Color.MID_GRAY)
-                    sys.stdout.write(f"{Color.MID_GRAY}│ {Color.WHITE}❯ {Color.RESET}" + "".join(chars))
-                    sys.stdout.flush()
-                elif ch in ('\r', '\n'):
+                if ch in ('\r', '\n'):
                     sys.stdout.write("\r\n")
                     sys.stdout.flush()
                     break
@@ -423,7 +420,7 @@ async def interactive_shell() -> None:
             elif cmd == "/clear":
                 os.system("cls" if os.name == "nt" else "clear")
                 print_header()
-                print_dashboard(active_provider, active_model, active_agent, active_iterations, current_workspace, len(attached_files), tokens_used, max_tokens)
+                print_dashboard(active_provider, active_model, active_iterations, current_workspace, len(attached_files), tokens_used, max_tokens)
                 print()
             elif cmd == "/login":
                 print_box("KSPR Authentication Gateway", [
@@ -493,7 +490,7 @@ async def interactive_shell() -> None:
                             print_colored(f"[✓] Workspace vinculado exitosamente a: {target_dir}", Color.WHITE)
                         else:
                             print_colored("[!] La ruta especificada no es un directorio válido.", Color.LIGHT_GRAY)
-                print_dashboard(active_provider, active_model, active_agent, active_iterations, current_workspace, len(attached_files), tokens_used, max_tokens)
+                print_dashboard(active_provider, active_model, active_iterations, current_workspace, len(attached_files), tokens_used, max_tokens)
             elif cmd == "/model":
                 if arg:
                     if active_provider in indexed_models and arg.isdigit():
@@ -524,7 +521,7 @@ async def interactive_shell() -> None:
                 else:
                     print_colored(f"[*] Modelo activo actual: {active_model}", Color.LIGHT_GRAY)
                     print_colored("[*] Consejo: Ejecuta /api para indexar automáticamente los modelos de tu proveedor.", Color.MID_GRAY)
-                print_dashboard(active_provider, active_model, active_agent, active_iterations, current_workspace, len(attached_files), tokens_used, max_tokens)
+                print_dashboard(active_provider, active_model, active_iterations, current_workspace, len(attached_files), tokens_used, max_tokens)
             elif cmd == "/provider":
                 if arg in {"gemini", "local", "openai", "groq", "deepseek"}:
                     active_provider = arg
@@ -532,7 +529,7 @@ async def interactive_shell() -> None:
                     persist_state()
                 else:
                     print_colored(f"[!] Proveedor activo actual: {active_provider} (opciones: gemini, local, openai, groq, deepseek)", Color.LIGHT_GRAY)
-                print_dashboard(active_provider, active_model, active_agent, active_iterations, current_workspace, len(attached_files), tokens_used, max_tokens)
+                print_dashboard(active_provider, active_model, active_iterations, current_workspace, len(attached_files), tokens_used, max_tokens)
             elif cmd == "/iterations":
                 if arg.isdigit() and 1 <= int(arg) <= 8:
                     active_iterations = int(arg)
@@ -540,7 +537,7 @@ async def interactive_shell() -> None:
                     persist_state()
                 else:
                     print_colored(f"[*] Iteraciones activas actuales: {active_iterations} (rango 1-8)", Color.LIGHT_GRAY)
-                print_dashboard(active_provider, active_model, active_agent, active_iterations, current_workspace, len(attached_files), tokens_used, max_tokens)
+                print_dashboard(active_provider, active_model, active_iterations, current_workspace, len(attached_files), tokens_used, max_tokens)
             elif cmd == "/context":
                 lines = [f"Workspace: {current_workspace}", f"Archivos adjuntos ({len(attached_files)}):"]
                 for path in attached_files:
@@ -626,7 +623,7 @@ async def interactive_shell() -> None:
                             print_colored(f"[!] No se pudieron indexar modelos automáticamente: {ex}", Color.LIGHT_GRAY)
                     else:
                         print_colored("[!] API Key no modificada (vacía).", Color.MID_GRAY)
-                print_dashboard(active_provider, active_model, active_agent, active_iterations, current_workspace, len(attached_files), tokens_used, max_tokens)
+                print_dashboard(active_provider, active_model, active_iterations, current_workspace, len(attached_files), tokens_used, max_tokens)
             elif cmd == "/analyze":
                 target_path = Path(arg) if arg else current_workspace
                 print_colored(f"[*] Iniciando análisis estático sobre {target_path}...", Color.LIGHT_GRAY)
@@ -664,10 +661,10 @@ async def interactive_shell() -> None:
             async def call_llm():
                 return await provider_instance.complete(full_prompt, active_model, effort=None if active_iterations < 3 else "high")
 
-            (response, latency) = await animate_spinner(call_llm(), f"KSPR I ({active_agent}) procesando con {active_provider}:{active_model}...")
+            (response, latency) = await animate_spinner(call_llm(), f"KSPR I procesando con {active_provider}:{active_model}...")
             
             tokens_used += len(response.encode()) // 3
-            print_response_box(f"KSPR I · {active_agent} ({active_provider}:{active_model})", response, latency=latency)
+            print_response_box(f"KSPR I ({active_provider}:{active_model})", response, latency=latency)
             if attached_files:
                 print_colored(f"[*] Contexto activo: {list(attached_files.keys())}", Color.MID_GRAY)
         except ProviderError as e:
@@ -675,15 +672,15 @@ async def interactive_shell() -> None:
             print_colored("[*] Intentando fallback con modo local...", Color.LIGHT_GRAY)
             local_provider = get_provider(ProviderName.local, settings)
             response, latency = await animate_spinner(local_provider.complete(prompt, 'kspr-local'), "KSPR I (Fallback Local)...")
-            print_response_box(f"KSPR I · {active_agent} (Fallback Local)", response, latency=latency)
+            print_response_box(f"KSPR I (Fallback Local)", response, latency=latency)
         except Exception as e:
             print_colored(f"\n[!] Error inesperado: {e}", Color.WHITE)
-            print_response_box(f"KSPR I · {active_agent} (Fallback)", [
+            print_response_box(f"KSPR I (Fallback)", [
                 "KSPR I está funcionando en modo local de demostración.",
                 "Conecta un proveedor válido para obtener razonamiento LLM completo."
             ])
         
-        print_dashboard(active_provider, active_model, active_agent, active_iterations, current_workspace, len(attached_files), tokens_used, max_tokens)
+        print_dashboard(active_provider, active_model, active_iterations, current_workspace, len(attached_files), tokens_used, max_tokens)
         print()
 
 
