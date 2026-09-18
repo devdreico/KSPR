@@ -25,6 +25,7 @@ __version__ = "0.1.0"
 
 CONFIG_DIR = Path.home() / ".kspr"
 CONFIG_FILE = CONFIG_DIR / "config.json"
+PROJECTS_FILE = CONFIG_DIR / "projects.json"
 
 
 def load_local_config() -> dict[str, Any]:
@@ -42,6 +43,23 @@ def save_local_config(data: dict[str, Any]) -> None:
         CONFIG_FILE.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
     except Exception as e:
         print(f"[!] No se pudo guardar la configuración local: {e}")
+
+
+def load_projects() -> list[dict[str, str]]:
+    if PROJECTS_FILE.is_file():
+        try:
+            return json.loads(PROJECTS_FILE.read_text(encoding="utf-8"))
+        except Exception:
+            return []
+    return []
+
+
+def save_projects(projects: list[dict[str, str]]) -> None:
+    try:
+        CONFIG_DIR.mkdir(parents=True, exist_ok=True)
+        PROJECTS_FILE.write_text(json.dumps(projects, ensure_ascii=False, indent=2), encoding="utf-8")
+    except Exception as e:
+        print(f"[!] No se pudo guardar la lista de proyectos: {e}")
 
 
 class Color:
@@ -87,14 +105,17 @@ def print_box(title: str, lines: list[str], color: Color = Color.WHITE) -> None:
     width = min(max(len(title) + 4, max((len(l) for l in lines), default=40) + 4), get_terminal_width() - 2)
     horizontal = "─" * (width - 2)
     
+    print()
     print_colored(f"┌─ {title} " + "─" * max(0, width - len(title) - 4) + "┐", color)
     for line in lines:
         padding = max(0, width - len(line) - 4)
         print_colored(f"│  {line}" + " " * padding + "│", Color.LIGHT_GRAY)
     print_colored(f"└{horizontal}┘", color)
+    print()
 
 
 def print_header() -> None:
+    print()
     for line in KSPR_ASCII:
         print_colored(line, Color.WHITE, True)
     print()
@@ -118,11 +139,13 @@ def print_dashboard(provider: str, model: str, agent: str, iterations: int, work
     if len(workspace_str) > 34:
         workspace_str = "..." + workspace_str[-31:]
 
+    print()
     print_colored(f"┌{horizontal}┐", Color.MID_GRAY)
     print_colored(f"│ {Color.WHITE}{Color.BOLD}KSPR CLI v0.1.0{Color.RESET} │ {Color.LIGHT_GRAY}Provider:{Color.RESET} {provider:<8} │ {Color.LIGHT_GRAY}Model:{Color.RESET} {model:<16} │ {Color.LIGHT_GRAY}Iter:{Color.RESET} {iterations} │", Color.MID_GRAY)
     print_colored(f"│ {Color.LIGHT_GRAY}Agent:{Color.RESET} {agent:<10} │ {Color.LIGHT_GRAY}Workdir:{Color.RESET} 📁 {workspace_str:<29} │ {Color.LIGHT_GRAY}Files:{Color.RESET} {attached_count:<2} │", Color.MID_GRAY)
     print_colored(f"│ {Color.LIGHT_GRAY}Context:{Color.RESET} [{bar}] {tokens_weight(tokens_used)}/{tokens_weight(max_tokens)} ({pct}%)" + " " * max(0, width - 48 - len(tokens_weight(tokens_used)) - len(tokens_weight(max_tokens))) + " │", Color.MID_GRAY)
     print_colored(f"└{horizontal}┘", Color.MID_GRAY)
+    print()
 
 
 async def animate_spinner(task_coro, message: str) -> tuple[Any, float]:
@@ -158,6 +181,7 @@ def print_response_box(title: str, text: str, latency: float = 0.0) -> None:
     lat_str = f" [ {latency:.2f}s ]" if latency > 0 else ""
     header_title = f"{title}{lat_str}"
     
+    print()
     print_colored(f"┌─ {header_title} " + "─" * max(0, width - len(header_title) - 3) + "┐", Color.WHITE)
     for line in lines:
         while len(line) > width - 4:
@@ -167,6 +191,7 @@ def print_response_box(title: str, text: str, latency: float = 0.0) -> None:
         padding = max(0, width - len(line) - 4)
         print_colored(f"│  {line}" + " " * padding + "│", Color.LIGHT_GRAY)
     print_colored(f"└{horizontal}┘", Color.WHITE)
+    print()
 
 
 # ---- Collect functions ----
@@ -268,7 +293,6 @@ async def run_batch_analysis(source: Path, git_url: str | None, output: Path, pr
 async def interactive_shell() -> None:
     print_header()
     
-    # Load persisted local config
     config = load_local_config()
     api_keys = config.get("api_keys", {})
     for prov, key in api_keys.items():
@@ -277,10 +301,10 @@ async def interactive_shell() -> None:
             if prov == "gemini":
                 os.environ["GEMINI_API_KEY"] = key
 
-    current_workspace = Path.cwd()
+    current_workspace = Path(config.get("current_workspace", Path.cwd()))
     active_model = config.get("active_model", "gemini-2.5-flash")
     active_provider = config.get("active_provider", "gemini")
-    active_agent = config.get("active_agent", "Architect")
+    active_agent = config.get("active_agent", "INSPECT")
     active_iterations = config.get("active_iterations", 3)
     attached_files: dict[str, str] = {}
     indexed_models: dict[str, list[dict[str, Any]]] = config.get("indexed_models", {})
@@ -294,19 +318,75 @@ async def interactive_shell() -> None:
         cfg["active_agent"] = active_agent
         cfg["active_iterations"] = active_iterations
         cfg["indexed_models"] = indexed_models
+        cfg["current_workspace"] = str(current_workspace)
         save_local_config(cfg)
 
     print_dashboard(active_provider, active_model, active_agent, active_iterations, current_workspace, len(attached_files), tokens_used, max_tokens)
     print()
 
-    while True:
-        try:
+    agents_cycle = ["INSPECT", "DEVELOPER"]
+
+    def toggle_agent() -> str:
+        nonlocal active_agent
+        idx = (agents_cycle.index(active_agent.upper()) + 1) % len(agents_cycle) if active_agent.upper() in agents_cycle else 0
+        active_agent = agents_cycle[idx]
+        persist_state()
+        return active_agent
+
+    def get_input_with_tab() -> str:
+        """Lee input permitiendo alternar agentes con la tecla TAB."""
+        if os.name == "nt":
             width = min(get_terminal_width() - 2, 86)
             horizontal = "─" * (width - 2)
-            
             print_colored(f"┌─ [ Input · {active_agent.lower()} @ {active_provider} ] " + "─" * max(0, width - len(active_agent) - len(active_provider) - 17) + "┐", Color.MID_GRAY)
-            prompt = input(f"{Color.MID_GRAY}│ {Color.WHITE}❯ {Color.RESET}").strip()
+            val = input(f"{Color.MID_GRAY}│ {Color.WHITE}❯ {Color.RESET}").strip()
             print_colored(f"└{horizontal}┘", Color.MID_GRAY)
+            return val
+
+        width = min(get_terminal_width() - 2, 86)
+        horizontal = "─" * (width - 2)
+        print_colored(f"┌─ [ Input · {active_agent.lower()} @ {active_provider} (Presiona TAB para alternar agente) ] " + "─" * max(0, width - len(active_agent) - len(active_provider) - 45) + "┐", Color.MID_GRAY)
+        sys.stdout.write(f"{Color.MID_GRAY}│ {Color.WHITE}❯ {Color.RESET}")
+        sys.stdout.flush()
+
+        import termios
+        import tty
+        fd = sys.stdin.fileno()
+        old_settings = termios.tcgetattr(fd)
+        chars = []
+        try:
+            tty.setraw(fd)
+            while True:
+                ch = sys.stdin.read(1)
+                if ch == '\t': # TAB key pressed
+                    toggle_agent()
+                    # Redraw top box border with new agent
+                    sys.stdout.write(f"\r\033[A\033[K")
+                    print_colored(f"┌─ [ Input · {active_agent.lower()} @ {active_provider} (Presiona TAB para alternar agente) ] " + "─" * max(0, width - len(active_agent) - len(active_provider) - 45) + "┐", Color.MID_GRAY)
+                    sys.stdout.write(f"{Color.MID_GRAY}│ {Color.WHITE}❯ {Color.RESET}" + "".join(chars))
+                    sys.stdout.flush()
+                elif ch in ('\r', '\n'):
+                    sys.stdout.write("\r\n")
+                    sys.stdout.flush()
+                    break
+                elif ch == '\x7f' or ch == '\b':
+                    if chars:
+                        chars.pop()
+                        sys.stdout.write("\b \b")
+                        sys.stdout.flush()
+                elif ord(ch) >= 32:
+                    chars.append(ch)
+                    sys.stdout.write(ch)
+                    sys.stdout.flush()
+        finally:
+            termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+
+        print_colored(f"└{horizontal}┘", Color.MID_GRAY)
+        return "".join(chars).strip()
+
+    while True:
+        try:
+            prompt = get_input_with_tab()
         except (KeyboardInterrupt, EOFError):
             print_colored("\n¡Hasta luego!", Color.LIGHT_GRAY)
             break
@@ -327,16 +407,18 @@ async def interactive_shell() -> None:
             elif cmd == "/help":
                 print_box("KSPR CLI Commands", [
                     "/help              - Muestra esta ayuda de comandos",
-                    "/api               - Configura proveedores, API Keys e indexa modelos disponibles",
-                    "/model [name/num]  - Muestra, busca o selecciona un modelo indexado",
+                    "/api               - Configura proveedores, API Keys e indexa modelos",
+                    "/project           - Gestión de proyectos locales (New project / Anteriores)",
+                    "/model [name/num]  - Muestra o selecciona un modelo indexado",
                     "/analyze [path]    - Ejecuta el análisis estático",
                     "/provider [name]   - Cambia el proveedor activo",
-                    "/agent [name]      - Establece el rol del agente (Architect, Developer, Auditor)",
+                    "/agent [name]      - INSPECT (Plan Mode) o DEVELOPER (Build Mode)",
                     "/iterations [n]    - Cambia iteraciones de análisis (1-8)",
                     "/context           - Muestra los archivos en contexto",
                     "/clear             - Limpia la pantalla y redibuja el dashboard",
                     "/update            - Actualiza KSPR a la última versión",
-                    "/exit              - Sale de la sesión interactiva"
+                    "/exit              - Sale de la sesión interactiva",
+                    "[TAB]              - Alterna instantáneamente entre INSPECT y DEVELOPER"
                 ], Color.WHITE)
             elif cmd == "/clear":
                 os.system("cls" if os.name == "nt" else "clear")
@@ -345,6 +427,45 @@ async def interactive_shell() -> None:
                 print()
             elif cmd == "/update":
                 run_update()
+            elif cmd == "/project":
+                print_box("KSPR Project Manager", [
+                    " 1. New project (Crear nuevo proyecto local)",
+                    " 2. Proyectos anteriores (Seleccionar workspace existente)"
+                ], Color.WHITE)
+                p_choice = input(f"{Color.WHITE}Elige opción (1-2): {Color.RESET}").strip()
+                
+                projects = load_projects()
+                if p_choice == "1":
+                    proj_name = input(f"{Color.WHITE}Nombre del nuevo proyecto: {Color.RESET}").strip()
+                    if proj_name:
+                        new_ws = Path.cwd() / "workspace" / proj_name
+                        new_ws.mkdir(parents=True, exist_ok=True)
+                        current_workspace = new_ws
+                        
+                        # Register project
+                        proj_entry = {"name": proj_name, "path": str(new_ws.resolve())}
+                        if proj_entry not in projects:
+                            projects.append(proj_entry)
+                            save_projects(projects)
+                        
+                        persist_state()
+                        print_colored(f"[✓] Proyecto '{proj_name}' creado en {new_ws.resolve()} con control CRUD total para el agente.", Color.WHITE)
+                elif p_choice == "2":
+                    if not projects:
+                        print_colored("[!] No hay proyectos anteriores registrados.", Color.LIGHT_GRAY)
+                    else:
+                        print_box("Proyectos Anteriores", [f" {idx+1}. {p['name']} ({p['path']})" for idx, p in enumerate(projects)], Color.WHITE)
+                        sel = input(f"{Color.WHITE}Selecciona número de proyecto: {Color.RESET}").strip()
+                        if sel.isdigit() and 1 <= int(sel) <= len(projects):
+                            chosen = projects[int(sel)-1]
+                            p_path = Path(chosen["path"])
+                            if p_path.is_dir():
+                                current_workspace = p_path
+                                persist_state()
+                                print_colored(f"[✓] Workspace cambiado a: {current_workspace}", Color.WHITE)
+                            else:
+                                print_colored("[!] El directorio del proyecto ya no existe.", Color.LIGHT_GRAY)
+                print_dashboard(active_provider, active_model, active_agent, active_iterations, current_workspace, len(attached_files), tokens_used, max_tokens)
             elif cmd == "/model":
                 if arg:
                     if active_provider in indexed_models and arg.isdigit():
@@ -385,12 +506,12 @@ async def interactive_shell() -> None:
                     print_colored(f"[!] Proveedor activo actual: {active_provider} (opciones: gemini, local, openai, groq, deepseek)", Color.LIGHT_GRAY)
                 print_dashboard(active_provider, active_model, active_agent, active_iterations, current_workspace, len(attached_files), tokens_used, max_tokens)
             elif cmd == "/agent":
-                if arg:
-                    active_agent = arg
+                if arg.upper() in {"INSPECT", "DEVELOPER"}:
+                    active_agent = arg.upper()
                     print_colored(f"[✓] Agente activo actualizado a: {active_agent}", Color.WHITE)
                     persist_state()
                 else:
-                    print_colored(f"[*] Agente activo actual: {active_agent}", Color.LIGHT_GRAY)
+                    print_colored(f"[!] Agente activo actual: {active_agent} (opciones: INSPECT, DEVELOPER)", Color.LIGHT_GRAY)
                 print_dashboard(active_provider, active_model, active_agent, active_iterations, current_workspace, len(attached_files), tokens_used, max_tokens)
             elif cmd == "/iterations":
                 if arg.isdigit() and 1 <= int(arg) <= 8:
@@ -451,7 +572,6 @@ async def interactive_shell() -> None:
                         if selected_prov == "gemini":
                             os.environ["GEMINI_API_KEY"] = new_key
                         
-                        # Persist API key in local config json
                         cfg = load_local_config()
                         cfg.setdefault("api_keys", {})[selected_prov] = new_key
                         cfg["active_provider"] = selected_prov
@@ -514,7 +634,8 @@ async def interactive_shell() -> None:
             provider_instance = get_provider(ProviderName(active_provider.lower()), settings, api_key=getattr(settings, f'{active_provider.lower()}_api_key', None))
             
             async def call_llm():
-                full_prompt = referenced_content + "\n\n" + prompt if referenced_content else prompt
+                agent_context = f"[MODO AGENTE: {active_agent}] - {'Plan Mode (INSPECT): Análisis estructural y estático' if active_agent == 'INSPECT' else 'Build Mode (DEVELOPER): Generación de código y refactorización'}\n\n"
+                full_prompt = agent_context + (referenced_content + "\n\n" + prompt if referenced_content else prompt)
                 return await provider_instance.complete(full_prompt, active_model, effort=None if active_iterations < 3 else "high")
 
             (response, latency) = await animate_spinner(call_llm(), f"KSPR I ({active_agent}) procesando con {active_provider}:{active_model}...")
