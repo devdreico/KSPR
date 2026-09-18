@@ -143,7 +143,7 @@ def tokens_weight(tokens: int) -> str:
     return str(tokens)
 
 
-def print_dashboard(provider: str, model: str, workspace: Path, attached_count: int, tokens_used: int, max_tokens: int) -> None:
+def print_dashboard(provider: str, model: str, iterations: int, workspace: Path, attached_count: int, tokens_used: int, max_tokens: int) -> None:
     width = min(get_terminal_width() - 2, 86)
     horizontal = "─" * (width - 2)
     

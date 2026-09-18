@@ -14,6 +14,7 @@ class Settings(BaseSettings):
     gemini_transcription_model: str = "gemini-2.5-flash"
     openai_api_key: str | None = None
     openai_base_url: str = "https://api.openai.com/v1"
+    openai_compatible_base_url: str = "https://api.openai.com/v1"
     groq_api_key: str | None = None
     groq_base_url: str = "https://api.groq.com/openai/v1"
     deepseek_api_key: str | None = None
