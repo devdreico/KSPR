@@ -696,6 +696,7 @@ def main() -> None:
     parser.add_argument("-V", "--version", action="version", version=f"%(prog)s {__version__}", help="Muestra la versión y sale")
     parser.add_argument("source", type=Path, nargs="?", default=None, help="Ruta al directorio o ZIP a analizar (si se omite, abre el shell interactivo)")
     parser.add_argument("--interactive", "-i", action="store_true", help="Inicia el shell interactivo")
+    parser.add_argument("--uninstall", action="store_true", help="Desinstala KSPR completamente del sistema")
     parser.add_argument("--git-url", default=None, help="Clona un repositorio Git en modo lectura para analizarlo")
     parser.add_argument("--output", type=Path, default=Path("kspr-context"), help="Directorio de salida para los artefactos Markdown")
     parser.add_argument("--project-name", default=None, help="Nombre del proyecto para el reporte")
@@ -703,6 +704,17 @@ def main() -> None:
     parser.add_argument("--provider", choices=["local", "gemini", "openai", "groq", "deepseek"], default="gemini", help="Proveedor de IA a utilizar")
     parser.add_argument("--model", default=None, help="Modelo de IA a utilizar (ej. gemini-2.5-flash)")
     args = parser.parse_args()
+
+    if args.uninstall:
+        import shutil
+        kspr_dir = str(Path.home() / ".kspr")
+        if os.path.exists(kspr_dir):
+            shutil.rmtree(kspr_dir)
+            print_colored("KSPR desinstalado completamente del sistema.", Color.WHITE)
+            print_colored("Se ha eliminado: ~/.kspr/", Color.LIGHT_GRAY)
+        else:
+            print_colored("No hay una instalacion de KSPR encontrada en ~/.kspr/.", Color.LIGHT_GRAY)
+        return
 
     if args.interactive or args.source is None:
         asyncio.run(interactive_shell())
