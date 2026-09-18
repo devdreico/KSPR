@@ -187,10 +187,13 @@ async def animate_spinner(task_coro, message: str) -> tuple[Any, float]:
         sys.stdout.flush()
 
 
-def print_response_box(title: str, text: str, latency: float = 0.0) -> None:
-    lines = text.splitlines()
-    if not lines:
-        lines = [text]
+def print_response_box(title: str, text: str | list[str], latency: float = 0.0) -> None:
+    if isinstance(text, list):
+        lines = text
+    else:
+        lines = text.splitlines()
+        if not lines:
+            lines = [text]
     width = min(max(len(title) + 12, max((len(l) for l in lines), default=40) + 4), get_terminal_width() - 2)
     horizontal = "─" * (width - 2)
     
@@ -652,6 +655,8 @@ async def interactive_shell() -> None:
                         print_colored(f"[!] No se pudo leer {filepath}: {e}", Color.MID_GRAY)
                 else:
                     print_colored(f"[!] Archivo no encontrado: {filepath}", Color.MID_GRAY)
+
+        full_prompt = prompt + referenced_content
 
         # Call the provider with animated spinner & latency tracking
         try:
