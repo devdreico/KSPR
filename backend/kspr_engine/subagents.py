@@ -9,20 +9,10 @@ from .prompts import KSPR_I_SYSTEM_PROMPT
 class SubagentOrchestrator:
     AGENTS = {
         "architect": {
-            "name": "KSPR I - Architect",
-            "role": "Descomposición estructural, diseño de arquitectura y supervisión general.",
-            "instructions": "Analiza sistemas complejos, define flujos y delega subtareas técnicas."
+            "name": "KSPR I",
+            "role": "Descomposición estructural, ingeniería inversa, análisis estático y supervisión general.",
+            "instructions": "Analiza sistemas complejos, define flujos, ejecuta análisis profundo y delega subtareas técnicas."
         },
-        "developer": {
-            "name": "KSPR II - Code Developer",
-            "role": "Generación, refactorización y autocorrección de código fuente.",
-            "instructions": "Escribe código limpio, robusto y compacto siguiendo estrictamente los estándares."
-        },
-        "auditor": {
-            "name": "KSPR III - Security & Audit",
-            "role": "Auditoría de seguridad estática, detección de vulnerabilidades y revisión de dependencias.",
-            "instructions": "Revisa código en busca de riesgos de seguridad, dependencias obsoletas y contradicciones."
-        }
     }
 
     @classmethod

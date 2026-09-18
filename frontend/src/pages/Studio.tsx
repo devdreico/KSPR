@@ -457,9 +457,9 @@ export function Studio() {
         ...Object.fromEntries(Object.entries(providerModels).map(([key, modelMap]) => [key, { name: key === "gemini" ? "Google Gemini" : key === "local" ? "KSPR" : "OpenAI-compatible", options: providerConfigs[key]?.baseUrl ? { baseURL: providerConfigs[key]?.baseUrl } : key === "openai-compatible" ? { baseURL: compatibleBaseUrl } : {}, models: modelMap }])),
       },
       agent: {
-        "kspr-i": { description: "KSPR I — ingeniería inversa agentica", mode: "primary", model: `${providerId}/${modelId}`, prompt: personalityMd },
-        "kspr-i-plan": { description: "KSPR I · Plan — análisis sin cambios", mode: "primary", model: `${providerId}/${modelId}`, prompt: `${personalityMd}\nTrabaja en modo plan: separa decisiones y no propongas acciones destructivas.` },
-        "kspr-i-review": { description: "KSPR I · Review — auditoría de evidencia", mode: "primary", model: `${providerId}/${modelId}`, prompt: `${personalityMd}\nTrabaja en modo revisión: busca contradicciones, riesgos y evidencia faltante.` },
+        "kspr-i": { description: "KSPR I — Reverse engineering engine", mode: "primary", model: `${providerId}/${modelId}`, prompt: personalityMd },
+        "kspr-i-plan": { description: "KSPR I · Plan — analysis without changes", mode: "primary", model: `${providerId}/${modelId}`, prompt: `${personalityMd}\nWork in plan mode: separate decisions and do not propose destructive actions.` },
+        "kspr-i-review": { description: "KSPR I · Review — evidence review", mode: "primary", model: `${providerId}/${modelId}`, prompt: `${personalityMd}\nWork in review mode: look for contradictions, risks and missing evidence.` },
         ...Object.fromEntries(customAgents.map((agent) => [agent.id, { description: agent.description, mode: agent.mode, model: agent.model || `${providerId}/${modelId}`, prompt: agent.prompt, permission: agent.permission }])),
       },
       default_agent: defaultAgent,
