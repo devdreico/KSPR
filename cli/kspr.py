@@ -353,13 +353,25 @@ async def interactive_shell() -> None:
         width = min(get_terminal_width() - 2, 86)
         horizontal = "─" * (width - 2)
         print_colored(f"┌─ [ Input · kspr i @ {active_provider} ] " + "─" * max(0, width - 6 - len(active_provider) - 17) + "┐", Color.MID_GRAY)
+        
+        if not sys.stdin.isatty():
+            val = input(f"{Color.MID_GRAY}│ {Color.WHITE}❯ {Color.RESET}").strip()
+            print_colored(f"└{horizontal}┘", Color.MID_GRAY)
+            return val
+
         sys.stdout.write(f"{Color.MID_GRAY}│ {Color.WHITE}❯ {Color.RESET}")
         sys.stdout.flush()
 
         import termios
         import tty
         fd = sys.stdin.fileno()
-        old_settings = termios.tcgetattr(fd)
+        try:
+            old_settings = termios.tcgetattr(fd)
+        except Exception:
+            val = input().strip()
+            print_colored(f"└{horizontal}┘", Color.MID_GRAY)
+            return val
+
         chars = []
         try:
             tty.setraw(fd)
@@ -379,7 +391,10 @@ async def interactive_shell() -> None:
                     sys.stdout.write(ch)
                     sys.stdout.flush()
         finally:
-            termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+            try:
+                termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+            except Exception:
+                pass
 
         print_colored(f"└{horizontal}┘", Color.MID_GRAY)
         return "".join(chars).strip()
