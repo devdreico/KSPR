@@ -324,6 +324,7 @@ async def interactive_shell() -> None:
     active_model = config.get("active_model", "gemini-2.5-flash")
     active_provider = config.get("active_provider", "gemini")
     active_iterations = config.get("active_iterations", 3)
+    active_effort = config.get("active_effort", "default")
     attached_files: dict[str, str] = {}
     indexed_models: dict[str, list[dict[str, Any]]] = config.get("indexed_models", {})
     tokens_used = 1250
@@ -334,6 +335,7 @@ async def interactive_shell() -> None:
         cfg["active_model"] = active_model
         cfg["active_provider"] = active_provider
         cfg["active_iterations"] = active_iterations
+        cfg["active_effort"] = active_effort
         cfg["indexed_models"] = indexed_models
         cfg["current_workspace"] = str(current_workspace)
         save_local_config(cfg)
@@ -407,18 +409,19 @@ async def interactive_shell() -> None:
                 break
             elif cmd == "/help":
                 print_box("KSPR CLI Commands", [
-                    "/help              - Muestra esta ayuda de comandos",
-                    "/login             - Activa tu licencia con tu código único para desbloquear /api",
-                    "/api               - Configura proveedores, API Keys e indexa modelos",
-                    "/project           - Gestión de proyectos locales (New project / Anteriores)",
-                    "/model [name/num]  - Muestra o selecciona un modelo indexado",
-                    "/analyze [path]    - Ejecuta el análisis estático",
-                    "/provider [name]   - Cambia el proveedor activo",
-                    "/iterations [n]    - Cambia iteraciones de análisis (1-8)",
-                    "/context           - Muestra los archivos en contexto",
-                    "/clear             - Limpia la pantalla y redibuja el dashboard",
-                    "/update            - Actualiza KSPR a la última versión",
-                    "/exit              - Sale de la sesión interactiva",
+                    "/help                - Show available commands",
+                    "/login               - Authenticate with your license code to unlock /api",
+                    "/api                 - Configure providers, API Keys and index models",
+                    "/project             - Local project management (New / Existing)",
+                    "/model [name/num]    - Show or select an indexed model",
+                    "/model-effort [lvl]  - Set inference effort: default, low, medium, high",
+                    "/analyze [path]      - Run static analysis",
+                    "/provider [name]     - Switch active provider",
+                    "/iterations [n]      - Set analysis iterations (1-8)",
+                    "/context             - Show attached files in context",
+                    "/clear               - Clear screen and redraw dashboard",
+                    "/update              - Update KSPR to latest version",
+                    "/exit                - Exit interactive session",
                 ], Color.WHITE)
             elif cmd == "/clear":
                 os.system("cls" if os.name == "nt" else "clear")
@@ -540,6 +543,19 @@ async def interactive_shell() -> None:
                     persist_state()
                 else:
                     print_colored(f"[*] Iteraciones activas actuales: {active_iterations} (rango 1-8)", Color.LIGHT_GRAY)
+                print_dashboard(active_provider, active_model, active_iterations, current_workspace, len(attached_files), tokens_used, max_tokens)
+            elif cmd == "/model-effort":
+                valid_efforts = ["default", "low", "medium", "high"]
+                if arg and arg.strip().lower() in valid_efforts:
+                    active_effort = arg.strip().lower()
+                    print_colored(f"[✓] Model effort set to: {active_effort}", Color.WHITE)
+                    persist_state()
+                elif arg:
+                    print_colored(f"[!] Invalid effort level: \"{arg}\". Options: default, low, medium, high", Color.LIGHT_GRAY)
+                else:
+                    print_colored(f"[*] Current model effort: {active_effort}", Color.LIGHT_GRAY)
+                    print_colored("    Options: default, low, medium, high", Color.MID_GRAY)
+                    print_colored("    Usage: /model-effort [level]", Color.MID_GRAY)
                 print_dashboard(active_provider, active_model, active_iterations, current_workspace, len(attached_files), tokens_used, max_tokens)
             elif cmd == "/context":
                 lines = [f"Workspace: {current_workspace}", f"Archivos adjuntos ({len(attached_files)}):"]
@@ -675,9 +691,10 @@ async def interactive_shell() -> None:
             provider_instance = get_provider(ProviderName(active_provider.lower()), settings, api_key=getattr(settings, f'{active_provider.lower()}_api_key', None))
             
             async def call_llm():
-                return await provider_instance.complete(full_prompt, active_model, effort=None if active_iterations < 3 else "high")
+                effort = None if active_effort == "default" else active_effort
+                return await provider_instance.complete(full_prompt, active_model, effort=effort)
 
-            (response, latency) = await animate_spinner(call_llm(), f"KSPR I procesando con {active_provider}:{active_model}...")
+            (response, latency) = await animate_spinner(call_llm(), f"KSPR I processing with {active_provider}:{active_model}...")
             
             tokens_used += len(response.encode()) // 3
             print_response_box(f"KSPR I ({active_provider}:{active_model})", response, latency=latency)
@@ -685,19 +702,33 @@ async def interactive_shell() -> None:
                 print_colored(f"[*] Contexto activo: {list(attached_files.keys())}", Color.MID_GRAY)
         except ProviderError as e:
             msg = str(e)
+            hint_lines = []
             if "API Key" in msg or "configura" in msg.lower() or "Configure" in msg:
-                msg = "Provider API Key not configured. To unlock Frontier models, authenticate using /login — or register at https://kspr.membership.vercel.app/"
+                hint_lines = [
+                    "No API Key detected for the active provider.",
+                    "  → Run /login to authenticate with your license code.",
+                    "  → Run /api to configure a provider and API Key.",
+                    "  → Register at: https://kspr.membership.vercel.app/",
+                ]
+            elif "devolvió" in msg.lower() or "respondió" in msg.lower() or "returned" in msg.lower() or "no devolvió" in msg.lower():
+                hint_lines = [
+                    f"Model \"{active_model}\" did not return a valid response.",
+                    "  → Run /model to switch to a different model.",
+                    "  → Run /provider to check your active provider.",
+                ]
+            else:
+                hint_lines = [
+                    f"Provider \"{active_provider}\" returned an error.",
+                    "  → Run /provider to switch providers.",
+                    "  → Run /api to reconfigure your API Key.",
+                ]
             print_colored(f"\n[!] Provider Error: {msg}", Color.WHITE)
-            print_colored("[*] Falling back to local demo mode...", Color.LIGHT_GRAY)
-            local_provider = get_provider(ProviderName.local, settings)
-            response, latency = await animate_spinner(local_provider.complete(prompt, 'kspr-local'), "KSPR I (Fallback Local)...")
-            print_response_box(f"KSPR I (Fallback Local)", response, latency=latency)
+            for line in hint_lines:
+                print_colored(line, Color.LIGHT_GRAY)
         except Exception as e:
-            print_colored(f"\n[!] Error inesperado: {e}", Color.WHITE)
-            print_response_box(f"KSPR I (Fallback)", [
-                "KSPR I está funcionando en modo local de demostración.",
-                "Conecta un proveedor válido para obtener razonamiento LLM completo."
-            ])
+            print_colored(f"\n[!] Unexpected Error: {e}", Color.WHITE)
+            print_colored("  → Run /provider to switch providers.", Color.LIGHT_GRAY)
+            print_colored("  → Run /model to switch models.", Color.LIGHT_GRAY)
         
         print_dashboard(active_provider, active_model, active_iterations, current_workspace, len(attached_files), tokens_used, max_tokens)
         print()
