@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import asyncio
+import json
 import os
 import subprocess
 import sys
@@ -11,6 +12,7 @@ import tempfile
 import time
 import zipfile
 from pathlib import Path
+from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "backend"))
 
@@ -20,6 +22,27 @@ from kspr_engine.models import AnalysisRequest, SourceFile
 from kspr_engine.providers import get_provider, ProviderName, ProviderError
 
 __version__ = "0.1.0"
+
+CONFIG_DIR = Path.home() / ".kspr"
+CONFIG_FILE = CONFIG_DIR / "config.json"
+
+
+def load_local_config() -> dict[str, Any]:
+    if CONFIG_FILE.is_file():
+        try:
+            return json.loads(CONFIG_FILE.read_text(encoding="utf-8"))
+        except Exception:
+            return {}
+    return {}
+
+
+def save_local_config(data: dict[str, Any]) -> None:
+    try:
+        CONFIG_DIR.mkdir(parents=True, exist_ok=True)
+        CONFIG_FILE.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+    except Exception as e:
+        print(f"[!] No se pudo guardar la configuración local: {e}")
+
 
 class Color:
     """High-contrast monochrome and grayscale ANSI color codes."""
@@ -243,15 +266,33 @@ async def run_batch_analysis(source: Path, git_url: str | None, output: Path, pr
 async def interactive_shell() -> None:
     print_header()
     
+    # Load persisted local config
+    config = load_local_config()
+    api_keys = config.get("api_keys", {})
+    for prov, key in api_keys.items():
+        if key:
+            os.environ[f"KSPR_{prov.upper()}_API_KEY"] = key
+            if prov == "gemini":
+                os.environ["GEMINI_API_KEY"] = key
+
     current_workspace = Path.cwd()
-    active_model = "gemini-2.5-flash"
-    active_provider = "gemini"
-    active_agent = "Architect"
-    active_iterations = 3
+    active_model = config.get("active_model", "gemini-2.5-flash")
+    active_provider = config.get("active_provider", "gemini")
+    active_agent = config.get("active_agent", "Architect")
+    active_iterations = config.get("active_iterations", 3)
     attached_files: dict[str, str] = {}
-    indexed_models: dict[str, list[dict[str, Any]]] = {}
-    tokens_used = 1250  # Initial baseline tokens for system prompt & dashboard
-    max_tokens = 128000 # 128k enterprise context window
+    indexed_models: dict[str, list[dict[str, Any]]] = config.get("indexed_models", {})
+    tokens_used = 1250
+    max_tokens = 128000
+
+    def persist_state() -> None:
+        cfg = load_local_config()
+        cfg["active_model"] = active_model
+        cfg["active_provider"] = active_provider
+        cfg["active_agent"] = active_agent
+        cfg["active_iterations"] = active_iterations
+        cfg["indexed_models"] = indexed_models
+        save_local_config(cfg)
 
     print_dashboard(active_provider, active_model, active_agent, active_iterations, current_workspace, len(attached_files), tokens_used, max_tokens)
     print()
@@ -310,11 +351,13 @@ async def interactive_shell() -> None:
                         if 0 <= idx < len(models):
                             active_model = models[idx].get("id")
                             print_colored(f"[✓] Modelo activo actualizado a: {active_model}", Color.WHITE)
+                            persist_state()
                         else:
                             print_colored("[!] Índice de modelo fuera de rango.", Color.LIGHT_GRAY)
                     else:
                         active_model = arg
                         print_colored(f"[✓] Modelo activo actualizado a: {active_model}", Color.WHITE)
+                        persist_state()
                 elif active_provider in indexed_models and indexed_models[active_provider]:
                     models = indexed_models[active_provider]
                     print_box(f"Modelos Disponibles ({active_provider})", [f" {idx+1}. {m.get('id')} ({m.get('name', '')})" for idx, m in enumerate(models)], Color.WHITE)
@@ -322,9 +365,11 @@ async def interactive_shell() -> None:
                     if m_choice.isdigit() and 1 <= int(m_choice) <= len(models):
                         active_model = models[int(m_choice)-1].get("id")
                         print_colored(f"[✓] Modelo activo actualizado a: {active_model}", Color.WHITE)
+                        persist_state()
                     elif m_choice:
                         active_model = m_choice
                         print_colored(f"[✓] Modelo activo actualizado a: {active_model}", Color.WHITE)
+                        persist_state()
                 else:
                     print_colored(f"[*] Modelo activo actual: {active_model}", Color.LIGHT_GRAY)
                     print_colored("[*] Consejo: Ejecuta /api para indexar automáticamente los modelos de tu proveedor.", Color.MID_GRAY)
@@ -333,6 +378,7 @@ async def interactive_shell() -> None:
                 if arg in {"gemini", "local", "openai", "groq", "deepseek"}:
                     active_provider = arg
                     print_colored(f"[✓] Proveedor activo actualizado a: {active_provider}", Color.WHITE)
+                    persist_state()
                 else:
                     print_colored(f"[!] Proveedor activo actual: {active_provider} (opciones: gemini, local, openai, groq, deepseek)", Color.LIGHT_GRAY)
                 print_dashboard(active_provider, active_model, active_agent, active_iterations, current_workspace, len(attached_files), tokens_used, max_tokens)
@@ -340,6 +386,7 @@ async def interactive_shell() -> None:
                 if arg:
                     active_agent = arg
                     print_colored(f"[✓] Agente activo actualizado a: {active_agent}", Color.WHITE)
+                    persist_state()
                 else:
                     print_colored(f"[*] Agente activo actual: {active_agent}", Color.LIGHT_GRAY)
                 print_dashboard(active_provider, active_model, active_agent, active_iterations, current_workspace, len(attached_files), tokens_used, max_tokens)
@@ -347,6 +394,7 @@ async def interactive_shell() -> None:
                 if arg.isdigit() and 1 <= int(arg) <= 8:
                     active_iterations = int(arg)
                     print_colored(f"[✓] Iteraciones activas actualizadas a: {active_iterations}", Color.WHITE)
+                    persist_state()
                 else:
                     print_colored(f"[*] Iteraciones activas actuales: {active_iterations} (rango 1-8)", Color.LIGHT_GRAY)
                 print_dashboard(active_provider, active_model, active_agent, active_iterations, current_workspace, len(attached_files), tokens_used, max_tokens)
@@ -386,6 +434,7 @@ async def interactive_shell() -> None:
                     print_colored("[✓] El proveedor local no requiere API Key.", Color.WHITE)
                     active_provider = selected_prov
                     indexed_models[selected_prov] = [{"id": "kspr-local", "name": "KSPR Local Demo"}]
+                    persist_state()
                 else:
                     env_key = f"KSPR_{selected_prov.upper()}_API_KEY"
                     current_key = os.getenv(env_key, "")
@@ -399,7 +448,14 @@ async def interactive_shell() -> None:
                         os.environ[env_key] = new_key
                         if selected_prov == "gemini":
                             os.environ["GEMINI_API_KEY"] = new_key
-                        print_colored(f"[✓] API Key para '{selected_prov}' guardada y aplicada exitosamente.", Color.WHITE)
+                        
+                        # Persist API key in local config json
+                        cfg = load_local_config()
+                        cfg.setdefault("api_keys", {})[selected_prov] = new_key
+                        cfg["active_provider"] = selected_prov
+                        save_local_config(cfg)
+
+                        print_colored(f"[✓] API Key para '{selected_prov}' guardada localmente y aplicada exitosamente.", Color.WHITE)
                         active_provider = selected_prov
                         
                         try:
@@ -413,6 +469,7 @@ async def interactive_shell() -> None:
                                 print_box(f"Modelos Indexados ({selected_prov}) - Total: {len(models)}", model_lines, Color.WHITE)
                                 active_model = models[0].get("id")
                                 print_colored(f"[✓] Modelo predeterminado establecido a: {active_model}", Color.WHITE)
+                                persist_state()
                             else:
                                 print_colored("[!] No se encontraron modelos en la respuesta de la API.", Color.MID_GRAY)
                         except Exception as ex:
