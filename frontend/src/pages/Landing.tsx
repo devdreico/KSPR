@@ -4,7 +4,7 @@ import { Terminal, Copy, Check, Sparkles, Shield, GitBranch, FolderArchive, Arro
 export function Landing() {
   const [copiedCmd, setCopiedCmd] = useState<string | null>(null);
   const [terminalTab, setTerminalTab] = useState<"install" | "analyze" | "git" | "dev">("install");
-  const [labTab, setLabTab] = useState<number>(0);
+  const [decompTab, setDecompTab] = useState<number>(0);
   const [runningSim, setRunningSim] = useState(false);
   const [simStep, setSimStep] = useState(0);
 
@@ -20,75 +20,61 @@ export function Landing() {
     if (runningSim) return;
     setRunningSim(true);
     setSimStep(1);
-    setTimeout(() => setSimStep(2), 800);
-    setTimeout(() => setSimStep(3), 1600);
+    setTimeout(() => setSimStep(2), 900);
+    setTimeout(() => setSimStep(3), 1800);
     setTimeout(() => {
       setSimStep(4);
       setRunningSim(false);
-    }, 2400);
+    }, 2700);
   };
 
-  const labProcesses = [
+  const headphoneDecompParts = [
     {
-      title: "1. Topología UI & AST",
-      desc: "Análisis sintáctico abstracto (AST) de componentes React, Vue, Svelte y plantillas HTML para extraer inventario de botones, formularios, rutas y contratos de entrada sin renderizar código.",
-      code: "kspr ./repo --output ./context --extract-ui",
-      output: "✓ 67 archivos analizados\n✓ 1,305 elementos UI indexados\n✓ Jerarquía de componentes consolidada en UI_INVENTORY.md"
+      title: "1. Transductores Planar-Magnéticos",
+      subtitle: "Arquitectura de Inducción y Diafragma Sub-Micrónico",
+      desc: "Desensamblaje estático de esquemáticos y notas de ingeniería acústica. KSPR decompila las especificaciones del diafragma de polimida de 1.5 micras, el patrón de grabado serpentino de aluminio y la simetría del arreglo magnético push-pull de neodimio N52 (1.5 Tesla).",
+      command: "kspr /decompilate ./audifonos/esquematicos.pdf ./audifonos/drivers.cad --target hi-fi",
+      output: "[Context Tree Generado]\n└── Context Trees/Hardware - Audifonos Planar HiFi/\n    ├── Contexto inicial.md (Topología y respuesta 5Hz-50kHz)\n    └── transductores_y_magnetismo.md (Flujo magnético y THD < 0.05%)"
     },
     {
-      title: "2. Endpoints & Rutas HTTP",
-      desc: "Desensamblado estático de enrutadores Express, FastAPI, Flask, Spring y Laravel para mapear métodos HTTP, parámetros de consulta, cuerpos de solicitud y guards de seguridad.",
-      code: "kspr ./backend --scan-routes --json",
-      output: "✓ 84 rutas HTTP detectadas\n✓ Métodos: GET (45), POST (28), PUT/DELETE (11)\n✓ Contratos OpenAPI/Swagger generados automáticamente"
+      title: "2. Circuitería DSP y DAC",
+      subtitle: "Decodificación Digital, Filtros FIR y Ganancia Dinámica",
+      desc: "Análisis estático de firmware y diagramas de bloques del procesador de señal digital. KSPR extrae la topología de conversión D/A diferencial, la gestión de muestreo UAC2 (32-bit/384kHz) y las tablas de calibración de fase.",
+      command: "kspr /decompilate ./firmware/dsp_registers.json ./specs/dac_topology.md",
+      output: "[Context Tree Generado]\n└── Context Trees/Hardware - Audifonos Planar HiFi/\n    └── circuiteria_dsp_dac.md (Registros I2S, filtros de fase y SNR 128dB)"
     },
     {
-      title: "3. Linaje de Datos & SQL",
-      desc: "Aislamiento de consultas SQL puras, ORMs (Prisma, SQLAlchemy, Hibernate) y migraciones para reconstruir esquemas relacionales, dependencias de tablas y flujos de mutación.",
-      code: "kspr ./data --sql-audit --export-schema",
-      output: "✓ 32 consultas SQL y sentencias ORM extraídas\n✓ Relaciones FK mapeadas\n✓ Reporte de linaje de datos listo para KSPR I"
+      title: "3. Cámaras Acústicas y Difusores Fazor",
+      subtitle: "Control de Ondas Estacionarias y Guías de Onda",
+      desc: "Ingeniería inversa de volúmenes de resonancia circumaural y rejillas aerodinámicas de titanio. El motor agéntico calcula coeficientes de difracción y mapea la atenuación de reflexiones internas.",
+      command: "kspr /decompilate https://docs.audio-engineering.org/fazor-waveguides --extract-geometry",
+      output: "[Context Tree Generado]\n└── Context Trees/Hardware - Audifonos Planar HiFi/\n    └── acustica_y_camaras_resonancia.md (Guías Fazor y atenuación modal)"
     },
     {
-      title: "4. Taint & Vulnerabilidad Estática",
-      desc: "Trazado heurístico de entradas de usuario sin validar desde controladores hasta sumideros de riesgo (SQLi, XSS, SSRF, RCE) con garantía absoluta de ejecución cero (0% de riesgo en runtime).",
-      code: "kspr ./src --security-audit --strict",
-      output: "✓ 0 ejecución de código en runtime (100% estático)\n✓ 3 advertencias de sanitización detectadas\n✓ Paquete de riesgos generado con mitigaciones"
-    },
-    {
-      title: "5. Deriva Arquitectónica",
-      desc: "Reconciliación matemática entre especificaciones de diseño y código implementado en producción para detectar código fantasma, rutas huérfanas y desvíos de contratos.",
-      code: "kspr ./app --drift-check --compare",
-      output: "✓ Deriva detectada: 4.2%\n✓ Rutas huérfanas identificadas: 5\n✓ Informe de deuda técnica exportado"
+      title: "4. Ensamble Mecánico y Materiales",
+      subtitle: "Tolerancias Térmicas, Aleaciones de Titanio y Ergonomía",
+      desc: "Procesamiento de planos mecánicos y diagramas de despiece CATIA/STEP. KSPR clasifica los puntos de esfuerzo estructural, la densidad de las almohadillas de polímero viscoelástico y la distribución de masa.",
+      command: "kspr /decompilate ./cad/chassis_assembly.step ./specs/materials.txt",
+      output: "[Context Tree Generado]\n└── Context Trees/Hardware - Audifonos Planar HiFi/\n    └── ensamble_mecanico_materiales.md (Chasis de titanio, torque y fatiga)"
     }
   ];
 
   return (
-    <div className="app-shell animate-fade-in">
-      {/* Telemetry Ticker Bar */}
-      <div className="telemetry-ticker">
-        <div className="ticker-track">
-          <div className="ticker-item"><span className="dot" /> SOVERATH HOLDING RESEARCH · BOGOTÁ D.C., COLOMBIA</div>
-          <div className="ticker-item"><span className="dot" /> 100% NON-EXECUTION STATIC REVERSE ENGINEERING</div>
-          <div className="ticker-item"><span className="dot" /> 9 LLM PROVIDERS SUPPORTED (GEMINI, CLAUDE, GPT-4O, DEEPSEEK)</div>
-          <div className="ticker-item"><span className="dot" /> MCP & CAPABILITY LAYER INTEGRATED</div>
-          <div className="ticker-item"><span className="dot" /> SOVERATH HOLDING RESEARCH · BOGOTÁ D.C., COLOMBIA</div>
-          <div className="ticker-item"><span className="dot" /> 100% NON-EXECUTION STATIC REVERSE ENGINEERING</div>
-        </div>
-      </div>
-
+    <div className="app-shell animate-fade-in" style={{ fontFamily: "'Montserrat', sans-serif" }}>
       {/* Topbar */}
       <header className="topbar">
         <div className="brand">
           <img src="/casper-ai-logo.png" alt="KSPR AI" className="brand-logo" />
           <div>
-            <strong>KSPR CLI</strong>
-            <span>Reverse Engineering Engine v0.1.0</span>
+            <strong style={{ fontWeight: 700 }}>KSPR CLI</strong>
+            <span style={{ fontWeight: 500 }}>Reverse Engineering Engine v0.1.0</span>
           </div>
         </div>
         
         <div className="topbar-right">
           <div className="institute-badge">
-            <span>Soverath Holding</span>
-            <strong>Bogotá D.C. - CO</strong>
+            <span style={{ fontWeight: 500 }}>Soverath Holding</span>
+            <strong style={{ fontWeight: 700 }}>Bogotá D.C. - CO</strong>
           </div>
           <a
             href="https://kspr.desktop.presentto.online"
@@ -96,9 +82,9 @@ export function Landing() {
             rel="noreferrer"
             className="desktop-link-btn"
           >
-            <Monitor size={14} color="#ffffff" />
-            KSPR AI DESKTOP
-            <ExternalLink size={12} style={{ opacity: 0.7 }} />
+            <Monitor size={15} color="#ffffff" />
+            <span>KSPR AI DESKTOP</span>
+            <ExternalLink size={13} style={{ opacity: 0.8 }} />
           </a>
         </div>
       </header>
@@ -108,23 +94,23 @@ export function Landing() {
         {/* Hero Section */}
         <section className="hero">
           <div className="section-tag">
-            <Sparkles size={13} /> KSPR ENGINE · AGENTE DE INGENIERÍA INVERSA ESTÁTICA
+            <Sparkles size={14} /> KSPR ENGINE · AGENTE DE INGENIERÍA INVERSA ESTÁTICA
           </div>
           
-          <h1>
-            Transforma sistemas legados en <em style={{ color: "#d4d4d8" }}>mapas cinéticos</em> desde la terminal.
+          <h1 style={{ fontWeight: 700 }}>
+            Transforma sistemas legados y hardware en <em style={{ fontWeight: 400 }}>mapas de contexto</em> desde la terminal.
           </h1>
           
-          <p>
-            Agente autónomo de ingeniería inversa estática desarrollado por <strong>Soverath Holding (Bogotá D.C. - Colombia)</strong>. Analiza repositorios y archivos sin ejecutar código, extrayendo componentes UI, rutas HTTP, esquemas SQL y dependencias para generar paquetes Markdown auditables listos para humanos y agentes de IA (KSPR I).
+          <p style={{ fontWeight: 400 }}>
+            Motor autónomo de ingeniería inversa estática desarrollado por <strong style={{ fontWeight: 700 }}>Soverath Holding (Bogotá D.C. - Colombia)</strong>. Analiza repositorios de código, esquemáticos, PDFs técnicos, imágenes y enlaces web mediante análisis estricto sin ejecución, generando árboles de conocimiento auditables para arquitectos e ingenieros de élite.
           </p>
 
           {/* Action Strip: Curl + Membership Side-by-Side */}
           <div className="action-strip">
             <div className="install-box">
-              <div style={{ display: "flex", alignItems: "center", gap: 10, overflow: "hidden" }}>
-                <Terminal size={18} color="#ffffff" style={{ flexShrink: 0 }} />
-                <code style={{ whiteSpace: "nowrap", overflowX: "auto" }}>{curlCommand}</code>
+              <div style={{ display: "flex", alignItems: "center", gap: 12, overflow: "hidden" }}>
+                <Terminal size={19} color="#ffffff" style={{ flexShrink: 0 }} />
+                <code style={{ whiteSpace: "nowrap", overflowX: "auto", fontFamily: "'Montserrat', sans-serif", fontSize: "13px" }}>{curlCommand}</code>
               </div>
               <button
                 onClick={() => copyToClipboard(curlCommand, "curl-install")}
@@ -132,7 +118,7 @@ export function Landing() {
                 title="Copiar comando de instalación"
               >
                 {copiedCmd === "curl-install" ? <Check size={14} color="#ffffff" /> : <Copy size={14} />}
-                <span>{copiedCmd === "curl-install" ? "Copiado" : "Copiar cURL"}</span>
+                <span style={{ fontWeight: 700 }}>{copiedCmd === "curl-install" ? "Copiado" : "Copiar cURL"}</span>
               </button>
             </div>
 
@@ -142,10 +128,10 @@ export function Landing() {
               rel="noreferrer"
               className="membership-card-btn"
             >
-              <CreditCard size={20} color="#ffffff" />
+              <CreditCard size={22} color="#ffffff" />
               <div className="membership-info">
-                <strong>KSPR MEMBERSHIP</strong>
-                <span>One-Time Purchase ↗</span>
+                <strong style={{ fontWeight: 700 }}>KSPR MEMBERSHIP</strong>
+                <span style={{ fontWeight: 500 }}>One-Time Purchase ↗</span>
               </div>
             </a>
           </div>
@@ -153,27 +139,27 @@ export function Landing() {
 
         {/* KSPR Desktop Highlight Banner */}
         <div style={{
-          background: "linear-gradient(135deg, #101014, #1c1c24)",
+          background: "linear-gradient(135deg, #0a0a0e, #14141c)",
           border: "1px solid #27272a",
-          borderRadius: "16px",
-          padding: "28px 36px",
-          margin: "30px 0 50px",
+          borderRadius: "18px",
+          padding: "32px 40px",
+          margin: "40px 0 60px",
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
           flexWrap: "wrap",
-          gap: 20,
-          boxShadow: "0 15px 40px rgba(0,0,0,0.7)"
+          gap: 24,
+          boxShadow: "0 20px 50px rgba(0,0,0,0.8)"
         }}>
           <div>
-            <div style={{ display: "flex", alignItems: "center", gap: 8, color: "#d4d4d8", font: "11px 'DM Mono', monospace", marginBottom: 6 }}>
-              <Zap size={14} /> CLIENTE NATIVO DE ESCRITORIO DISPONIBLE
+            <div style={{ display: "flex", alignItems: "center", gap: 8, color: "#d4d4d8", fontSize: "12px", fontWeight: 600, marginBottom: 8, letterSpacing: ".1em" }}>
+              <Zap size={15} /> CLIENTE NATIVO DE ESCRITORIO DISPONIBLE
             </div>
-            <h3 style={{ margin: 0, fontSize: "20px", fontWeight: 700, fontFamily: "'Montserrat', sans-serif", color: "#fff" }}>
+            <h3 style={{ margin: 0, fontSize: "22px", fontWeight: 700, color: "#fff" }}>
               KSPR AI Desktop — Entorno Gráfico Avanzado
             </h3>
-            <p style={{ margin: "6px 0 0", color: "var(--muted)", fontSize: "14px", maxWidth: "700px" }}>
-              ¿Prefieres una interfaz visual nativa con control de grafos y MCP servers en tiempo real? Accede al cliente de escritorio oficial alojado en la red de Soverath Holding.
+            <p style={{ margin: "8px 0 0", color: "var(--muted)", fontSize: "15px", maxWidth: "720px", fontWeight: 400 }}>
+              ¿Prefieres una interfaz visual nativa con control de grafos y MCP servers en tiempo real? Accede al cliente de escritorio oficial en la infraestructura de Soverath Holding.
             </p>
           </div>
           <a
@@ -183,131 +169,133 @@ export function Landing() {
             style={{
               background: "#ffffff",
               color: "#000000",
-              padding: "12px 24px",
-              borderRadius: "10px",
+              padding: "14px 28px",
+              borderRadius: "12px",
               fontWeight: 700,
-              fontSize: "13px",
+              fontSize: "14px",
               textDecoration: "none",
               display: "flex",
               alignItems: "center",
-              gap: 8,
-              boxShadow: "0 4px 20px rgba(255, 255, 255, 0.2)",
+              gap: 10,
+              boxShadow: "0 6px 25px rgba(255, 255, 255, 0.2)",
               transition: "transform 0.2s"
             }}
           >
-            Abrir kspr.desktop.presentto.online <ExternalLink size={14} />
+            <span>Abrir kspr.desktop.presentto.online</span>
+            <ExternalLink size={15} />
           </a>
         </div>
 
-        {/* Deep Dive: Architecture & Engineering */}
-        <section style={{ margin: "50px 0" }}>
-          <div style={{ marginBottom: 24 }}>
-            <span style={{ color: "#d4d4d8", font: "11px 'DM Mono', monospace", letterSpacing: ".1em" }}>ARQUITECTURA DE INGENIERÍA</span>
-            <h2 style={{ fontSize: "28px", margin: "6px 0 0", fontWeight: 700, fontFamily: "'Montserrat', sans-serif" }}>
-              ¿Cómo opera el motor estático de KSPR?
+        {/* Real Workflows & Exploration Areas */}
+        <section style={{ margin: "60px 0" }}>
+          <div style={{ marginBottom: 28 }}>
+            <span style={{ color: "#d4d4d8", fontSize: "12px", fontWeight: 600, letterSpacing: ".12em" }}>CAMPOS DE APLICACIÓN INDUSTRIAL</span>
+            <h2 style={{ fontSize: "32px", margin: "8px 0 0", fontWeight: 700 }}>
+              Flujos de trabajo reales donde KSPR destaca
             </h2>
           </div>
 
           <div className="grid-cards">
             <div className="card">
-              <Shield size={24} color="#ffffff" />
-              <h3>Seguridad Estática Pura</h3>
+              <Shield size={28} color="#ffffff" />
+              <h3 style={{ fontWeight: 700 }}>1. Auditoría y Taint Analysis sin Ejecución</h3>
               <p>
-                KSPR examina únicamente la sintaxis y los árboles de análisis abstracto (AST). <strong>Jamás ejecuta el código analizado</strong>, garantizando 0% de vulnerabilidades de ejecución en repositorios legados o desconocidos.
+                Analiza software crítico de cadena de suministro y repositorios legados con 0% de riesgo de runtime. KSPR rastrea entradas de usuario desde controladores hasta sumideros de riesgo (SQLi, XSS, RCE) puramente mediante AST y análisis sintáctico.
               </p>
             </div>
 
             <div className="card">
-              <Layers size={24} color="#d4d4d8" />
-              <h3>Capability Layer & MCP</h3>
+              <Layers size={28} color="#d4d4d8" />
+              <h3 style={{ fontWeight: 700 }}>2. Decompilación Multi-Modal con /decompilate</h3>
               <p>
-                Una capa de abstracción unificada que descubre automáticamente herramientas CLI (incluyendo adaptadores CLI-Anything), servidores MCP y plugins externos bajo estrictos controles de permisos.
+                Ingesta simultánea de PDFs, esquemáticos en imagen (.jpg, .png, .heif), notas de texto y enlaces web. KSPR agrupa la evidencia y genera árboles de contexto estructurados en carpetas con sub-archivos Markdown granulares.
               </p>
             </div>
 
             <div className="card">
-              <Cpu size={24} color="#a1a1aa" />
-              <h3>KSPR I & Tool Calling Loop</h3>
+              <Cpu size={28} color="#a1a1aa" />
+              <h3 style={{ fontWeight: 700 }}>3. Orquestación Multi-LLM y Tool-Calling</h3>
               <p>
-                El núcleo agéntico procesa la evidencia en bucles iterativos de hasta 10 turnos, invocando herramientas, verificando resultados y autocorrigiendo hipótesis antes de consolidar la documentación.
+                Bucle agéntico autónomo de hasta 10 iteraciones (KSPR I) respaldado por 9 proveedores (Gemini, Claude 3.5, GPT-4o, DeepSeek, Groq, OpenRouter, OpenCode Zen, Local). Invoca herramientas y corrige hipótesis dinámicamente.
               </p>
             </div>
           </div>
         </section>
 
-        {/* Interactive Reverse Engineering Lab */}
-        <section className="lab-container">
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20, flexWrap: "wrap", gap: 12 }}>
+        {/* Cinematic Hardware Decomposition Example (Planar Headphones) */}
+        <section className="decomp-container">
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24, flexWrap: "wrap", gap: 16 }}>
             <div>
-              <span style={{ color: "#d4d4d8", font: "11px 'DM Mono', monospace", letterSpacing: ".1em" }}>LABORATORIO TÉCNICO</span>
-              <h2 style={{ fontSize: "24px", margin: "4px 0 0", fontWeight: 700 }}>Procesos de Ingeniería Inversa</h2>
+              <span style={{ color: "#d4d4d8", fontSize: "12px", fontWeight: 600, letterSpacing: ".12em" }}>DEMOSTRACIÓN DE CAPACIDAD TÉCNICA</span>
+              <h2 style={{ fontSize: "26px", margin: "6px 0 0", fontWeight: 700 }}>Decompilación Estática de Hardware: Audífonos Planar Hi-Fi</h2>
             </div>
-            <span style={{ color: "var(--muted)", font: "11px 'DM Mono', monospace" }}>Soverath Holding · Bogotá D.C.</span>
+            <span style={{ color: "var(--muted)", fontSize: "12px", fontWeight: 500 }}>Soverath Holding · Bogotá D.C.</span>
           </div>
 
-          <div className="lab-tabs">
-            {labProcesses.map((proc, idx) => (
+          <div className="decomp-tabs">
+            {headphoneDecompParts.map((part, idx) => (
               <button
                 key={idx}
-                onClick={() => setLabTab(idx)}
-                className={`lab-tab ${labTab === idx ? "active" : ""}`}
+                onClick={() => setDecompTab(idx)}
+                className={`decomp-tab ${decompTab === idx ? "active" : ""}`}
               >
-                {proc.title}
+                {part.title}
               </button>
             ))}
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "30px", alignItems: "stretch" }} className="lab-content-grid">
-            <div style={{ background: "#08080a", padding: "24px", borderRadius: "12px", border: "1px solid var(--line)" }}>
-              <h4 style={{ margin: "0 0 12px", color: "#fff", fontSize: "16px" }}>{labProcesses[labTab].title}</h4>
-              <p style={{ margin: 0, color: "var(--muted)", fontSize: "14px", lineHeight: "1.7" }}>
-                {labProcesses[labTab].desc}
+          <div style={{ display: "grid", gridTemplateColumns: "1.1fr 0.9fr", gap: "32px", alignItems: "stretch" }} className="decomp-grid">
+            <div style={{ background: "#050508", padding: "30px", borderRadius: "16px", border: "1px solid var(--line)" }}>
+              <h4 style={{ margin: "0 0 6px", color: "#fff", fontSize: "18px", fontWeight: 700 }}>{headphoneDecompParts[decompTab].title}</h4>
+              <div style={{ color: "#a1a1aa", fontSize: "13px", fontWeight: 500, marginBottom: "16px" }}>{headphoneDecompParts[decompTab].subtitle}</div>
+              <p style={{ margin: 0, color: "var(--muted)", fontSize: "15px", lineHeight: "1.7", fontWeight: 400 }}>
+                {headphoneDecompParts[decompTab].desc}
               </p>
-              <div style={{ marginTop: "20px", padding: "12px", background: "#141418", borderRadius: "8px", font: "12px 'DM Mono', monospace", color: "#ffffff" }}>
-                $ {labProcesses[labTab].code}
+              <div style={{ marginTop: "24px", padding: "14px 18px", background: "#101015", borderRadius: "10px", fontSize: "13px", fontWeight: 600, color: "#ffffff", border: "1px solid #27272a" }}>
+                $ {headphoneDecompParts[decompTab].command}
               </div>
             </div>
 
-            <div style={{ background: "#020203", padding: "24px", borderRadius: "12px", border: "1px solid var(--line)", fontFamily: "'DM Mono', monospace", fontSize: "13px", display: "flex", flexDirection: "column", justifyContent: "center" }}>
-              <div style={{ color: "var(--muted)", marginBottom: "8px" }}># Salida estructurada de evidencia:</div>
-              <pre style={{ margin: 0, color: "#d4d4d8", whiteSpace: "pre-wrap", lineHeight: 1.6 }}>
-                {labProcesses[labTab].output}
+            <div style={{ background: "#010103", padding: "30px", borderRadius: "16px", border: "1px solid var(--line)", fontSize: "13px", display: "flex", flexDirection: "column", justifyContent: "center" }}>
+              <div style={{ color: "var(--muted)", marginBottom: "10px", fontWeight: 500 }}># Resultado del Árbol de Contexto Generado:</div>
+              <pre style={{ margin: 0, color: "#d4d4d8", whiteSpace: "pre-wrap", lineHeight: 1.7, fontWeight: 500 }}>
+                {headphoneDecompParts[decompTab].output}
               </pre>
             </div>
           </div>
         </section>
 
         {/* Terminal Simulation Section */}
-        <section style={{ margin: "50px 0" }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16, flexWrap: "wrap", gap: 12 }}>
+        <section style={{ margin: "60px 0" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20, flexWrap: "wrap", gap: 16 }}>
             <div>
-              <span style={{ color: "#d4d4d8", font: "11px 'DM Mono', monospace", letterSpacing: ".1em" }}>TERMINAL CLI</span>
-              <h2 style={{ fontSize: "22px", margin: "4px 0 0", fontWeight: 700 }}>Simulador de Ejecución y Comandos</h2>
+              <span style={{ color: "#d4d4d8", fontSize: "12px", fontWeight: 600, letterSpacing: ".12em" }}>TERMINAL CLI</span>
+              <h2 style={{ fontSize: "24px", margin: "6px 0 0", fontWeight: 700 }}>Simulador de Comandos y Flujo Interactivo</h2>
             </div>
-            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+            <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
               <button
                 onClick={() => setTerminalTab("install")}
-                className={`lab-tab ${terminalTab === "install" ? "active" : ""}`}
+                className={`decomp-tab ${terminalTab === "install" ? "active" : ""}`}
               >
                 1. cURL Install
               </button>
               <button
                 onClick={() => setTerminalTab("analyze")}
-                className={`lab-tab ${terminalTab === "analyze" ? "active" : ""}`}
+                className={`decomp-tab ${terminalTab === "analyze" ? "active" : ""}`}
               >
-                2. Análisis Local
+                2. /decompilate
               </button>
               <button
                 onClick={() => setTerminalTab("git")}
-                className={`lab-tab ${terminalTab === "git" ? "active" : ""}`}
+                className={`decomp-tab ${terminalTab === "git" ? "active" : ""}`}
               >
-                3. Repositorio Git
+                3. /trees
               </button>
               <button
                 onClick={() => setTerminalTab("dev")}
-                className={`lab-tab ${terminalTab === "dev" ? "active" : ""}`}
+                className={`decomp-tab ${terminalTab === "dev" ? "active" : ""}`}
               >
-                4. Shell Interactivo
+                4. Shell KSPR I
               </button>
             </div>
           </div>
@@ -318,7 +306,7 @@ export function Landing() {
                 <span className="dot-r" />
                 <span className="dot-y" />
                 <span className="dot-g" />
-                <span style={{ marginLeft: 8, fontSize: "12px", fontFamily: "'DM Mono', monospace", color: "#a1a1aa" }}>kspr@soverath-bogota:~</span>
+                <span style={{ marginLeft: 10, fontSize: "13px", fontWeight: 500, color: "#a1a1aa" }}>kspr@soverath-bogota:~</span>
               </div>
               <button
                 onClick={runSimulation}
@@ -327,10 +315,9 @@ export function Landing() {
                   background: runningSim ? "#27272a" : "#3f3f46",
                   color: "#fff",
                   border: "none",
-                  padding: "6px 14px",
-                  borderRadius: "6px",
-                  fontSize: "11px",
-                  fontFamily: "'Montserrat', sans-serif",
+                  padding: "8px 16px",
+                  borderRadius: "8px",
+                  fontSize: "12px",
                   fontWeight: 700,
                   cursor: runningSim ? "wait" : "pointer"
                 }}
@@ -343,8 +330,8 @@ export function Landing() {
               {terminalTab === "install" && (
                 <div>
                   <div style={{ color: "#71717a" }}># Instalación desatendida mediante script Bash oficial</div>
-                  <div style={{ color: "#ffffff", margin: "8px 0" }}>$ curl -sSL https://raw.githubusercontent.com/devdreiortiz/KSPR/main/bin/install.sh | bash</div>
-                  <div style={{ color: "#a1a1aa", marginTop: "12px" }}>
+                  <div style={{ color: "#ffffff", margin: "10px 0", fontWeight: 600 }}>$ curl -sSL https://raw.githubusercontent.com/devdreiortiz/KSPR/main/bin/install.sh | bash</div>
+                  <div style={{ color: "#a1a1aa", marginTop: "14px" }}>
                     ✓ Clonación segura en ~/.kspr<br />
                     ✓ Entorno virtual Python aislado (.venv)<br />
                     ✓ Enlace ejecutable creado en ~/.local/bin/kspr
@@ -354,15 +341,14 @@ export function Landing() {
 
               {terminalTab === "analyze" && (
                 <div>
-                  <div style={{ color: "#71717a" }}># Analizar directorio local con 3 iteraciones de razonamiento agéntico</div>
-                  <div style={{ color: "#ffffff", margin: "8px 0" }}>$ kspr ./mi-proyecto --output ./kspr-context --iterations 3</div>
-                  {simStep >= 1 && <div style={{ color: "#d4d4d8", marginTop: "6px" }}>[1/3] Ingesta estática completada: 67 archivos leídos sin ejecución.</div>}
-                  {simStep >= 2 && <div style={{ color: "#a1a1aa", marginTop: "4px" }}>[2/3] Extracción AST de UI, rutas HTTP, SQL y dependencias...</div>}
-                  {simStep >= 3 && <div style={{ color: "#71717a", marginTop: "4px" }}>[3/3] Consolidando mapa cinético con KSPR I (3/3)...</div>}
+                  <div style={{ color: "#71717a" }}># Ingesta multi-fuente y compilación de Context Trees</div>
+                  <div style={{ color: "#ffffff", margin: "10px 0", fontWeight: 600 }}>$ kspr /decompilate ./specs.pdf ./diagram.png https://docs.api.com</div>
+                  {simStep >= 1 && <div style={{ color: "#d4d4d8", marginTop: "8px" }}>[1/3] Fuentes indexadas y subidas a staging workspace.</div>}
+                  {simStep >= 2 && <div style={{ color: "#a1a1aa", marginTop: "6px" }}>[2/3] Análisis agéntico con KSPR I y extracción heurística...</div>}
+                  {simStep >= 3 && <div style={{ color: "#71717a", marginTop: "6px" }}>[3/3] Generación de Contexto inicial.md y archivos modulares...</div>}
                   {simStep >= 4 && (
-                    <div style={{ color: "#ffffff", marginTop: "8px", borderTop: "1px dashed #27272a", paddingTop: "8px" }}>
-                      ✓ Análisis finalizado con éxito (Duración: 1.4s)<br />
-                      Paquete generado en: ./kspr-context<br />
+                    <div style={{ color: "#ffffff", marginTop: "12px", borderTop: "1px dashed #27272a", paddingTop: "10px", fontWeight: 600 }}>
+                      ✓ Context Tree creado en: ./Context Trees/Hardware - Audifonos Planar HiFi/<br />
                       Soverath Holding Secure Vault · Bogotá D.C.
                     </div>
                   )}
@@ -371,20 +357,23 @@ export function Landing() {
 
               {terminalTab === "git" && (
                 <div>
-                  <div style={{ color: "#71717a" }}># Clonar y auditar repositorio Git remoto de forma superficial (--depth 1)</div>
-                  <div style={{ color: "#ffffff", margin: "8px 0" }}>$ kspr . --git-url https://github.com/org/repo.git --output ./repo-context</div>
-                  <div style={{ color: "#a1a1aa", marginTop: "8px" }}>Clonación segura completada en sandbox temporal. Listo para exportación de conocimiento.</div>
+                  <div style={{ color: "#71717a" }}># Listar rutas de los Context Trees generados</div>
+                  <div style={{ color: "#ffffff", margin: "10px 0", fontWeight: 600 }}>$ kspr /trees</div>
+                  <div style={{ color: "#a1a1aa", marginTop: "14px" }}>
+                    - Concepto: Hardware - Audifonos Planar HiFi | Ruta: ./Context Trees/Hardware - Audifonos Planar HiFi<br />
+                    - Concepto: Legacy Banking Core | Ruta: ./Context Trees/Legacy Banking Core
+                  </div>
                 </div>
               )}
 
               {terminalTab === "dev" && (
                 <div>
-                  <div style={{ color: "#71717a" }}># Iniciar el shell interactivo de KSPR con logotipo ASCII y comandos slash</div>
-                  <div style={{ color: "#ffffff", margin: "8px 0" }}>$ kspr --interactive</div>
-                  <div style={{ color: "#e2e8f0", marginTop: "6px" }}>
-                    <span style={{ color: "#d4d4d8" }}>  KSPR CLI — OpenCode Interactive Terminal Agent (v0.1.0)</span><br/>
-                    <span style={{ color: "#a1a1aa" }}>  Escribe una consulta, referencia archivos con @ o usa /capabilities, /prompts, /skills.</span><br/>
-                    <span style={{ color: "#ffffff" }}>kspr (architect)&gt; /capabilities</span>
+                  <div style={{ color: "#71717a" }}># Iniciar shell interactivo de KSPR I</div>
+                  <div style={{ color: "#ffffff", margin: "10px 0", fontWeight: 600 }}>$ kspr --interactive</div>
+                  <div style={{ color: "#e2e8f0", marginTop: "8px" }}>
+                    <span style={{ color: "#d4d4d8", fontWeight: 600 }}>  KSPR CLI — OpenCode Interactive Terminal Agent (v0.1.0)</span><br/>
+                    <span style={{ color: "#a1a1aa" }}>  Usa @ para adjuntar archivos, o comandos /decompilate, /trees, /capabilities.</span><br/>
+                    <span style={{ color: "#ffffff", fontWeight: 700 }}>kspr (architect)&gt; /trees</span>
                   </div>
                 </div>
               )}
@@ -395,21 +384,21 @@ export function Landing() {
         {/* Feature Grid */}
         <div className="grid-cards">
           <div className="card">
-            <Activity size={24} color="#ffffff" />
-            <h3>Integración de 9 Proveedores LLM</h3>
-            <p>Soporte nativo para Google Gemini, OpenAI GPT-4o, Anthropic Claude 3.5, DeepSeek Reasoner/V3, Groq, OpenRouter, OpenCode Zen, Local LLMs y endpoints OpenAI-compatibles.</p>
+            <Activity size={26} color="#ffffff" />
+            <h3 style={{ fontWeight: 700 }}>9 Proveedores LLM Sincronizados</h3>
+            <p>Conectividad directa con Google Gemini, OpenAI GPT-4o, Anthropic Claude 3.5, DeepSeek Reasoner/V3, Groq, OpenRouter, OpenCode Zen, Local LLMs y gateways compatibles.</p>
           </div>
 
           <div className="card">
-            <FolderArchive size={24} color="#d4d4d8" />
-            <h3>Paquetes Markdown Modulares</h3>
-            <p>Exporta carpetas estructuradas conteniendo inventario UI, mapa de flujos, contratos de API, riesgos de seguridad y contradicciones listos para entregar a humanos o agentes.</p>
+            <FolderArchive size={26} color="#d4d4d8" />
+            <h3 style={{ fontWeight: 700 }}>Paquetes Markdown Modulares</h3>
+            <p>Exportación estructurada de inventarios UI, grafos de rutas HTTP, contratos de API y reportes de seguridad listos para entrega empresarial.</p>
           </div>
 
           <div className="card">
-            <Search size={24} color="#a1a1aa" />
-            <h3>gsap-skills & Prompts Personalizados</h3>
-            <p>Sistema de habilidades empaquetadas (gsap-skills) y gestión de prompts guardados mediante el comando <code style={{ color: "#fff" }}>/prompts</code> para flujos de trabajo repetibles.</p>
+            <Search size={26} color="#a1a1aa" />
+            <h3 style={{ fontWeight: 700 }}>gsap-skills & Prompts Guardados</h3>
+            <p>Sistema de habilidades empaquetadas (gsap-skills) y gestión de prompts personalizados mediante el comando <code style={{ color: "#fff", fontWeight: 700 }}>/prompts</code>.</p>
           </div>
         </div>
       </main>
@@ -423,9 +412,9 @@ export function Landing() {
           Engineered & Maintained by Soverath Holding · Bogotá D.C. - Colombia
         </div>
         <div>
-          <a href="https://kspr.desktop.presentto.online" target="_blank" rel="noreferrer" style={{ color: "#ffffff", textDecoration: "none" }}>Desktop Client ↗</a>
+          <a href="https://kspr.desktop.presentto.online" target="_blank" rel="noreferrer" style={{ color: "#ffffff", textDecoration: "none", fontWeight: 700 }}>Desktop Client ↗</a>
           {" · "}
-          <a href="https://github.com/devdreiortiz/KSPR" target="_blank" rel="noreferrer" style={{ color: "var(--muted)", textDecoration: "none" }}>GitHub</a>
+          <a href="https://github.com/devdreiortiz/KSPR" target="_blank" rel="noreferrer" style={{ color: "var(--muted)", textDecoration: "none", fontWeight: 500 }}>GitHub</a>
         </div>
       </footer>
     </div>
