@@ -430,9 +430,10 @@ async def interactive_shell() -> None:
             elif cmd == "/project":
                 print_box("KSPR Project Manager", [
                     " 1. New project (Crear nuevo proyecto local)",
-                    " 2. Proyectos anteriores (Seleccionar workspace existente)"
+                    " 2. Proyectos anteriores (Seleccionar workspace existente)",
+                    " 3. Abrir carpeta existente del sistema (Ruta custom)"
                 ], Color.WHITE)
-                p_choice = input(f"{Color.WHITE}Elige opción (1-2): {Color.RESET}").strip()
+                p_choice = input(f"{Color.WHITE}Elige opción (1-3): {Color.RESET}").strip()
                 
                 projects = load_projects()
                 if p_choice == "1":
@@ -442,7 +443,6 @@ async def interactive_shell() -> None:
                         new_ws.mkdir(parents=True, exist_ok=True)
                         current_workspace = new_ws
                         
-                        # Register project
                         proj_entry = {"name": proj_name, "path": str(new_ws.resolve())}
                         if proj_entry not in projects:
                             projects.append(proj_entry)
@@ -465,6 +465,21 @@ async def interactive_shell() -> None:
                                 print_colored(f"[✓] Workspace cambiado a: {current_workspace}", Color.WHITE)
                             else:
                                 print_colored("[!] El directorio del proyecto ya no existe.", Color.LIGHT_GRAY)
+                elif p_choice == "3":
+                    raw_path = input(f"{Color.WHITE}Introduce la ruta absoluta o relativa de la carpeta: {Color.RESET}").strip()
+                    if raw_path:
+                        target_dir = Path(raw_path).expanduser().resolve()
+                        if target_dir.is_dir():
+                            current_workspace = target_dir
+                            proj_name = target_dir.name
+                            proj_entry = {"name": proj_name, "path": str(target_dir)}
+                            if proj_entry not in projects:
+                                projects.append(proj_entry)
+                                save_projects(projects)
+                            persist_state()
+                            print_colored(f"[✓] Workspace vinculado exitosamente a: {target_dir}", Color.WHITE)
+                        else:
+                            print_colored("[!] La ruta especificada no es un directorio válido.", Color.LIGHT_GRAY)
                 print_dashboard(active_provider, active_model, active_agent, active_iterations, current_workspace, len(attached_files), tokens_used, max_tokens)
             elif cmd == "/model":
                 if arg:
