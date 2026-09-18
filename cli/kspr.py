@@ -45,7 +45,20 @@ def save_local_config(data: dict[str, Any]) -> None:
         print(f"[!] No se pudo guardar la configuración local: {e}")
 
 
-def load_projects() -> list[dict[str, str]]:
+def verify_license_code(code: str) -> bool:
+    lic_path = Path(__file__).resolve().parents[1] / "backend" / "kspr_engine" / "licenses.json"
+    if not lic_path.is_file():
+        lic_path = CONFIG_DIR / "licenses.json"
+    if not lic_path.is_file():
+        return False
+    try:
+        data = json.loads(lic_path.read_text(encoding="utf-8"))
+        codes = data.get("codes", {})
+        if code.strip() in codes:
+            return True
+    except Exception:
+        pass
+    return False
     if PROJECTS_FILE.is_file():
         try:
             return json.loads(PROJECTS_FILE.read_text(encoding="utf-8"))
@@ -407,6 +420,7 @@ async def interactive_shell() -> None:
             elif cmd == "/help":
                 print_box("KSPR CLI Commands", [
                     "/help              - Muestra esta ayuda de comandos",
+                    "/login             - Activa tu licencia con tu código único para desbloquear /api",
                     "/api               - Configura proveedores, API Keys e indexa modelos",
                     "/project           - Gestión de proyectos locales (New project / Anteriores)",
                     "/model [name/num]  - Muestra o selecciona un modelo indexado",
@@ -424,6 +438,19 @@ async def interactive_shell() -> None:
                 os.system("cls" if os.name == "nt" else "clear")
                 print_header()
                 print_dashboard(active_provider, active_model, active_agent, active_iterations, current_workspace, len(attached_files), tokens_used, max_tokens)
+                print()
+            elif cmd == "/login":
+                print_box("KSPR Authentication Gateway", [
+                    "Ingresa tu código único de identificación proporcionado en tu software externo:"
+                ], Color.WHITE)
+                code_input = input(f"{Color.WHITE}Código único: {Color.RESET}").strip()
+                if verify_license_code(code_input):
+                    cfg = load_local_config()
+                    cfg["unlocked"] = True
+                    save_local_config(cfg)
+                    print_colored("[✓] ¡Código verificado con éxito! Ya puedes utilizar /api para configurar tus proveedores con máxima eficiencia.", Color.WHITE)
+                else:
+                    print_colored("[✕] Código de identificación inválido o no reconocido.", Color.LIGHT_GRAY)
                 print()
             elif cmd == "/update":
                 run_update()
@@ -542,6 +569,14 @@ async def interactive_shell() -> None:
                     lines.append(f" - @{path}")
                 print_box("Active Context", lines, Color.WHITE)
             elif cmd == "/api":
+                cfg = load_local_config()
+                if not cfg.get("unlocked", False):
+                    print_box("🔒 KSPR Security Lock", [
+                        "Acceso restringido: Se requiere un código único de acceso.",
+                        "Por favor ejecuta el comando /login e introduce tu código para desbloquear /api."
+                    ], Color.WHITE)
+                    print()
+                    continue
                 providers_list = ["gemini", "openai", "groq", "deepseek", "local"]
                 print_box("API & Provider Configuration", [
                     "Selecciona el proveedor para configurar su API Key e indexar modelos:",
