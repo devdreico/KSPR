@@ -1,4 +1,4 @@
-"""KSPR Autonomous Cognitive OS: Sandbox File I/O & Secure Shell Execution with Self-Correction."""
+"""KSPR Autonomous Cognitive OS: Sandbox File I/O & Secure Shell Execution with Self-Correction & Permissions."""
 
 from __future__ import annotations
 
@@ -8,6 +8,7 @@ import subprocess
 import shlex
 from pathlib import Path
 from typing import Any
+from .permissions import check_permission
 
 class SandboxError(Exception):
     """Raised when sandbox security or execution limits are breached."""
@@ -31,6 +32,9 @@ class SafeSandbox:
 
     def write_file(self, path: str | Path, content: str) -> str:
         target = self._validate_path(path)
+        if target.exists():
+            if not check_permission("fs_modify", str(target.relative_to(self.workspace_root))):
+                raise SandboxError("Permiso de modificación de archivo denegado.")
         target.parent.mkdir(parents=True, exist_ok=True)
         target.write_text(content, encoding="utf-8")
         return str(target.relative_to(self.workspace_root))
@@ -38,12 +42,17 @@ class SafeSandbox:
     def delete_file(self, path: str | Path) -> bool:
         target = self._validate_path(path)
         if target.is_file():
+            if not check_permission("fs_delete", str(target.relative_to(self.workspace_root))):
+                raise SandboxError("Permiso de eliminación de archivo denegado.")
             target.unlink()
             return True
         return False
 
     async def execute_shell(self, command: str, timeout: int = 60, max_retries: int = 3) -> dict[str, Any]:
-        """Ejecuta un comando de terminal de forma aislada con bucle de autocorrección ante errores."""
+        """Ejecuta un comando de terminal de forma aislada con verificación de permisos y autocorrección."""
+        if not check_permission("shell_exec", command):
+            return {"success": False, "command": command, "error": "Permiso denegado por el usuario (Cancel)"}
+
         attempt = 0
         current_command = command
         last_error = ""
@@ -73,7 +82,6 @@ class SafeSandbox:
                     }
                 else:
                     last_error = stderr or stdout
-                    # Bucle de autocorrección: si falla, reportamos para que el orquestador intente corregir
                     if attempt >= max_retries:
                         return {
                             "success": False,
