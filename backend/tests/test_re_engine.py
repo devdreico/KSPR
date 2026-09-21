@@ -142,6 +142,25 @@ def test_pcap_analysis(tmp_path: Path):
     assert any(host == "example.com" for host, _count in result["http_hosts"])
 
 
+def test_multi_language_ast(tmp_path: Path):
+    from kspr_engine.re.code.ast import analyze_code, supported_languages
+
+    assert "python" in supported_languages() and "javascript" in supported_languages()
+
+    js = tmp_path / "app.js"
+    js.write_text("import x from 'y';\nfunction foo(a){ return a; }\nclass Bar {}\n", encoding="utf-8")
+    result = analyze_code(js)
+    assert result["language"] == "javascript"
+    assert any(fn["name"] == "foo" for fn in result["functions"])
+    assert any(cls["name"] == "Bar" for cls in result["classes"])
+
+    py = tmp_path / "mod.py"
+    py.write_text("import os\n\ndef f():\n    pass\n\nclass C:\n    pass\n", encoding="utf-8")
+    py_result = analyze_code(py)
+    assert py_result["language"] == "python"
+    assert any(fn["name"] == "f" for fn in py_result["functions"])
+
+
 def test_agents_catalog_and_selection():
     from kspr_engine.agents import list_agents, plan_for, select_agent
 

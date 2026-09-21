@@ -37,7 +37,6 @@ from kspr_core import (
 )
 from kspr_engine.agents import list_agents, plan_for, select_agent
 from kspr_engine.analyzer import analyze
-from kspr_engine.ast_parser import CodeASTAnalyzer
 from kspr_engine.capabilities import CapabilityManager
 from kspr_engine.config import Settings
 from kspr_engine.decompiler import DecompilerEngine
@@ -1026,19 +1025,25 @@ async def interactive_shell() -> None:
             elif cmd == "/ast":
                 target_name = arg.strip()
                 if not target_name:
-                    print_colored("[!] Uso: /ast <archivo.py dentro del workspace>", Color.LIGHT_GRAY)
+                    print_colored("[!] Uso: /ast <archivo dentro del workspace>", Color.LIGHT_GRAY)
                 else:
                     fpath = safe_workspace_path(current_workspace, target_name)
                     if not fpath or not fpath.is_file():
                         print_colored("[!] Archivo no encontrado o fuera del workspace.", Color.LIGHT_GRAY)
                     else:
-                        analysis = CodeASTAnalyzer.analyze_python_file(fpath)
-                        if "error" in analysis:
+                        from kspr_engine.re.code.ast import analyze_code
+
+                        analysis = analyze_code(fpath)
+                        if analysis.get("error") and not analysis.get("functions"):
                             print_colored(f"[!] {analysis['error']}", Color.LIGHT_GRAY)
                         else:
-                            lines = [f"Clases: {len(analysis['classes'])}", f"Funciones: {len(analysis['functions'])}", f"Imports: {len(analysis['imports'])}"]
-                            lines.extend(f"  class {cls['name']} (L{cls['lineno']}) · {len(cls['methods'])} metodos" for cls in analysis["classes"][:10])
-                            lines.extend(f"  def {fn['name']}({', '.join(fn['args'])}) (L{fn['lineno']})" for fn in analysis["functions"][:20])
+                            lines = [
+                                f"Lenguaje: {analysis.get('language', '?')}",
+                                f"Clases: {len(analysis['classes'])}  |  Funciones: {len(analysis['functions'])}  |  Imports: {len(analysis['imports'])}",
+                            ]
+                            lines.extend(f"  class {cls['name']} (L{cls['line']})" for cls in analysis["classes"][:12])
+                            lines.extend(f"  fn {fn['name']} (L{fn['line']})" for fn in analysis["functions"][:25])
+                            lines.extend(f"  import {imp}" for imp in analysis["imports"][:12])
                             print_box(f"AST · {target_name}", lines, Color.WHITE)
             elif cmd == "/remember":
                 text_to_remember = arg.strip()

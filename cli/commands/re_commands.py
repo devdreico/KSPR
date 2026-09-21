@@ -267,6 +267,10 @@ def _cmd_decompile(ctx: REContext, parts: list[str]) -> bool:
     target = parts[1] if len(parts) > 1 else None
     result = decompile(str(path), target=target)
     if result.get("engine") == "none":
+        jvm = _try_jvm_decompile(path)
+        if jvm is not None:
+            result = jvm
+    if result.get("engine") == "none":
         TerminalUI.print_box("Decompilador no disponible", [
             result.get("message", ""),
             f"Disponibles: {', '.join(result.get('available') or []) or 'ninguno'}",
@@ -274,6 +278,24 @@ def _cmd_decompile(ctx: REContext, parts: list[str]) -> bool:
         return True
     TerminalUI.print_response(f"Decompile · {result['engine']} · {target or 'entry'}", result.get("output", ""))
     return True
+
+
+def _try_jvm_decompile(path: Path) -> dict[str, Any] | None:
+    """Decompile JVM/Android artifacts with jadx when available."""
+    import shutil
+    import subprocess
+    import tempfile
+
+    if path.suffix.lower() not in {".jar", ".apk", ".class", ".dex", ".zip"} or not shutil.which("jadx"):
+        return None
+    with tempfile.TemporaryDirectory(prefix="kspr-jadx-") as workdir:
+        completed = subprocess.run(["jadx", "-d", workdir, "--no-res", str(path)], capture_output=True, text=True, timeout=600, check=False)
+        sources: list[str] = []
+        for source_file in sorted(Path(workdir).rglob("*.java"))[:5]:
+            sources.append(f"// ==== {source_file.relative_to(workdir)} ====")
+            sources.append(source_file.read_text(encoding="utf-8", errors="replace")[:8000])
+        output = "\n".join(sources) or (completed.stdout + completed.stderr)[:8000]
+        return {"engine": "jadx", "output": output, "returncode": completed.returncode}
 
 
 async def _cmd_pseudo(ctx: REContext, parts: list[str]) -> bool:
