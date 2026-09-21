@@ -22,6 +22,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 
 from .analyzer import analyze
+from .api.re_routes import router as re_router
 from .auth import get_current_user, hash_password
 from .config import get_settings
 from .decompiler import DecompilerEngine
@@ -42,6 +43,7 @@ from .repository import SupabaseRepository, UserRepository
 settings = get_settings()
 app = FastAPI(title=settings.app_name, version="0.1.0", description="KSPR AI - Empresarial (Powered by KSPR Engine).")
 app.add_middleware(CORSMiddleware, allow_origins=settings.allowed_origins, allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
+app.include_router(re_router)
 
 
 MAX_CONTEXT_BYTES = 20_000_000

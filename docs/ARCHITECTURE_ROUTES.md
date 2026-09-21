@@ -52,6 +52,15 @@ La interfaz de comandos interactiva maneja el siguiente enrutamiento de comandos
 | `/context` | Inspección de archivos adjuntos activos en la sesión. |
 | `/compact` / `/new` / `/sessions` | Gestión de contexto y sesiones persistentes. |
 | `/banner` | Redibuja el wordmark ASCII de KSPR con el proveedor/modelo activos. |
+| `/theme [nombre]` | Cambia el tema (`grayscale`, `phosphor`, `amber`, `ice`, `void`). |
+| `/tools [detect\|install]` | Detecta e instala herramientas de ingeniería inversa. |
+| `/recon` `/file` `/hashes` `/strings` `/hex` | Triage y evidencia textual de un artefacto. |
+| `/sections` `/imports` `/exports` `/symbols` | Análisis estático de formato ELF/PE. |
+| `/entropy` `/packer` `/yara` `/capa` `/crypto` `/iocs` | Detección de amenazas y características. |
+| `/disasm` `/cfg` `/graph` `/callgraph` `/xrefs` `/diff` `/signature` | Desensamblado, grafos y firmas. |
+| `/decompile` `/pseudo` | Descompilación real o pseudocódigo asistido por IA con evidencia. |
+| `/carve` `/recover` `/extract` `/unpack` `/firmware` | Recuperación, extracción y desempaquetado. |
+| `/report` `/sbom` `/ask` `/verify` `/agents` `/plan` `/memory` | Informes, RAG, verificación y ecosistema de agentes. |
 | `/clear` | Limpia la pantalla y redibuja el dashboard ejecutivo. |
 | `/update` | Actualización automática mediante `install.sh`. |
 | `/exit` | Cierre de la sesión interactiva. |

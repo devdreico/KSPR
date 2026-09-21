@@ -20,6 +20,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from datetime import UTC
 
+from commands import COMMANDS, find_command, search_commands
+from commands.re_commands import REContext, dispatch_re_command
 from kspr_core import (
     build_messages_prompt,
     estimate_tokens,
@@ -33,6 +35,7 @@ from kspr_core import (
 from kspr_core import (
     verify_license_code as verify_license_code_file,
 )
+from kspr_engine.agents import list_agents, plan_for, select_agent
 from kspr_engine.analyzer import analyze
 from kspr_engine.ast_parser import CodeASTAnalyzer
 from kspr_engine.capabilities import CapabilityManager
@@ -47,6 +50,8 @@ from kspr_engine.sandbox import SafeSandbox
 from kspr_engine.skills import SkillsManager
 from kspr_engine.todos import TaskEngine
 from kspr_terminal_ui import TerminalTheme, TerminalUI
+from shell import ShellPrompt, shell_available
+from shell.themes import theme_names
 
 __version__ = "0.1.0"
 
@@ -290,6 +295,19 @@ def doctor_report(config: dict[str, Any], active_provider: str, active_model: st
 
     unlocked = bool(config.get("unlocked"))
     lines.append(f"Modo /api desbloqueado: {'sí' if unlocked else 'no (ejecuta /login)'}")
+
+    try:
+        from kspr_engine.re.disasm import available_backends
+        from kspr_engine.re.installer import status as tools_status
+
+        info = tools_status()
+        installed_tools = len(info["installed"])
+        total_tools = installed_tools + len(info["missing"])
+        lines.append("")
+        lines.append(f"Herramientas RE: {installed_tools}/{total_tools} instaladas ({', '.join(info['installed']) or 'ninguna'})")
+        lines.append(f"Backends de desensamblado: {', '.join(available_backends()) or 'ninguno'}")
+    except Exception as exc:
+        lines.append(f"Herramientas RE: no disponible ({exc})")
     return lines
 
 
@@ -422,6 +440,22 @@ async def interactive_shell() -> None:
     session_id = time.strftime("%Y%m%d_%H%M%S")
     session_history: list[dict[str, str]] = []
 
+    TerminalUI.set_theme(config.get("theme", "grayscale"))
+    shell_prompt: ShellPrompt | None = None
+    if shell_available():
+        try:
+            shell_prompt = ShellPrompt(
+                theme=config.get("theme", "grayscale"),
+                status_provider=lambda: (
+                    f" KSPR I · {active_provider}:{active_model} · ctx {tokens_used // 1000}k/{max_tokens // 1000}k "
+                    f"· {current_workspace.name} · [Ctrl+K] paleta [/] comandos [@] archivos "
+                ),
+                workspace_provider=lambda: current_workspace,
+                models_provider=lambda: [str(m.get("id", "")) for m in indexed_models.get(active_provider, [])] or [active_model],
+            )
+        except Exception:
+            shell_prompt = None
+
     def persist_state() -> None:
         cfg = load_local_config()
         cfg["active_model"] = active_model
@@ -449,7 +483,14 @@ async def interactive_shell() -> None:
     print()
 
     def get_input_with_tab() -> str:
-        """Read a line with history and cursor editing via readline when available."""
+        """Read a line: premium prompt_toolkit shell, or readline fallback."""
+        if shell_prompt is not None:
+            try:
+                return shell_prompt.prompt("❯ ").strip()
+            except (EOFError, KeyboardInterrupt):
+                raise
+            except Exception:
+                pass
         width = min(get_terminal_width() - 2, 86)
         horizontal = "─" * (width - 2)
         header = f"┌─ [ Input · kspr i @ {active_provider} ] " + "─" * max(0, width - 6 - len(active_provider) - 17) + "┐"
@@ -489,42 +530,51 @@ async def interactive_shell() -> None:
             cmd = parts[0].lower()
             arg = parts[1] if len(parts) > 1 else ""
 
+            if cmd not in {"/help", "/theme"}:
+                re_context = REContext(workspace=current_workspace, provider_name=active_provider, model=active_model, config=config)
+                if await dispatch_re_command(cmd, arg, re_context):
+                    print_dashboard(active_provider, active_model, current_workspace, len(attached_files), tokens_used, max_tokens)
+                    print()
+                    continue
+
             if cmd in {"/exit", "/quit"}:
                 print_colored("Saliendo de la sesión de KSPR CLI.", Color.LIGHT_GRAY)
                 break
             elif cmd == "/help":
-                print_box("KSPR CLI Commands", [
-                    "/help                - Show available commands",
-                    "/login               - Authenticate with your license code to unlock /api",
-                    "/api                 - Configure providers, API Keys and index models",
-                    "/project             - Local project management (New / Existing)",
-                    "/model [name/num]    - Show or select an indexed model",
-                    "/provider [name]     - Switch active provider",
-                    "/mcp [action]        - Configure and manage MCP servers",
-                    "/plugins [action]    - Install and manage plugins",
-                    "/capabilities [act]  - Discover and manage CLI capabilities",
-                    "/prompts [action]    - Manage saved prompts (add/select/remove/info)",
-                    "/skills [action]     - View and manage loaded skill bundles",
-                    "/decompilate         - Index multiple files/links and generate Context Trees",
-                    "/trees               - List generated Context Trees paths",
-                    "/doctor              - Self-diagnosis of the installation and providers",
-                    "/config              - Show configuration paths and active state",
-                    "/export [json]       - Export the current session transcript",
-                    "/todo [add|list|done] - Manage the workspace task graph",
-                    "/ast <file.py>       - Static AST analysis of a workspace file",
-                    "/remember <text>     - Store a note in local vector memory",
-                    "/recall <query>      - Semantic search over local memory",
-                    "/sandbox             - Show the sandbox policy for /run",
-                    "/run <command>       - Run a shell command inside the workspace",
-                    "/context             - Show attached files in context",
-                    "/compact             - Compact context and token usage",
-                    "/new                 - Start a fresh session",
-                    "/sessions            - Browse and restore saved sessions",
-                    "/clear               - Clear screen and redraw dashboard",
-                    "/banner              - Redraw the KSPR ASCII wordmark",
-                    "/update              - Update KSPR to latest version",
-                    "/exit                - Exit interactive session",
-                ], Color.WHITE)
+                query = arg.strip().lstrip("/")
+                if query:
+                    command = find_command(query)
+                    if command:
+                        print_box(f"/{command.name}", [
+                            command.summary,
+                            f"Uso: {command.usage or '/' + command.name}",
+                            f"Categoría: {command.category}",
+                            f"Requiere: {', '.join(command.requires) or 'nada'}",
+                        ], Color.WHITE)
+                    else:
+                        matches = search_commands(query, limit=8)
+                        print_box("¿Quisiste decir?", [f"/{c.name}  ·  {c.summary}" for c in matches] or ["Sin coincidencias"], Color.WHITE)
+                else:
+                    groups: dict[str, list[str]] = {}
+                    for command in COMMANDS:
+                        groups.setdefault(command.category, []).append(command.name)
+                    lines = []
+                    for category, names in groups.items():
+                        lines.append(f"[{category}]")
+                        lines.append("  " + "  ".join(f"/{name}" for name in names))
+                    lines.append("")
+                    lines.append("Escribe /help <comando> para detalle · Ctrl+K abre la paleta · / <Tab> autocompleta")
+                    print_box("KSPR CLI Commands", lines, Color.WHITE)
+            elif cmd == "/theme":
+                name = arg.strip().lower()
+                if name in theme_names():
+                    TerminalUI.set_theme(name)
+                    cfg = load_local_config()
+                    cfg["theme"] = name
+                    save_local_config(cfg)
+                    print_colored(f"[✓] Tema aplicado: {name}", Color.WHITE)
+                else:
+                    print_box("Temas disponibles", theme_names(), Color.WHITE)
             elif cmd == "/banner":
                 print_header(f"{active_provider}:{active_model}")
             elif cmd == "/clear":
@@ -1030,6 +1080,49 @@ async def interactive_shell() -> None:
                     "Cada operación sensible pide Accept Once / Accept Always / Cancel.",
                     "Usa /run <comando> para ejecutar.",
                 ], Color.WHITE)
+            elif cmd == "/agents":
+                agent = select_agent(arg) if arg.strip() else None
+                if agent:
+                    print_box(f"Subagente · {agent.name}", [
+                        f"Rol: {agent.role}",
+                        f"Herramientas: {', '.join(agent.tools)}",
+                        f"Modelo: {agent.model_hint}",
+                    ], Color.WHITE)
+                else:
+                    print_box("Subagentes KSPR", [f"{a.key:<12} {a.role}" for a in list_agents()] + ["", "Usa /agents <clave> para detalle."], Color.WHITE)
+            elif cmd == "/plan":
+                goal = arg.strip() or "analizar artefacto"
+                steps = plan_for(goal)
+                engine = TaskEngine(current_workspace)
+                for step in steps:
+                    engine.add_task(f"[{step.agent}] {step.title}")
+                print_box(f"Plan · {goal}", [f"{i}. [{step.agent}] {step.title}  →  {'; '.join(step.commands)}" for i, step in enumerate(steps, 1)], Color.WHITE)
+            elif cmd == "/verify":
+                target = arg.strip()
+                fpath = safe_workspace_path(current_workspace, target) if target else None
+                resolved = fpath if fpath and fpath.is_file() else REContext(workspace=current_workspace).resolve(target)
+                if not resolved:
+                    print_colored("[!] Uso: /verify <ruta> (artefacto a auditar)", Color.LIGHT_GRAY)
+                else:
+                    from kspr_engine.re.analyze import analyze_artifact
+
+                    report = analyze_artifact(resolved)
+                    checks = [
+                        ["hashes", "OK" if report.hashes.get("sha256") else "FALTA", "integridad del artefacto"],
+                        ["formato", report.kind, report.description],
+                        ["strings", str(len(report.strings)), "evidencia textual"],
+                        ["hallazgos", str(len(report.findings)), "conclusiones con evidencia"],
+                    ]
+                    TerminalUI.print_table(f"Verificación · {resolved.name}", ["CHECK", "VALOR", "NOTA"], checks)
+                    for finding in report.findings:
+                        print_colored(f"  [{finding.severity}] {finding.title}", Color.SILVER)
+            elif cmd == "/memory":
+                memory = VectorMemory(CONFIG_DIR / "memory")
+                total = len(getattr(memory, "documents", []))
+                rows = [[doc.get("id", "?"), truncate(str(doc.get("content", "")), 70)] for doc in getattr(memory, "documents", [])[:40]]
+                print_box(f"Memoria vectorial · {total} documentos", ["Usa /remember <texto> y /recall <consulta>."] if not rows else [])
+                if rows:
+                    TerminalUI.print_table("Memoria", ["ID", "CONTENIDO"], rows)
             elif cmd == "/decompilate":
                 print_box("KSPR Decompiler — Indexación Multi-Fuente", [
                     "Añade archivos (PDF, imágenes .jpg/.png/.heif, .txt, .md) o enlaces web.",

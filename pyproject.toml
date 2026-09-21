@@ -17,7 +17,14 @@ dependencies = [
   "passlib[bcrypt]>=1.7.4",
   "bcrypt>=4.0.0",
   "PyJWT>=2.8.0",
-  "PyYAML>=6.0"
+  "PyYAML>=6.0",
+  # TUI premium
+  "prompt_toolkit>=3.0.0",
+  "rich>=13.0.0",
+  # Triage y formatos (puro Python, siempre disponible)
+  "pyelftools>=0.31",
+  "pefile>=2024.8.26",
+  "filetype>=1.2.0"
 ]
 
 [project.optional-dependencies]
@@ -25,6 +32,23 @@ dev = [
   "pytest>=8.3.0",
   "pytest-asyncio>=0.23.0",
   "ruff>=0.6.0"
+]
+# Motor de ingeniería inversa: parsers binarios, disasm, detección y recuperación.
+re = [
+  "lief>=0.15",
+  "capstone>=5.0",
+  "yara-python>=4.5",
+  "tree-sitter>=0.23",
+  "tree-sitter-language-pack>=0.7",
+  "dnfile>=0.15",
+  "xdis>=6.1",
+  "scapy>=2.6",
+  "py7zr>=0.22",
+  "rarfile>=4.2"
+]
+# Embeddings y búsqueda vectorial locales.
+ml = [
+  "fastembed>=0.3"
 ]
 
 [tool.setuptools.packages.find]
@@ -55,6 +79,7 @@ ignore = [
   "S110",    # try/except/pass intencional en rutas opcionales
   "SIM105",  # try/except/pass explícito es válido en rutas opcionales
   "RUF001",  # la UI usa glifos unicode intencionales (❯, ─, ✓)
+  "RUF003",  # idem en comentarios
 ]
 
 [tool.ruff.lint.per-file-ignores]

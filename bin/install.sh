@@ -48,10 +48,23 @@ python3 -m venv "$VENV_DIR"
 
 echo "[*] Instalando dependencias..."
 if [ -f "$INSTALL_DIR/pyproject.toml" ]; then
-    "$VENV_DIR/bin/pip" install "$INSTALL_DIR"
+    "$VENV_DIR/bin/pip" install "$INSTALL_DIR[re]" || "$VENV_DIR/bin/pip" install "$INSTALL_DIR"
 else
-    "$VENV_DIR/bin/pip" install fastapi httpx pydantic pydantic-settings python-multipart uvicorn bcrypt PyJWT PyYAML
+    "$VENV_DIR/bin/pip" install fastapi httpx pydantic pydantic-settings python-multipart uvicorn bcrypt PyJWT PyYAML \
+        prompt_toolkit rich pyelftools pefile filetype
 fi
+
+echo "[*] Detectando herramientas de ingeniería inversa..."
+"$VENV_DIR/bin/python" - <<'PY' || true
+try:
+    from kspr_engine.re.installer import status
+    info = status()
+    print(f"    instaladas: {', '.join(info['installed']) or 'ninguna'}")
+    print(f"    faltantes:  {', '.join(info['missing'][:8])}{'...' if len(info['missing'])>8 else ''}")
+    print("    instala el resto desde el shell con: /tools install")
+except Exception as exc:
+    print(f"    (no se pudo detectar: {exc})")
+PY
 
 echo "[*] Creando lanzador auto-reparable en $BIN_DIR/kspr..."
 mkdir -p "$BIN_DIR"
