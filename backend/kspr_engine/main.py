@@ -1,7 +1,11 @@
 from __future__ import annotations
 
 import asyncio
+import ipaddress
 import json
+import socket
+from pathlib import Path
+from urllib.parse import urlparse
 
 from fastapi import (
     BackgroundTasks,
@@ -20,6 +24,7 @@ from fastapi.responses import StreamingResponse
 from .analyzer import analyze
 from .auth import get_current_user, hash_password
 from .config import get_settings
+from .decompiler import DecompilerEngine
 from .jobs import job_store
 from .models import (
     AnalysisRequest,
@@ -33,11 +38,61 @@ from .models import (
 )
 from .providers import GeminiProvider, ProviderError, get_provider
 from .repository import SupabaseRepository, UserRepository
-from .decompiler import DecompilerEngine
 
 settings = get_settings()
 app = FastAPI(title=settings.app_name, version="0.1.0", description="KSPR AI - Empresarial (Powered by KSPR Engine).")
 app.add_middleware(CORSMiddleware, allow_origins=settings.allowed_origins, allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
+
+
+MAX_CONTEXT_BYTES = 20_000_000
+
+
+def _enforce_context_limit(request: AnalysisRequest) -> int:
+    """Return the total context size, rejecting abusive payloads."""
+    total = sum(len(item.content) for item in request.files)
+    if total > MAX_CONTEXT_BYTES:
+        raise HTTPException(
+            status_code=413,
+            detail="El contexto supera el límite de 20 MB; divide el análisis en partes.",
+        )
+    return total
+
+
+def _safe_stage_name(filename: str | None, fallback: str = "upload.bin") -> str:
+    """Strip directories and reject traversal in an uploaded filename."""
+    base = Path((filename or fallback).replace("\\", "/")).name.strip()
+    if not base or base in {".", ".."} or ".." in base:
+        return fallback
+    return base
+
+
+def _is_safe_remote_url(url: str) -> bool:
+    """Allow only http(s) URLs resolving to public addresses (anti-SSRF)."""
+    try:
+        parsed = urlparse(url)
+    except ValueError:
+        return False
+    if parsed.scheme not in {"http", "https"} or not parsed.hostname:
+        return False
+    try:
+        infos = socket.getaddrinfo(parsed.hostname, None)
+    except OSError:
+        return False
+    for info in infos:
+        try:
+            address = ipaddress.ip_address(info[4][0])
+        except ValueError:
+            return False
+        if (
+            address.is_private
+            or address.is_loopback
+            or address.is_link_local
+            or address.is_reserved
+            or address.is_multicast
+            or address.is_unspecified
+        ):
+            return False
+    return True
 
 
 @app.get("/api/v1/health")
@@ -97,7 +152,7 @@ async def login(request: UserLoginRequest) -> TokenResponse:
 
 
 @app.get("/api/v1/auth/me", response_model=UserProfile)
-async def get_current_user_profile(current_user: UserProfile = Depends(get_current_user)) -> UserProfile:  # noqa: B008
+async def get_current_user_profile(current_user: UserProfile = Depends(get_current_user)) -> UserProfile:
     return current_user
 
 
@@ -112,13 +167,14 @@ async def oauth_login(request: OAuthLoginRequest) -> TokenResponse:
 @app.post("/api/v1/analyze", response_model=AnalysisResult)
 async def create_analysis(
     request: AnalysisRequest,
-    current_user: UserProfile = Depends(get_current_user),  # noqa: B008
+    current_user: UserProfile = Depends(get_current_user),
     x_kspr_api_key: str | None = Header(default=None, alias="X-KSPR-API-Key"),
     x_gemini_api_key: str | None = Header(default=None, alias="X-Gemini-API-Key"),
     x_kspr_base_url: str | None = Header(default=None, alias="X-KSPR-Base-URL"),
     x_kspr_auth_mode: str = Header(default="api_key", alias="X-KSPR-Auth-Mode"),
 ) -> AnalysisResult:
-    if request.mode.value == "async" or (request.mode.value == "auto" and sum(len(item.content) for item in request.files) > 250_000):
+    total_size = _enforce_context_limit(request)
+    if request.mode.value == "async" or (request.mode.value == "auto" and total_size > 250_000):
         raise HTTPException(status_code=409, detail="Este contexto requiere un job asíncrono; usa /api/v1/jobs")
     try:
         result = await analyze(
@@ -137,13 +193,14 @@ async def create_analysis(
 @app.post("/api/v1/analyze/stream")
 async def stream_analysis(
     request: AnalysisRequest,
-    current_user: UserProfile = Depends(get_current_user),  # noqa: B008
+    current_user: UserProfile = Depends(get_current_user),
     x_kspr_api_key: str | None = Header(default=None, alias="X-KSPR-API-Key"),
     x_gemini_api_key: str | None = Header(default=None, alias="X-Gemini-API-Key"),
     x_kspr_base_url: str | None = Header(default=None, alias="X-KSPR-Base-URL"),
     x_kspr_auth_mode: str = Header(default="api_key", alias="X-KSPR-Auth-Mode"),
 ) -> StreamingResponse:
     """Emite progreso y resultado como eventos SSE para el compositor web."""
+    _enforce_context_limit(request)
 
     async def events():
         queue: asyncio.Queue[dict] = asyncio.Queue()
@@ -167,7 +224,7 @@ async def stream_analysis(
                 )
                 await SupabaseRepository(settings).save_analysis(result, user_id=current_user.id)
                 await queue.put({"type": "result", "result": result.model_dump(mode="json")})
-            except Exception as exc:  # noqa: BLE001 - serialized at the stream boundary
+            except Exception as exc:
                 await queue.put({"type": "error", "message": str(exc)})
 
         task = asyncio.create_task(run())
@@ -195,12 +252,13 @@ async def stream_analysis(
 async def create_job(
     request: AnalysisRequest,
     background_tasks: BackgroundTasks,
-    current_user: UserProfile = Depends(get_current_user),  # noqa: B008
+    current_user: UserProfile = Depends(get_current_user),
     x_kspr_api_key: str | None = Header(default=None, alias="X-KSPR-API-Key"),
     x_gemini_api_key: str | None = Header(default=None, alias="X-Gemini-API-Key"),
     x_kspr_base_url: str | None = Header(default=None, alias="X-KSPR-Base-URL"),
     x_kspr_auth_mode: str = Header(default="api_key", alias="X-KSPR-Auth-Mode"),
 ) -> JobStatus:
+    _enforce_context_limit(request)
     job = job_store.create()
     background_tasks.add_task(
         job_store.run,
@@ -216,7 +274,7 @@ async def create_job(
 
 
 @app.get("/api/v1/jobs/{job_id}", response_model=JobStatus)
-async def get_job(job_id: str, current_user: UserProfile = Depends(get_current_user)) -> JobStatus:  # noqa: B008
+async def get_job(job_id: str, current_user: UserProfile = Depends(get_current_user)) -> JobStatus:
     job = job_store.get(job_id)
     if not job:
         raise HTTPException(status_code=404, detail="Job no encontrado")
@@ -224,14 +282,14 @@ async def get_job(job_id: str, current_user: UserProfile = Depends(get_current_u
 
 
 @app.delete("/api/v1/jobs/{job_id}")
-async def cancel_job(job_id: str, current_user: UserProfile = Depends(get_current_user)) -> dict:  # noqa: B008
+async def cancel_job(job_id: str, current_user: UserProfile = Depends(get_current_user)) -> dict:
     if not job_store.cancel(job_id):
         raise HTTPException(status_code=409, detail="El job no puede cancelarse en su estado actual")
     return {"job_id": job_id, "status": "cancelled", "message": "Job cancelado"}
 
 
 @app.post("/api/v1/ingest/files")
-async def ingest_files(files: list[UploadFile] = File(...)) -> dict:  # noqa: B008
+async def ingest_files(files: list[UploadFile] = File(...)) -> dict:
     """Previsualiza archivos cargados; la ejecución de código está prohibida."""
     allowed = {".py", ".js", ".jsx", ".ts", ".tsx", ".cs", ".java", ".sql", ".html", ".vue", ".php", ".md", ".txt", ".json", ".yaml", ".yml"}
     result = []
@@ -246,7 +304,7 @@ async def ingest_files(files: list[UploadFile] = File(...)) -> dict:  # noqa: B0
 
 
 @app.post("/api/v1/ingest/archive")
-async def ingest_archive(file: UploadFile = File(...)) -> dict:  # noqa: B008
+async def ingest_archive(file: UploadFile = File(...)) -> dict:
     """Extrae ZIP sin permitir traversal de rutas ni ejecutar contenido."""
     import io
     import zipfile
@@ -274,7 +332,7 @@ async def ingest_archive(file: UploadFile = File(...)) -> dict:  # noqa: B008
 
 @app.post("/api/v1/transcribe")
 async def transcribe_audio(
-    file: UploadFile = File(...),  # noqa: B008
+    file: UploadFile = File(...),
     x_gemini_api_key: str | None = Header(default=None, alias="X-Gemini-API-Key"),
     x_kspr_api_key: str | None = Header(default=None, alias="X-KSPR-API-Key"),
     x_kspr_auth_mode: str = Header(default="api_key", alias="X-KSPR-Auth-Mode"),
@@ -339,6 +397,7 @@ async def decompilate_sources(
     links: str | None = Query(default=None),
     provider: str = Query(default="gemini"),
     model: str = Query(default="gemini-2.5-flash"),
+    current_user: UserProfile = Depends(get_current_user),
     x_kspr_api_key: str | None = Header(default=None, alias="X-KSPR-API-Key"),
     x_kspr_base_url: str | None = Header(default=None, alias="X-KSPR-Base-URL"),
     x_kspr_auth_mode: str = Header(default="api_key", alias="X-KSPR-Auth-Mode"),
@@ -347,21 +406,27 @@ async def decompilate_sources(
     decompiler = DecompilerEngine()
     ingested = []
 
-    # Save uploaded files to staging
+    # Save uploaded files to staging with sanitized names (no traversal).
     for file in files:
         raw = await file.read()
-        stage_path = decompiler.staging_dir / file.filename
+        if len(raw) > 25_000_000:
+            raise HTTPException(status_code=413, detail=f"El archivo {file.filename or 'sin nombre'} supera el límite de 25 MB")
+        stage_path = decompiler.staging_dir / _safe_stage_name(file.filename)
         stage_path.write_bytes(raw)
         res = decompiler.ingest_source(str(stage_path))
         ingested.append(res)
 
-    # Ingest links if provided
+    # Ingest links if provided (public http/https only, anti-SSRF).
     if links:
         for link in links.split(","):
             link_clean = link.strip()
-            if link_clean:
-                res = decompiler.ingest_source(link_clean)
-                ingested.append(res)
+            if not link_clean:
+                continue
+            if not _is_safe_remote_url(link_clean):
+                ingested.append({"source": link_clean, "success": False, "error": "URL no permitida (solo http/https públicos)"})
+                continue
+            res = decompiler.ingest_source(link_clean)
+            ingested.append(res)
 
     combined_text = "\n\n".join([f"SOURCE: {item['source']}\n{item.get('content', '')}" for item in ingested if item.get('success')])
 
@@ -392,7 +457,7 @@ async def decompilate_sources(
 
 
 @app.get("/api/v1/trees")
-async def list_context_trees() -> dict:
+async def list_context_trees(current_user: UserProfile = Depends(get_current_user)) -> dict:
     """Lists all generated Context Trees."""
     decompiler = DecompilerEngine()
     return {"trees": decompiler.list_trees()}

@@ -1,8 +1,6 @@
 import json
-import pytest
-from pathlib import Path
+
 from kspr_engine.plugin_manager import PluginManager
-from kspr_engine.models import PluginInfo, MCPTool
 
 
 class TestPluginManager:

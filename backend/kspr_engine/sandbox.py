@@ -3,12 +3,11 @@
 from __future__ import annotations
 
 import asyncio
-import os
-import subprocess
-import shlex
 from pathlib import Path
 from typing import Any
+
 from .permissions import check_permission
+
 
 class SandboxError(Exception):
     """Raised when sandbox security or execution limits are breached."""
@@ -19,8 +18,10 @@ class SafeSandbox:
         self.workspace_root = (workspace_root or Path.cwd()).resolve()
 
     def _validate_path(self, path: str | Path) -> Path:
-        resolved = (self.workspace_root / path).resolve()
-        if not str(resolved).startswith(str(self.workspace_root)):
+        candidate = Path(path)
+        # Una ruta absoluta nunca puede escapar del workspace.
+        resolved = (candidate if candidate.is_absolute() else self.workspace_root / candidate).resolve()
+        if resolved != self.workspace_root and self.workspace_root not in resolved.parents:
             raise SandboxError("Violación de seguridad: Acceso fuera del workspace prohibido.")
         return resolved
 
@@ -32,9 +33,8 @@ class SafeSandbox:
 
     def write_file(self, path: str | Path, content: str) -> str:
         target = self._validate_path(path)
-        if target.exists():
-            if not check_permission("fs_modify", str(target.relative_to(self.workspace_root))):
-                raise SandboxError("Permiso de modificación de archivo denegado.")
+        if target.exists() and not check_permission("fs_modify", str(target.relative_to(self.workspace_root))):
+            raise SandboxError("Permiso de modificación de archivo denegado.")
         target.parent.mkdir(parents=True, exist_ok=True)
         target.write_text(content, encoding="utf-8")
         return str(target.relative_to(self.workspace_root))
@@ -92,7 +92,7 @@ class SafeSandbox:
                             "exit_code": exit_code,
                             "error": last_error
                         }
-            except asyncio.TimeoutError:
+            except TimeoutError:
                 try:
                     proc.kill()
                 except Exception:

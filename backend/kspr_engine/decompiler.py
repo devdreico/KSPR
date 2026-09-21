@@ -2,15 +2,46 @@
 
 from __future__ import annotations
 
-import json
+import ipaddress
 import logging
-import os
 import re
+import socket
 from pathlib import Path
 from typing import Any
+from urllib.parse import urlparse
+
 import httpx
 
 logger = logging.getLogger(__name__)
+
+
+def _is_public_url(url: str) -> bool:
+    """Only allow http(s) URLs resolving to public addresses (anti-SSRF)."""
+    try:
+        parsed = urlparse(url)
+    except ValueError:
+        return False
+    if parsed.scheme not in {"http", "https"} or not parsed.hostname:
+        return False
+    try:
+        infos = socket.getaddrinfo(parsed.hostname, None)
+    except OSError:
+        return False
+    for info in infos:
+        try:
+            address = ipaddress.ip_address(info[4][0])
+        except ValueError:
+            return False
+        if (
+            address.is_private
+            or address.is_loopback
+            or address.is_link_local
+            or address.is_reserved
+            or address.is_multicast
+            or address.is_unspecified
+        ):
+            return False
+    return True
 
 CONTEXT_TREES_DIR = Path.cwd() / "Context Trees"
 
@@ -33,7 +64,7 @@ class DecompilerEngine:
     def _ingest_file(self, path: Path) -> dict[str, Any]:
         if not path.is_file():
             return {"source": str(path), "success": False, "error": "File not found"}
-        
+
         suffix = path.suffix.lower()
         content = ""
         file_type = "unknown"
@@ -70,6 +101,8 @@ class DecompilerEngine:
             return {"source": str(path), "success": False, "error": str(e)}
 
     def _ingest_url(self, url: str) -> dict[str, Any]:
+        if not _is_public_url(url):
+            return {"source": url, "success": False, "error": "URL no permitida (solo http/https públicos)"}
         try:
             resp = httpx.get(url, timeout=10, follow_redirects=True)
             text = resp.text

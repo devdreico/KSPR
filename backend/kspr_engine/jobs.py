@@ -59,7 +59,7 @@ class JobStore:
             self.jobs[job_id].status = "cancelled"
             self.jobs[job_id].stage = "cancelled"
             self.jobs[job_id].message = "Cancelado por el usuario"
-        except Exception as exc:  # noqa: BLE001 - job boundary must persist failure state
+        except Exception as exc:
             self.jobs[job_id].status = "failed"
             self.jobs[job_id].stage = "error"
             self.jobs[job_id].error = str(exc)

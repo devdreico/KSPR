@@ -39,8 +39,6 @@ class CLIAnythingDetector:
         """Find executables starting with 'cli-anything-' in PATH."""
         harnesses: list[dict] = []
         prefixes = ["cli-anything-", "cli-hub-"]
-        for path_dir in shutil.which("path") or []:
-            pass
         # Search common bin directories
         for bin_dir in [Path("/usr/local/bin"), Path.home() / ".local" / "bin"]:
             if not bin_dir.is_dir():

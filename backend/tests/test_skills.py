@@ -1,5 +1,3 @@
-import pytest
-from pathlib import Path
 from kspr_engine.skills import SkillBundle, SkillsManager
 
 

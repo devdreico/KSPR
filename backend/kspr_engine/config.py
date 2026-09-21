@@ -28,7 +28,9 @@ class Settings(BaseSettings):
     supabase_url: str | None = None
     supabase_anon_key: str | None = None
     supabase_service_role_key: str | None = None
-    jwt_secret_key: str = "kspr-secret-default-key-change-in-production"
+    # Sin valor por defecto hardcodeado: auth.py genera/lee una clave local
+    # persistente en ~/.kspr/jwt_secret.key cuando no se configura explícitamente.
+    jwt_secret_key: str = ""
     jwt_algorithm: str = "HS256"
     jwt_expiration_minutes: int = 1440
     mcp_servers: str = '{}'

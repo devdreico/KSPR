@@ -1,26 +1,29 @@
 #!/usr/bin/env node
-// KSPR CLI - Node.js wrapper
+// KSPR CLI - Node.js wrapper.
 // Installed globally via: npm install -g kspr-ai
 // Or locally: npx kspr-ai
 
-const { spawn } = require("child_process");
+const { spawnSync } = require("child_process");
 const path = require("path");
+const fs = require("fs");
 
-const pythonScript = path.join(__dirname, "..", "cli", "kspr.py");
+const repoRoot = path.join(__dirname, "..");
+const pythonScript = path.join(repoRoot, "cli", "kspr.py");
 
-// Use python3 directly (works in most environments)
-const pythonCmd = process.platform === "win32" ? "python" : "python3";
+const venvPython = process.platform === "win32"
+  ? path.join(repoRoot, ".venv", "Scripts", "python.exe")
+  : path.join(repoRoot, ".venv", "bin", "python");
 
-const args = [pythonScript, ...process.argv.slice(2)];
+const pythonCmd = fs.existsSync(venvPython)
+  ? venvPython
+  : (process.platform === "win32" ? "python" : "python3");
 
-const child = spawn(pythonCmd, args, { stdio: "inherit" });
+const result = spawnSync(pythonCmd, [pythonScript, ...process.argv.slice(2)], { stdio: "inherit" });
 
-child.on("error", (err) => {
-  console.error("KSPR CLI Error:", err.message);
+if (result.error) {
+  console.error("KSPR CLI Error:", result.error.message);
   console.error("Ensure Python 3 and KSPR dependencies are installed (pip install -e .).");
   process.exit(1);
-});
+}
 
-child.on("exit", (code) => {
-  process.exit(code !== null ? code : 0);
-});
+process.exit(result.status === null ? 1 : result.status);

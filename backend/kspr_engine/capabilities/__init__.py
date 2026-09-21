@@ -5,27 +5,27 @@ from __future__ import annotations
 import logging
 from typing import Any
 
-from .schemas import CapabilitySchema, CapabilityResult, CapabilityValidation
-from .registry import CapabilityRegistry
-from .permissions import CapabilityPermissions
-from .loader import CapabilityLoader
 from .discovery import CapabilityDiscovery
 from .executor import CapabilityExecutor
+from .loader import CapabilityLoader
+from .permissions import CapabilityPermissions
+from .registry import CapabilityRegistry
+from .schemas import CapabilityResult, CapabilitySchema, CapabilityValidation
 from .validator import CapabilityValidator
 
 logger = logging.getLogger(__name__)
 
 __all__ = [
-    "CapabilitySchema",
-    "CapabilityResult",
-    "CapabilityValidation",
-    "CapabilityRegistry",
-    "CapabilityPermissions",
-    "CapabilityLoader",
     "CapabilityDiscovery",
     "CapabilityExecutor",
-    "CapabilityValidator",
+    "CapabilityLoader",
     "CapabilityManager",
+    "CapabilityPermissions",
+    "CapabilityRegistry",
+    "CapabilityResult",
+    "CapabilitySchema",
+    "CapabilityValidation",
+    "CapabilityValidator",
 ]
 
 

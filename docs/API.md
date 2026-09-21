@@ -33,3 +33,12 @@ Base local: http://localhost:8000.
 `/api/v1/analyze/stream` devuelve eventos SSE con `type: progress`, `type: delta`, `type: result` o `type: error`. El cliente puede cerrar la conexión para cancelar la tarea en curso.
 
 La interfaz incluye `local`/`kspr-local` para el smoke test de conversación, permite añadir modelos manuales y puede importar proveedores personalizados. Para `openai-compatible` y proveedores personalizados, el `model` se envía al endpoint `/chat/completions`; para Gemini se envía a `models/{model}:generateContent`.
+
+## Seguridad
+
+- `POST /api/v1/decompilate` y `GET /api/v1/trees` requieren `Authorization: Bearer <token>` porque escriben y leen archivos del servidor.
+- Los nombres de archivo subidos a `/decompilate` se sanean (`basename`) para impedir traversal de rutas.
+- Los enlaces aceptados por `/decompilate` debe ser `http(s)` y resolver a direcciones públicas; se rechazan loopback, rangos privados y metadatos de nube (anti-SSRF).
+- El contexto total está limitado a 20 MB en `/analyze`, `/analyze/stream` y `/jobs` (HTTP 413 por encima).
+- Las credenciales de proveedor nunca se persisten en el servidor; se reciben por cabeceras `X-KSPR-*` y viven solo en la sesión.
+- El secreto JWT no se versiona: se toma de `KSPR_JWT_SECRET_KEY` o se genera y persiste en `~/.kspr/jwt_secret.key`.

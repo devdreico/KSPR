@@ -1,16 +1,22 @@
 #!/usr/bin/env bun
-// KSPR CLI - Bun wrapper
+// KSPR CLI - Bun wrapper.
 // Usage: bun run bin/kspr.bun [args]  or  npx kspr-ai [args]
 
-const { spawn } = require("bun");
-const path = require("path");
-const fs = require("fs");
+import { existsSync } from "node:fs";
+import { spawnSync } from "node:child_process";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 
-const pythonScript = path.join(__dirname, "..", "cli", "kspr.py");
-const args = ["python3", pythonScript, ...Bun.args];
+const repoRoot = join(dirname(fileURLToPath(import.meta.url)), "..");
+const pythonScript = join(repoRoot, "cli", "kspr.py");
 
-const child = spawn(args, { stdio: "inherit" });
+const venvPython = process.platform === "win32"
+  ? join(repoRoot, ".venv", "Scripts", "python.exe")
+  : join(repoRoot, ".venv", "bin", "python");
 
-child.on("exit", (code) => {
-  process.exit(code !== null ? code : 0);
-});
+const pythonCmd = existsSync(venvPython)
+  ? venvPython
+  : (process.platform === "win32" ? "python" : "python3");
+
+const result = spawnSync(pythonCmd, [pythonScript, ...process.argv.slice(2)], { stdio: "inherit" });
+process.exit(result.status === null ? 1 : result.status);

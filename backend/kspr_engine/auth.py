@@ -1,6 +1,9 @@
 from __future__ import annotations
 
+import os
+import secrets
 from datetime import UTC, datetime, timedelta
+from pathlib import Path
 
 import bcrypt
 import jwt
@@ -10,6 +13,35 @@ from .config import Settings, get_settings
 from .models import UserProfile
 
 pwd_context = None  # Not using passlib anymore
+
+_SECRET_FILE = Path.home() / ".kspr" / "jwt_secret.key"
+
+
+def _resolve_secret_key(configured: str) -> str:
+    """Return a stable secret without shipping a hardcoded default.
+
+    Priority: explicit setting > environment > persisted local key > ephemeral.
+    """
+    if configured:
+        return configured
+    env_secret = os.getenv("KSPR_JWT_SECRET_KEY") or os.getenv("JWT_SECRET_KEY")
+    if env_secret:
+        return env_secret
+    try:
+        if _SECRET_FILE.is_file():
+            value = _SECRET_FILE.read_text(encoding="utf-8").strip()
+            if value:
+                return value
+        _SECRET_FILE.parent.mkdir(parents=True, exist_ok=True)
+        value = secrets.token_urlsafe(48)
+        _SECRET_FILE.write_text(value, encoding="utf-8")
+        try:
+            os.chmod(_SECRET_FILE, 0o600)
+        except OSError:
+            pass
+        return value
+    except OSError:
+        return secrets.token_urlsafe(48)
 
 
 class AuthError(Exception):
@@ -30,7 +62,7 @@ class UserNotFound(AuthError):
 
 class JWTHandler:
     def __init__(self, settings: Settings):
-        self.secret_key = settings.jwt_secret_key
+        self.secret_key = _resolve_secret_key(settings.jwt_secret_key)
         self.algorithm = settings.jwt_algorithm
         self.expiration_minutes = settings.jwt_expiration_minutes
 
@@ -72,7 +104,7 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 
 async def get_current_user(
     authorization: str = Header(default=None, alias="Authorization"),
-    settings: Settings = Depends(get_settings),  # noqa: B008
+    settings: Settings = Depends(get_settings),
 ) -> UserProfile:
     if not authorization or not authorization.startswith("Bearer "):
         raise HTTPException(
@@ -116,7 +148,7 @@ async def get_current_user(
 
 async def get_optional_user(
     authorization: str = Header(default=None, alias="Authorization"),
-    settings: Settings = Depends(get_settings),  # noqa: B008
+    settings: Settings = Depends(get_settings),
 ) -> UserProfile | None:
     if not authorization or not authorization.startswith("Bearer "):
         return None

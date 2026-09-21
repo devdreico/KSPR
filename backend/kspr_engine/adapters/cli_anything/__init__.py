@@ -5,9 +5,9 @@ from __future__ import annotations
 import json
 import logging
 
-from .. import BaseAdapter
 from ...capabilities.loader import CapabilityLoader
 from ...capabilities.schemas import CapabilitySchema
+from .. import BaseAdapter
 from .detector import CLIAnythingDetector
 from .parser import SKILLParser
 from .runner import CLIRunner
@@ -70,7 +70,7 @@ class CLIAnythingAdapter(BaseAdapter):
         capabilities: list[CapabilitySchema] = []
         try:
             data = json.loads(registry_path.read_text(encoding="utf-8"))
-            for skill_id, skill_info in data.get("skills", {}).items():
+            for skill_info in data.get("skills", {}).values():
                 skill_path = skill_info.get("skill_path")
                 if skill_path:
                     cap = self._parser.parse_skill_md(skill_path)

@@ -4,9 +4,9 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Any
-from .sandbox import SafeSandbox
+
 from .memory import VectorMemory
+from .sandbox import SafeSandbox
 
 
 class MCPServer:
@@ -57,7 +57,7 @@ class MCPServer:
                 elif tool_name == "search_memory":
                     results = self.memory.search(args.get("query", ""))
                     return json.dumps({"jsonrpc": "2.0", "result": {"results": results}, "id": req_id})
-            
+
             return json.dumps({"jsonrpc": "2.0", "error": {"code": -32601, "message": "Method not found"}, "id": req_id})
         except Exception as e:
             return json.dumps({"jsonrpc": "2.0", "error": {"code": -32603, "message": str(e)}, "id": 1})

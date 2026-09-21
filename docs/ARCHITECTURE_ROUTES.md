@@ -27,22 +27,41 @@ El servidor backend expone los siguientes puntos de entrada (routes) bajo el pre
 
 La interfaz de comandos interactiva maneja el siguiente enrutamiento de comandos slash (`/`):
 
-1. **`/help`**: Muestra la ayuda interactiva de comandos disponibles.
-2. **`/clear`**: Limpia la pantalla y redibuja el dashboard ejecutivo de KSPR.
-3. **`/login`**: Valida códigos únicos de identificación contra el registro de licencias (`licenses.json`).
-4. **`/project`**: Gestor de proyectos locales (Creación, selección de workspace anterior, ruta personalizada).
-5. **`/model`**: Selección e indexación de modelos activos por proveedor.
-6. **`/provider`**: Cambio de proveedor activo (`gemini`, `openai`, `groq`, `deepseek`, `local`).
-7. **`/iterations`**: Ajuste del nivel de iteraciones de análisis (1-8).
-8. **`/context`**: Inspección de archivos adjuntos activos en la sesión.
-9. **`/api`**: Configuración de API Keys e indexación automática de modelos remotos.
-10. **`/analyze`**: Ejecución de análisis estático sobre el workspace actual o ruta específica.
-11. **`/update`**: Actualización automática de KSPR mediante `install.sh`.
-12. **`/exit`**: Cierre de la sesión interactiva.
+| Comando | Propósito |
+| --- | --- |
+| `/help` | Ayuda interactiva de comandos disponibles. |
+| `/doctor` | Autodiagnóstico: Python, dependencias, rutas, proveedor y claves. |
+| `/config` | Rutas de configuración y estado activo (proveedor, modelo, workspace). |
+| `/login` | Valida códigos únicos contra el registro de licencias (`licenses.json`). |
+| `/api` | Configura API Keys e indexa modelos remotos. |
+| `/project` | Gestor de proyectos locales (nuevo, anterior, ruta personalizada). |
+| `/model` | Selección e indexación de modelos activos por proveedor. |
+| `/provider` | Cambio de proveedor activo (`gemini`, `openai`, `groq`, `deepseek`, `anthropic`, `openrouter`, `opencode-zen`, `local`). |
+| `/mcp` | Registro y prueba de servidores MCP (`add`, `remove`, `enable`, `test`, `tools`). |
+| `/plugins` | Gestión de plugins externos. |
+| `/capabilities` | Descubrimiento y ejecución de capacidades CLI-Anything. |
+| `/prompts` | Prompts guardados (`add`, `select`, `remove`, `info`) con `$ARGUMENTS`/`$1`. |
+| `/skills` | Bundles de skills cargados. |
+| `/decompilate` | Indexación multi-fuente y generación de Context Trees. |
+| `/trees` | Lista de Context Trees generados. |
+| `/todo` | Grafo de tareas del workspace (`add`, `list`, `done`, `clear`). |
+| `/ast` | Análisis AST estático de un archivo Python del workspace. |
+| `/remember` / `/recall` | Memoria vectorial local (guardar y búsqueda semántica). |
+| `/sandbox` / `/run` | Ejecución de shell confinada al workspace con permisos explícitos. |
+| `/export` | Exporta la transcripción de la sesión (`md`/`json`). |
+| `/context` | Inspección de archivos adjuntos activos en la sesión. |
+| `/compact` / `/new` / `/sessions` | Gestión de contexto y sesiones persistentes. |
+| `/clear` | Limpia la pantalla y redibuja el dashboard ejecutivo. |
+| `/update` | Actualización automática mediante `install.sh`. |
+| `/exit` | Cierre de la sesión interactiva. |
+
+La lectura de entrada usa `readline` cuando está disponible (historial con flechas ↑/↓ y edición
+de línea) y las referencias `@archivo` se resuelven siempre dentro del workspace activo.
 
 ---
 
 ## 3. Mecanismo de Fallback y Resiliencia en Proveedores (`backend/kspr_engine/providers.py`)
 
-- **Proveedores Soportados**: `GeminiProvider`, `OpenAICompatibleProvider`, `OpenAIProvider`, `GroqProvider`, `DeepseekProvider`, `LocalProvider`.
-- **Estrategia de Resiliencia**: Ante cualquier error de proveedor (`ProviderError`) por ausencia de API Key o fallo de conectividad externa, la CLI intercepta la excepción, muestra una guía orientada a acción (`/login` y registro en `https://kspr.membership.vercel.app/`) y ejecuta un **fallback automático con `LocalProvider` (`kspr-local`)** para garantizar que la sesión nunca se bloquee ni sufra un error fatal.
+- **Proveedores Soportados**: `GeminiProvider`, `OpenAICompatibleProvider`, `OpenAIProvider`, `GroqProvider`, `DeepseekProvider`, `AnthropicProvider`, `OpenRouterProvider`, `OpenCodeZenProvider`, `LocalProvider`.
+- **Estrategia de Resiliencia**: ante un `ProviderError` relacionado con credenciales ausentes, la CLI muestra el error y ejecuta un **fallback automático con `LocalProvider` (`kspr-local`)** para garantizar que la sesión nunca se bloquee. Para errores de otro tipo muestra guías orientadas a acción (`/login`, `/api`, `/model`, `/provider`) y registro en `https://kspr.membership.vercel.app/`.
+- **Streaming**: cuando no hay herramientas activas, el chat usa `complete_stream` y muestra los deltas en vivo si la salida es una TTY; con herramientas activas usa `complete` para poder interpretar `tool_calls`.

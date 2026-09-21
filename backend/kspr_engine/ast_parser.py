@@ -12,7 +12,7 @@ class CodeASTAnalyzer:
     def analyze_python_file(filepath: Path) -> dict[str, Any]:
         if not filepath.is_file():
             return {"error": "File not found"}
-        
+
         try:
             code = filepath.read_text(encoding="utf-8", errors="replace")
             tree = ast.parse(code, filename=str(filepath))

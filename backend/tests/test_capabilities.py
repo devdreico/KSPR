@@ -1,15 +1,15 @@
-import pytest
-import tempfile
 import os
+import tempfile
 from pathlib import Path
-from kspr_engine.capabilities.schemas import CapabilitySchema, CapabilityResult, CapabilityValidation
-from kspr_engine.capabilities.registry import CapabilityRegistry
-from kspr_engine.capabilities.permissions import CapabilityPermissions
-from kspr_engine.capabilities.loader import CapabilityLoader
+
+from kspr_engine.capabilities import CapabilityManager
 from kspr_engine.capabilities.discovery import CapabilityDiscovery
 from kspr_engine.capabilities.executor import CapabilityExecutor
+from kspr_engine.capabilities.loader import CapabilityLoader
+from kspr_engine.capabilities.permissions import CapabilityPermissions
+from kspr_engine.capabilities.registry import CapabilityRegistry
+from kspr_engine.capabilities.schemas import CapabilityResult, CapabilitySchema, CapabilityValidation
 from kspr_engine.capabilities.validator import CapabilityValidator
-from kspr_engine.capabilities import CapabilityManager
 
 
 class TestCapabilitySchema:

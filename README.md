@@ -45,9 +45,9 @@ Para Vercel, importa `frontend/` como proyecto Vite y define `VITE_API_URL` con 
 Puedes instalar y ejecutar KSPR directamente desde **npm**:
 
 ```bash
-npm install -g kspr
+npm install -g kspr-ai
 # o ejecución instantánea con npx:
-npx kspr
+npx kspr-ai
 ```
 
 O bien ejecutar el script localmente:
@@ -57,10 +57,16 @@ python cli/kspr.py ./mi-repositorio --output ./kspr-context --iterations 3
 # o interactivo tipo OpenCode:
 python cli/kspr.py
 # o un repositorio Git:
-python cli/kspr.py . --git-url https://github.com/org/repo.git --output ./kspr-context
+python cli/kspr.py --git-url https://github.com/org/repo.git --output ./kspr-context
 ```
 
 La CLI nunca ejecuta el código analizado: solo lee archivos permitidos y genera evidencia estructurada.
+
+Comandos del shell interactivo: `/help`, `/doctor`, `/config`, `/api`, `/project`, `/model`,
+`/provider`, `/mcp`, `/plugins`, `/capabilities`, `/prompts`, `/skills`, `/decompilate`,
+`/trees`, `/todo`, `/ast`, `/remember`, `/recall`, `/sandbox`, `/run`, `/export`, `/context`,
+`/compact`, `/new`, `/sessions`, `/update` y `/exit`. La entrada soporta historial (flechas ↑/↓),
+referencias `@archivo` confinadas al workspace y streaming en vivo de la respuesta.
 
 ## Gemini real
 

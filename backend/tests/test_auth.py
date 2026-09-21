@@ -42,7 +42,7 @@ def test_jwt_expiration():
     time.sleep(0.1)
     try:
         handler.decode_token(token)
-        assert False, "Should have raised TokenExpired"
+        raise AssertionError("Should have raised TokenExpired")
     except TokenExpired as e:
         assert "expirado" in str(e).lower()
 
@@ -55,7 +55,7 @@ def test_jwt_tampering():
     tampered_token = token[:-5] + "xxxxx"
     try:
         handler.decode_token(tampered_token)
-        assert False, "Should have raised InvalidCredentials"
+        raise AssertionError("Should have raised InvalidCredentials")
     except InvalidCredentials as e:
         assert "inválido" in str(e).lower()
 

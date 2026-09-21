@@ -11,6 +11,8 @@
 - API FastAPI, jobs híbridos y persistencia Supabase opcional.
 - Conexión real con Google Gemini, prueba de credenciales y listado de modelos habilitados.
 - Shell de conversación estilo OpenCode: sesiones, paleta, comandos slash, Main Prompt, modelos manuales, pegar/arrastrar archivos, audio, copia y cancelación de jobs.
+- CLI agéntica robusta: streaming en vivo, historial de entrada con flechas, referencias `@archivo` confinadas al workspace, fallback automático a `KSPR Local`, `/doctor`, `/config`, `/export`, `/todo`, `/ast`, `/remember`/`/recall`, `/sandbox`/`/run` con permisos Accept Once/Always/Cancel y auto-reparación del instalador.
+- Endurecimiento de seguridad: saneado de nombres en `/decompilate`, bloqueo anti-SSRF de URLs privadas, autenticación en endpoints que escriben, límite de contexto de 20 MB y secreto JWT persistido localmente en lugar de un valor por defecto.
 
 ## Siguiente evolución
 

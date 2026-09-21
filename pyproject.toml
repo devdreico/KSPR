@@ -16,7 +16,8 @@ dependencies = [
   "uvicorn[standard]>=0.30.0",
   "passlib[bcrypt]>=1.7.4",
   "bcrypt>=4.0.0",
-  "PyJWT>=2.8.0"
+  "PyJWT>=2.8.0",
+  "PyYAML>=6.0"
 ]
 
 [project.optional-dependencies]
@@ -27,11 +28,34 @@ dev = [
 ]
 
 [tool.setuptools.packages.find]
+where = ["backend"]
 include = ["kspr_engine*"]
+
+[tool.setuptools.package-data]
+kspr_engine = ["licenses.json"]
 
 [tool.vercel]
 entrypoint = "backend.kspr_engine.main:app"
 
 [tool.pytest.ini_options]
 testpaths = ["backend/tests"]
-pythonpath = ["backend"]
+pythonpath = ["backend", "cli"]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 140
+exclude = [".venv", "cli-anything", "frontend", "node_modules"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "C4", "SIM", "RUF"]
+ignore = [
+  "E501",    # line length gestionado por el formatter
+  "B008",    # FastAPI depende de llamadas en argumentos por defecto
+  "BLE001",  # el CLI captura excepciones amplias en la frontera de usuario
+  "S110",    # try/except/pass intencional en rutas opcionales
+  "SIM105",  # try/except/pass explícito es válido en rutas opcionales
+  "RUF001",  # la UI usa glifos unicode intencionales (❯, ─, ✓)
+]
+
+[tool.ruff.lint.per-file-ignores]
+"cli/kspr.py" = ["E402", "B023", "ASYNC221", "SIM102"]

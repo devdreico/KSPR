@@ -1,12 +1,10 @@
-import pytest
-import tempfile
 import os
-from pathlib import Path
+import tempfile
+
+from kspr_engine.adapters.cli_anything import CLIAnythingAdapter
 from kspr_engine.adapters.cli_anything.detector import CLIAnythingDetector
 from kspr_engine.adapters.cli_anything.parser import SKILLParser
 from kspr_engine.adapters.cli_anything.runner import CLIRunner
-from kspr_engine.adapters.cli_anything import CLIAnythingAdapter
-from kspr_engine.capabilities.schemas import CapabilitySchema
 
 
 class TestCLIAnythingDetector:

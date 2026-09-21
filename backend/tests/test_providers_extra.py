@@ -1,7 +1,7 @@
 import httpx
 import pytest
 from kspr_engine.config import Settings
-from kspr_engine.providers import AnthropicProvider, OpenRouterProvider, OpenCodeZenProvider
+from kspr_engine.providers import AnthropicProvider, OpenRouterProvider
 
 
 class FakeAnthropicAsyncClient:

@@ -18,7 +18,7 @@ class TerminalTheme:
     DIM = "\033[2m"
     UNDERLINE = "\033[4m"
     INVERSE = "\033[7m"
-    
+
     WHITE = "\033[97m"         # Primary focus, active titles, prompt
     SILVER = "\033[37m"        # Normal readable text
     GRAPHITE = "\033[90m"      # Borders, dividers, metadata
@@ -40,9 +40,9 @@ class TerminalUI:
 
     @staticmethod
     def print_box(title: str, lines: list[str]) -> None:
-        width = min(max(len(title) + 6, max((len(l) for l in lines), default=40) + 4), TerminalUI.get_width() - 2)
+        width = min(max(len(title) + 6, max((len(line) for line in lines), default=40) + 4), TerminalUI.get_width() - 2)
         horizontal = "─" * (width - 2)
-        
+
         print()
         TerminalUI.print_colored(f"┌─ {title} " + "─" * max(0, width - len(title) - 4) + "┐", TerminalTheme.WHITE, bold=True)
         for line in lines:
@@ -69,11 +69,11 @@ class TerminalUI:
             max_tokens = kwargs.get("max_tokens", 128000)
 
         width = min(TerminalUI.get_width() - 2, 90)
-        
+
         pct = int((tokens_used / max_tokens) * 100) if max_tokens > 0 else 0
         filled = int((pct / 100) * 14)
         bar = "█" * filled + "░" * (14 - filled)
-        
+
         ws_str = str(workspace)
         if len(ws_str) > 30:
             ws_str = "..." + ws_str[-27:]
@@ -81,7 +81,7 @@ class TerminalUI:
         print()
         TerminalUI.print_colored(f"┌─ KSPR I  │  sess: {session_id}  │  {provider}:{model}  " + "─" * max(0, width - len(str(session_id)) - len(str(provider)) - len(str(model)) - 34) + "┐", TerminalTheme.GRAPHITE)
         TerminalUI.print_colored(f"│  ctx: [{bar}] {tokens_used // 1000}k/{max_tokens // 1000}k ({pct}%)  │  dir: {ws_str:<24}  │  files: {attached_count:<2}  │", TerminalTheme.SILVER)
-        TerminalUI.print_colored(f"└─ tips: [@] attach   [/] cmds   [/decompilate] tree   [^C] exit " + "─" * max(0, width - 67) + "┘", TerminalTheme.GRAPHITE)
+        TerminalUI.print_colored("└─ tips: [@] attach   [/] cmds   [/decompilate] tree   [^C] exit " + "─" * max(0, width - 67) + "┘", TerminalTheme.GRAPHITE)
         print()
 
     @staticmethod
@@ -89,9 +89,9 @@ class TerminalUI:
         spinners = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"]
         idx = 0
         start_time = time.time()
-        
+
         task = asyncio.create_task(task_coro)
-        
+
         sys.stdout.write("\033[?25l")
         try:
             while not task.done():
@@ -128,11 +128,11 @@ class TerminalUI:
             lines = text.splitlines()
             if not lines:
                 lines = [text]
-        width = min(max(len(title) + 16, max((len(l) for l in lines), default=40) + 4), TerminalUI.get_width() - 2)
+        width = min(max(len(title) + 16, max((len(line) for line in lines), default=40) + 4), TerminalUI.get_width() - 2)
         horizontal = "─" * (width - 2)
-        
+
         lat_str = f" │ {latency:.2f}s " if latency > 0 else ""
-        
+
         print()
         TerminalUI.print_colored(f"┌── {title}{lat_str}" + "─" * max(0, width - len(title) - len(lat_str) - 3) + "┐", TerminalTheme.WHITE, bold=True)
         for line in lines:

@@ -82,8 +82,8 @@ class SKILLParser:
     @staticmethod
     def parse_from_string(content: str, name: str = "unknown") -> CapabilitySchema | None:
         """Parse SKILL.md from a string (for testing)."""
-        import tempfile
         import os
+        import tempfile
 
         with tempfile.NamedTemporaryFile(
             mode="w", suffix=".md", delete=False, encoding="utf-8"

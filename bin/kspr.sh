@@ -1,16 +1,18 @@
 #!/bin/bash
-# KSPR CLI - Bash wrapper
-# Usage: ./kspr.sh [args]  or  kspr [args] (after install)
+# KSPR CLI - Bash wrapper.
+# Usage: ./bin/kspr.sh [args]  or  kspr [args] (after install)
+set -euo pipefail
 
-# Resolve script directory relative to working directory
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(dirname "$SCRIPT_DIR")"
+PYTHON_SCRIPT="$REPO_ROOT/cli/kspr.py"
 
-# Handle case where script is invoked via symlink or from different cwd
-if [ ! -f "$SCRIPT_DIR/cli/kspr.py" ]; then
-  # Try relative to project root
-  SCRIPT_DIR="$(dirname "$(dirname "$(realpath "${BASH_SOURCE[0]}")")")/cli"
+if [ ! -f "$PYTHON_SCRIPT" ]; then
+  echo "[!] No se encontró cli/kspr.py en $REPO_ROOT" >&2
+  exit 1
 fi
 
-PYTHON_SCRIPT="$SCRIPT_DIR/kspr.py"
-
+if [ -x "$REPO_ROOT/.venv/bin/python" ]; then
+  exec "$REPO_ROOT/.venv/bin/python" "$PYTHON_SCRIPT" "$@"
+fi
 exec python3 "$PYTHON_SCRIPT" "$@"

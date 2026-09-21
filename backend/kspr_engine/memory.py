@@ -61,9 +61,9 @@ class VectorMemory:
         scored = []
         for doc in self.documents:
             doc_vec = doc["vector"]
-            similarity = sum(q * d for q, d in zip(q_vec, doc_vec))
+            similarity = sum(q * d for q, d in zip(q_vec, doc_vec, strict=False))
             scored.append((similarity, doc))
-        
+
         scored.sort(key=lambda x: x[0], reverse=True)
         return [{
             "id": doc["id"],

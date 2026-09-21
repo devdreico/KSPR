@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import asyncio
+import importlib.util
 import json
 import os
 import subprocess
@@ -15,16 +16,36 @@ from pathlib import Path
 from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "backend"))
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 
+from datetime import UTC
+
+from kspr_core import (
+    build_messages_prompt,
+    estimate_tokens,
+    expand_command_template,
+    is_allowed_path,
+    mask_secret,
+    safe_workspace_path,
+    should_skip_dir,
+    truncate,
+)
+from kspr_core import (
+    verify_license_code as verify_license_code_file,
+)
 from kspr_engine.analyzer import analyze
-from kspr_engine.config import Settings
-from kspr_engine.models import AnalysisRequest, SourceFile, MCPServerConfig
-from kspr_engine.providers import get_provider, ProviderName, ProviderError
-from kspr_engine.mcp_client import MCPManager
-from kspr_engine.plugin_manager import PluginManager
+from kspr_engine.ast_parser import CodeASTAnalyzer
 from kspr_engine.capabilities import CapabilityManager
+from kspr_engine.config import Settings
+from kspr_engine.decompiler import DecompilerEngine
+from kspr_engine.mcp_client import MCPManager
+from kspr_engine.memory import VectorMemory
+from kspr_engine.models import AnalysisRequest, MCPServerConfig, SourceFile
+from kspr_engine.plugin_manager import PluginManager
+from kspr_engine.providers import ProviderError, ProviderName, get_provider
+from kspr_engine.sandbox import SafeSandbox
 from kspr_engine.skills import SkillsManager
-from kspr_engine.decompiler import DecompilerEngine, CONTEXT_TREES_DIR
+from kspr_engine.todos import TaskEngine
 from kspr_terminal_ui import TerminalTheme, TerminalUI
 
 __version__ = "0.1.0"
@@ -55,19 +76,14 @@ def save_local_config(data: dict[str, Any]) -> None:
 
 
 def verify_license_code(code: str) -> bool:
-    lic_path = Path(__file__).resolve().parents[1] / "backend" / "kspr_engine" / "licenses.json"
-    if not lic_path.is_file():
-        lic_path = CONFIG_DIR / "licenses.json"
-    if not lic_path.is_file():
-        return False
-    try:
-        data = json.loads(lic_path.read_text(encoding="utf-8"))
-        codes = data.get("codes", {})
-        if code.strip() in codes:
-            return True
-    except Exception:
-        pass
-    return False
+    candidates = [
+        Path(__file__).resolve().parents[1] / "backend" / "kspr_engine" / "licenses.json",
+        CONFIG_DIR / "licenses.json",
+    ]
+    spec = importlib.util.find_spec("kspr_engine")
+    if spec and spec.origin:
+        candidates.append(Path(spec.origin).parent / "licenses.json")
+    return verify_license_code_file(code, candidates)
 
 
 def load_projects() -> list[dict[str, str]]:
@@ -123,8 +139,8 @@ def save_prompts(data: dict) -> None:
 
 def add_prompt(name: str, content: str, description: str = "", tags: list[str] | None = None) -> dict:
     data = load_prompts()
-    from datetime import datetime, timezone
-    now = datetime.now(timezone.utc).isoformat()
+    from datetime import datetime
+    now = datetime.now(UTC).isoformat()
     data["prompts"][name] = {
         "name": name,
         "description": description,
@@ -176,34 +192,42 @@ print_response_box = TerminalUI.print_response
 
 # ---- Collect functions ----
 
-def collect(root: Path) -> list[SourceFile]:
-    files = []
+def collect(root: Path, limit: int = 2_000) -> list[SourceFile]:
+    files: list[SourceFile] = []
+    root = root.resolve()
     for path in root.rglob("*"):
-        if not path.is_file() or path.suffix.lower() not in ALLOWED:
+        if not path.is_file():
             continue
-        if any(part in {".git", "node_modules", ".venv", "venv", "dist", "build"} for part in path.parts):
+        relative = path.relative_to(root).as_posix()
+        if not is_allowed_path(relative):
+            continue
+        if any(should_skip_dir(part) for part in Path(relative).parts):
             continue
         try:
-            text = path.read_text(encoding="utf-8", errors="replace")
-            if len(text.encode()) <= 2_000_000:
-                files.append(SourceFile(path=str(path.relative_to(root)), content=text))
-        except Exception:
-            pass
+            raw = path.read_bytes()
+        except OSError:
+            continue
+        if len(raw) > 2_000_000:
+            continue
+        files.append(SourceFile(path=relative, content=raw.decode("utf-8", errors="replace")))
+        if len(files) >= limit:
+            break
     return files
 
 
-def collect_zip(archive_path: Path) -> list[SourceFile]:
-    files = []
+def collect_zip(archive_path: Path, limit: int = 2_000) -> list[SourceFile]:
+    files: list[SourceFile] = []
     with zipfile.ZipFile(archive_path) as archive:
         for member in archive.infolist()[:2_000]:
             name = member.filename.replace("\\", "/")
-            suffix = "." + name.rsplit(".", 1)[-1].lower() if "." in name else ""
-            if member.is_dir() or suffix not in ALLOWED or name.startswith("/") or ".." in name.split("/") or member.file_size > 2_000_000:
+            if member.is_dir() or not is_allowed_path(name) or member.file_size > 2_000_000:
                 continue
             try:
                 files.append(SourceFile(path=name, content=archive.read(member)[:2_000_000].decode("utf-8", errors="replace")))
-            except Exception:
+            except (OSError, zipfile.BadZipFile):
                 pass
+            if len(files) >= limit:
+                break
     return files
 
 
@@ -221,26 +245,113 @@ def run_update() -> None:
     try:
         subprocess.run(cmd, shell=True, check=True)
         print_colored("[✓] ¡KSPR se ha actualizado exitosamente!", Color.WHITE)
-    except Exception as e:
+    except subprocess.CalledProcessError as e:
         print_colored(f"[!] Error al actualizar: {e}", Color.LIGHT_GRAY)
+
+
+# ---- Diagnostics & Session Export ----
+
+REQUIRED_DEPENDENCIES = ("fastapi", "httpx", "pydantic", "pydantic_settings", "yaml", "bcrypt", "jwt", "uvicorn")
+
+
+def doctor_report(config: dict[str, Any], active_provider: str, active_model: str, workspace: Path) -> list[str]:
+    """Build a human-readable self-diagnosis of the KSPR installation."""
+    lines: list[str] = []
+    lines.append(f"KSPR CLI: v{__version__}  |  Python: {sys.version.split()[0]}")
+    lines.append(f"Ejecutable: {sys.executable}")
+    lines.append(f"Backend importable: {'sí' if 'kspr_engine' in sys.modules or _backend_available() else 'no'}")
+    lines.append("")
+
+    missing: list[str] = []
+    for module in REQUIRED_DEPENDENCIES:
+        if importlib.util.find_spec(module) is None:
+            missing.append(module)
+    lines.append(f"Dependencias: {'todas presentes' if not missing else 'FALTAN ' + ', '.join(missing)}")
+
+    lines.append(f"Directorio de configuración: {CONFIG_DIR} ({'OK' if CONFIG_DIR.is_dir() else 'no existe'})")
+    lines.append(f"Configuración: {CONFIG_FILE} ({'OK' if CONFIG_FILE.is_file() else 'no existe'})")
+    sessions_dir = CONFIG_DIR / "sessions"
+    session_count = len(list(sessions_dir.glob("*.json"))) if sessions_dir.is_dir() else 0
+    lines.append(f"Sesiones guardadas: {session_count}")
+    lines.append(f"Workspace activo: {workspace} ({'OK' if workspace.is_dir() else 'no existe'})")
+    lines.append("")
+
+    api_keys = config.get("api_keys") or {}
+    lines.append(f"Proveedor activo: {active_provider}  |  Modelo activo: {active_model}")
+    configured = [f"{prov}={mask_secret(key)}" for prov, key in api_keys.items() if key]
+    lines.append("API Keys locales: " + (", ".join(configured) if configured else "ninguna"))
+    env_provider_key = os.getenv(f"KSPR_{active_provider.upper()}_API_KEY")
+    if active_provider == ProviderName.local.value:
+        lines.append("Estado del proveedor: local (no requiere API Key)")
+    elif env_provider_key:
+        lines.append("Estado del proveedor: API Key presente en el entorno")
+    else:
+        lines.append("Estado del proveedor: sin API Key (usa /api o /login)")
+
+    unlocked = bool(config.get("unlocked"))
+    lines.append(f"Modo /api desbloqueado: {'sí' if unlocked else 'no (ejecuta /login)'}")
+    return lines
+
+
+def _backend_available() -> bool:
+    return importlib.util.find_spec("kspr_engine") is not None
+
+
+def export_session(session_history: list[dict[str, Any]], session_id: str, fmt: str = "md") -> Path:
+    """Persist the current session transcript to ~/.kspr/exports."""
+    exports_dir = CONFIG_DIR / "exports"
+    exports_dir.mkdir(parents=True, exist_ok=True)
+    if fmt == "json":
+        target = exports_dir / f"{session_id}.json"
+        target.write_text(json.dumps(session_history, ensure_ascii=False, indent=2), encoding="utf-8")
+        return target
+    target = exports_dir / f"{session_id}.md"
+    body = [f"# KSPR Session {session_id}", "", f"> Exportado {time.strftime('%Y-%m-%d %H:%M:%S')}", ""]
+    for message in session_history:
+        role = "Usuario" if message.get("role") == "user" else "KSPR I"
+        body.append(f"## {role}")
+        body.append("")
+        body.append(str(message.get("content", "")))
+        body.append("")
+    target.write_text("\n".join(body), encoding="utf-8")
+    return target
 
 
 # ---- Batch Analysis ----
 
-async def run_batch_analysis(source: Path, git_url: str | None, output: Path, project_name: str | None, iterations: int, provider: str, model: str | None) -> None:
+def apply_config_environment() -> None:
+    """Expose locally stored API keys to the provider layer via environment."""
+    config = load_local_config()
+    for prov, key in (config.get("api_keys") or {}).items():
+        if key:
+            os.environ[f"KSPR_{prov.upper()}_API_KEY"] = key
+            if prov == "gemini":
+                os.environ["GEMINI_API_KEY"] = key
+
+
+async def run_batch_analysis(source: Path | None, git_url: str | None, output: Path, project_name: str | None, iterations: int, provider: str, model: str | None) -> None:
+    apply_config_environment()
     if git_url:
+        if not (git_url.startswith("https://") or git_url.startswith("http://") or git_url.startswith("git@")):
+            raise SystemExit("Error: El repositorio Git debe usar http(s):// o git@.")
         print_colored(f"[*] Clonando repositorio Git de forma segura: {git_url}", Color.WHITE)
         with tempfile.TemporaryDirectory(prefix="kspr-git-") as checkout:
-            await asyncio.to_thread(
-                subprocess.run,
-                ["git", "clone", "--depth", "1", "--no-tags", git_url, checkout],
-                check=True,
-                capture_output=True,
-                text=True,
-            )
+            try:
+                await asyncio.to_thread(
+                    subprocess.run,
+                    ["git", "clone", "--depth", "1", "--no-tags", git_url, checkout],
+                    check=True,
+                    capture_output=True,
+                    text=True,
+                )
+            except subprocess.CalledProcessError as exc:
+                detail = (exc.stderr or "").strip()[:300]
+                raise SystemExit(f"Error: no se pudo clonar el repositorio. {detail}") from exc
             files = collect(Path(checkout))
         default_name = git_url.rstrip("/").rsplit("/", 1)[-1].removesuffix(".git")
     else:
+        if source is None:
+            raise SystemExit("Error: indica una ruta de origen o usa --git-url.")
         print_colored(f"[*] Analizando fuente local: {source}", Color.WHITE)
         files = collect_source(source)
         default_name = source.stem
@@ -249,8 +360,19 @@ async def run_batch_analysis(source: Path, git_url: str | None, output: Path, pr
         raise SystemExit("Error: No se encontraron archivos soportados en la fuente.")
 
     print_colored(f"[*] Archivos recolectados: {len(files)}. Ejecutando KSPR Engine ({iterations} iteraciones)...", Color.LIGHT_GRAY)
+
+    async def emit_progress(value: int, stage: str, message: str) -> None:
+        print_colored(f"  [{value:>3}%] {stage}: {message}", Color.MID_GRAY)
+
     request = AnalysisRequest(project_name=project_name or default_name, files=files, iterations=iterations, provider=provider, model=model)
-    result = await analyze(request, Settings())
+    try:
+        result = await analyze(request, Settings(), emit_progress)
+    except ProviderError as exc:
+        print_colored(f"[!] Proveedor '{provider}' no disponible: {exc}", Color.LIGHT_GRAY)
+        print_colored("[*] Continuando con KSPR Local (fallback determinista).", Color.LIGHT_GRAY)
+        request.provider = ProviderName.local.value
+        request.model = "kspr-local"
+        result = await analyze(request, Settings(), emit_progress)
 
     output.mkdir(parents=True, exist_ok=True)
     for artifact in result.artifacts:
@@ -270,40 +392,26 @@ async def run_batch_analysis(source: Path, git_url: str | None, output: Path, pr
 
 # ---- Interactive Shell ----
 
-def _sync_execute(manager: MCPManager, name: str, arguments: dict) -> str:
-    """Synchronous wrapper to execute MCP tool from inside an async context."""
-    import concurrent.futures
-    import asyncio as _aio
-
-    async def _run():
-        return await manager.execute_tool(name, arguments)
-
-    # Create a new event loop in a thread to avoid conflict with the running one
-    with concurrent.futures.ThreadPoolExecutor(max_workers=1) as pool:
-        future = pool.submit(_aio.run, _run())
-        return str(future.result(timeout=30))
-
-
 def _build_messages_prompt(messages: list[dict[str, Any]]) -> str:
-    parts = []
-    for m in messages:
-        role = m.get("role", "")
-        content = m.get("content", "")
-        if content:
-            parts.append(f"[{role}]: {content}")
-    return "\n".join(parts)
+    return build_messages_prompt(messages)
+
+
+def _init_line_editing() -> Any:
+    """Enable readline-backed history/editing when available (POSIX + Windows)."""
+    try:
+        import readline
+        return readline
+    except ImportError:
+        return None
+
 
 async def interactive_shell() -> None:
     print_header()
-    
-    config = load_local_config()
-    api_keys = config.get("api_keys", {})
-    for prov, key in api_keys.items():
-        if key:
-            os.environ[f"KSPR_{prov.upper()}_API_KEY"] = key
-            if prov == "gemini":
-                os.environ["GEMINI_API_KEY"] = key
+    apply_config_environment()
 
+    readline = _init_line_editing()
+
+    config = load_local_config()
     current_workspace = Path(config.get("current_workspace", Path.cwd()))
     active_model = config.get("active_model", "gemini-2.5-flash")
     active_provider = config.get("active_provider", "gemini")
@@ -341,63 +449,23 @@ async def interactive_shell() -> None:
     print()
 
     def get_input_with_tab() -> str:
-        """Lee input del usuario."""
-        if os.name == "nt":
-            width = min(get_terminal_width() - 2, 86)
-            horizontal = "─" * (width - 2)
-            print_colored(f"┌─ [ Input · kspr i @ {active_provider} ] " + "─" * max(0, width - 6 - len(active_provider) - 17) + "┐", Color.MID_GRAY)
-            val = input(f"{Color.MID_GRAY}│ {Color.WHITE}❯ {Color.RESET}").strip()
-            print_colored(f"└{horizontal}┘", Color.MID_GRAY)
-            return val
-
+        """Read a line with history and cursor editing via readline when available."""
         width = min(get_terminal_width() - 2, 86)
         horizontal = "─" * (width - 2)
-        print_colored(f"┌─ [ Input · kspr i @ {active_provider} ] " + "─" * max(0, width - 6 - len(active_provider) - 17) + "┐", Color.MID_GRAY)
-        
-        if not sys.stdin.isatty():
+        header = f"┌─ [ Input · kspr i @ {active_provider} ] " + "─" * max(0, width - 6 - len(active_provider) - 17) + "┐"
+        print_colored(header, Color.MID_GRAY)
+        try:
             val = input(f"{Color.MID_GRAY}│ {Color.WHITE}❯ {Color.RESET}").strip()
-            print_colored(f"└{horizontal}┘", Color.MID_GRAY)
-            return val
-
-        sys.stdout.write(f"{Color.MID_GRAY}│ {Color.WHITE}❯ {Color.RESET}")
-        sys.stdout.flush()
-
-        import termios
-        import tty
-        fd = sys.stdin.fileno()
-        try:
-            old_settings = termios.tcgetattr(fd)
-        except Exception:
-            val = input().strip()
-            print_colored(f"└{horizontal}┘", Color.MID_GRAY)
-            return val
-
-        chars = []
-        try:
-            tty.setraw(fd)
-            while True:
-                ch = sys.stdin.read(1)
-                if ch in ('\r', '\n'):
-                    sys.stdout.write("\r\n")
-                    sys.stdout.flush()
-                    break
-                elif ch == '\x7f' or ch == '\b':
-                    if chars:
-                        chars.pop()
-                        sys.stdout.write("\b \b")
-                        sys.stdout.flush()
-                elif ord(ch) >= 32:
-                    chars.append(ch)
-                    sys.stdout.write(ch)
-                    sys.stdout.flush()
         finally:
+            print_colored(f"└{horizontal}┘", Color.MID_GRAY)
+        if val and readline is not None:
             try:
-                termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+                readline.add_history(val)
             except Exception:
                 pass
+        return val
 
-        print_colored(f"└{horizontal}┘", Color.MID_GRAY)
-        return "".join(chars).strip()
+    selected_prompt_injection = ""
 
     while True:
         try:
@@ -409,7 +477,12 @@ async def interactive_shell() -> None:
         if not prompt:
             continue
 
-        tokens_used += len(prompt.encode()) // 3
+        if selected_prompt_injection and not prompt.startswith("/"):
+            prompt = selected_prompt_injection + "\n\n" + prompt
+            selected_prompt_injection = ""
+            print_colored("[✓] Prompt seleccionado inyectado en este turno.", Color.LIGHT_GRAY)
+
+        tokens_used += estimate_tokens(prompt)
 
         if prompt.startswith("/"):
             parts = prompt.split(maxsplit=1)
@@ -434,6 +507,15 @@ async def interactive_shell() -> None:
                     "/skills [action]     - View and manage loaded skill bundles",
                     "/decompilate         - Index multiple files/links and generate Context Trees",
                     "/trees               - List generated Context Trees paths",
+                    "/doctor              - Self-diagnosis of the installation and providers",
+                    "/config              - Show configuration paths and active state",
+                    "/export [json]       - Export the current session transcript",
+                    "/todo [add|list|done] - Manage the workspace task graph",
+                    "/ast <file.py>       - Static AST analysis of a workspace file",
+                    "/remember <text>     - Store a note in local vector memory",
+                    "/recall <query>      - Semantic search over local memory",
+                    "/sandbox             - Show the sandbox policy for /run",
+                    "/run <command>       - Run a shell command inside the workspace",
                     "/context             - Show attached files in context",
                     "/compact             - Compact context and token usage",
                     "/new                 - Start a fresh session",
@@ -469,7 +551,7 @@ async def interactive_shell() -> None:
                     " 3. Abrir carpeta existente del sistema (Ruta custom)"
                 ], Color.WHITE)
                 p_choice = input(f"{Color.WHITE}Elige opción (1-3): {Color.RESET}").strip()
-                
+
                 projects = load_projects()
                 if p_choice == "1":
                     proj_name = input(f"{Color.WHITE}Nombre del nuevo proyecto: {Color.RESET}").strip()
@@ -477,12 +559,12 @@ async def interactive_shell() -> None:
                         new_ws = Path.cwd() / "workspace" / proj_name
                         new_ws.mkdir(parents=True, exist_ok=True)
                         current_workspace = new_ws
-                        
+
                         proj_entry = {"name": proj_name, "path": str(new_ws.resolve())}
                         if proj_entry not in projects:
                             projects.append(proj_entry)
                             save_projects(projects)
-                        
+
                         persist_state()
                         print_colored(f"[✓] Proyecto '{proj_name}' creado en {new_ws.resolve()} con control CRUD total para el agente.", Color.WHITE)
                 elif p_choice == "2":
@@ -531,7 +613,7 @@ async def interactive_shell() -> None:
                         active_model = arg
                         print_colored(f"[✓] Modelo activo actualizado a: {active_model}", Color.WHITE)
                         persist_state()
-                elif active_provider in indexed_models and indexed_models[active_provider]:
+                elif indexed_models.get(active_provider):
                     models = indexed_models[active_provider]
                     print_box(f"Modelos Disponibles ({active_provider})", [f" {idx+1}. {m.get('id')} ({m.get('name', '')})" for idx, m in enumerate(models)], Color.WHITE)
                     m_choice = input(f"{Color.WHITE}Elige número de modelo o escribe nombre: {Color.RESET}").strip()
@@ -582,7 +664,7 @@ async def interactive_shell() -> None:
                     if target.startswith("http://") or target.startswith("https://"):
                         servers_data[sname] = {"type": "remote", "url": target, "enabled": True}
                     else:
-                        servers_data[sname] = {"type": "local", "command": [target] + mcp_args[3:], "enabled": True}
+                        servers_data[sname] = {"type": "local", "command": [target, *mcp_args[3:]], "enabled": True}
                     save_mcp_servers(servers_data)
                     print_colored(f"[✓] MCP server '{sname}' added.", Color.WHITE)
                 elif mcp_action == "remove" and len(mcp_args) >= 2:
@@ -609,7 +691,7 @@ async def interactive_shell() -> None:
                     else:
                         print_colored(f"[*] Testing MCP server '{sname}'...", Color.LIGHT_GRAY)
                         mgr = MCPManager({sname: MCPServerConfig(**servers_data[sname])})
-                        connected = asyncio.run(mgr.connect_all())
+                        connected = await mgr.connect_all()
                         if connected:
                             tools = mgr.get_tools_sync()
                             print_colored(f"[✓] Connected. {len(tools)} tools available.", Color.WHITE)
@@ -621,7 +703,7 @@ async def interactive_shell() -> None:
                         print_colored("[!] No MCP servers configured.", Color.LIGHT_GRAY)
                     else:
                         mgr = MCPManager({k: MCPServerConfig(**v) for k, v in servers_data.items()})
-                        asyncio.run(mgr.connect_all())
+                        await mgr.connect_all()
                         tools = mgr.get_tools_sync()
                         if tools:
                             tool_lines = [f" {t.name}  |  {t.server}  |  {t.description[:50]}" for t in tools]
@@ -744,7 +826,7 @@ async def interactive_shell() -> None:
                     if get_prompt(pname):
                         print_colored(f"[!] Prompt '{pname}' already exists.", Color.LIGHT_GRAY)
                     else:
-                        print_colored(f"Creating prompt '{name}'. Type content (empty line to finish):", Color.WHITE)
+                        print_colored(f"Creating prompt '{pname}'. Type content (empty line to finish):", Color.WHITE)
                         lines_list = []
                         while True:
                             try:
@@ -768,8 +850,11 @@ async def interactive_shell() -> None:
                         pname = prompt_args[1]
                         prompt_data = get_prompt(pname)
                         if prompt_data:
-                            print_colored(f"[✓] Prompt '{pname}' selected.", Color.WHITE)
-                            return ("PROMPT_INJECT", prompt_data["content"])
+                            selected_content = prompt_data["content"]
+                            if len(prompt_args) > 2:
+                                selected_content = expand_command_template(selected_content, " ".join(prompt_args[2:]))
+                            selected_prompt_injection = selected_content
+                            print_colored(f"[✓] Prompt '{pname}' selected. Se inyectará en tu próximo mensaje.", Color.WHITE)
                         else:
                             print_colored(f"[!] Prompt '{pname}' not found.", Color.LIGHT_GRAY)
                     else:
@@ -784,7 +869,8 @@ async def interactive_shell() -> None:
                                 choice = int(input(f"{Color.WHITE}Number: {Color.RESET}")) - 1
                                 if 0 <= choice < len(prompts):
                                     selected = prompts[choice]
-                                    return ("PROMPT_INJECT", selected["content"])
+                                    selected_prompt_injection = selected["content"]
+                                    print_colored(f"[✓] Prompt '{selected['name']}' selected. Se inyectará en tu próximo mensaje.", Color.WHITE)
                                 else:
                                     print_colored("[!] Invalid selection.", Color.LIGHT_GRAY)
                             except (ValueError, IndexError, EOFError):
@@ -846,6 +932,101 @@ async def interactive_shell() -> None:
                 else:
                     print_colored("[!] Usage: /skills [info|context|load] [args]", Color.LIGHT_GRAY)
                 print_dashboard(active_provider, active_model, current_workspace, len(attached_files), tokens_used, max_tokens)
+            elif cmd == "/doctor":
+                print_box("KSPR Doctor · Autodiagnóstico", doctor_report(config, active_provider, active_model, current_workspace), Color.WHITE)
+            elif cmd == "/config":
+                configured_providers = [prov for prov, key in (config.get("api_keys") or {}).items() if key]
+                print_box("KSPR Configuration", [
+                    f"Config:     {CONFIG_FILE}",
+                    f"Projects:   {PROJECTS_FILE}",
+                    f"MCP:        {MCP_SERVERS_FILE}",
+                    f"Prompts:    {PROMPTS_FILE}",
+                    f"Workspace:  {current_workspace}",
+                    f"Provider:   {active_provider}   Model: {active_model}",
+                    f"API Keys:   {', '.join(configured_providers) if configured_providers else 'ninguna'}",
+                    f"Unlocked:   {config.get('unlocked', False)}",
+                ], Color.WHITE)
+            elif cmd == "/export":
+                fmt = "json" if arg.strip().lower() == "json" else "md"
+                target = export_session(session_history, session_id, fmt)
+                print_colored(f"[✓] Sesión exportada en: {target}", Color.WHITE)
+            elif cmd == "/todo":
+                engine = TaskEngine(current_workspace)
+                todo_args = arg.strip().split(maxsplit=1)
+                todo_action = todo_args[0].lower() if todo_args else "list"
+                if todo_action == "add" and len(todo_args) > 1:
+                    task = engine.add_task(todo_args[1])
+                    print_colored(f"[✓] Tarea creada: {task['title']}", Color.WHITE)
+                elif todo_action in {"done", "complete"} and len(todo_args) > 1:
+                    ok = engine.update_status(todo_args[1], "completed")
+                    print_colored(f"[{'✓' if ok else '!'}] Tarea {'completada' if ok else 'no encontrada'}.", Color.WHITE)
+                elif todo_action in {"clear", "reset"}:
+                    engine.tasks = []
+                    engine.save_tasks()
+                    print_colored("[✓] Tareas eliminadas.", Color.WHITE)
+                else:
+                    tasks = engine.list_tasks()
+                    if not tasks:
+                        print_colored("[!] No hay tareas. Usa /todo add <descripcion>.", Color.LIGHT_GRAY)
+                    else:
+                        print_box("KSPR Task Graph", [f" [{t.get('status', '?')[:4]}] {t.get('title')}" for t in tasks], Color.WHITE)
+            elif cmd == "/ast":
+                target_name = arg.strip()
+                if not target_name:
+                    print_colored("[!] Uso: /ast <archivo.py dentro del workspace>", Color.LIGHT_GRAY)
+                else:
+                    fpath = safe_workspace_path(current_workspace, target_name)
+                    if not fpath or not fpath.is_file():
+                        print_colored("[!] Archivo no encontrado o fuera del workspace.", Color.LIGHT_GRAY)
+                    else:
+                        analysis = CodeASTAnalyzer.analyze_python_file(fpath)
+                        if "error" in analysis:
+                            print_colored(f"[!] {analysis['error']}", Color.LIGHT_GRAY)
+                        else:
+                            lines = [f"Clases: {len(analysis['classes'])}", f"Funciones: {len(analysis['functions'])}", f"Imports: {len(analysis['imports'])}"]
+                            lines.extend(f"  class {cls['name']} (L{cls['lineno']}) · {len(cls['methods'])} metodos" for cls in analysis["classes"][:10])
+                            lines.extend(f"  def {fn['name']}({', '.join(fn['args'])}) (L{fn['lineno']})" for fn in analysis["functions"][:20])
+                            print_box(f"AST · {target_name}", lines, Color.WHITE)
+            elif cmd == "/remember":
+                text_to_remember = arg.strip()
+                if not text_to_remember:
+                    print_colored("[!] Uso: /remember <texto a memorizar>", Color.LIGHT_GRAY)
+                else:
+                    memory = VectorMemory(CONFIG_DIR / "memory")
+                    memory.add_document(f"note_{int(time.time() * 1000)}", text_to_remember, {"source": "cli", "workspace": str(current_workspace)})
+                    print_colored(f"[✓] Guardado en memoria ({len(text_to_remember)} chars).", Color.WHITE)
+            elif cmd == "/recall":
+                query = arg.strip()
+                if not query:
+                    print_colored("[!] Uso: /recall <consulta>", Color.LIGHT_GRAY)
+                else:
+                    memory = VectorMemory(CONFIG_DIR / "memory")
+                    results = memory.search(query, top_k=5)
+                    if not results:
+                        print_colored("[!] Sin resultados en memoria.", Color.LIGHT_GRAY)
+                    else:
+                        print_box(f"Memoria · {query}", [f" {r['score']:.3f} · {truncate(r['content'], 100)}" for r in results], Color.WHITE)
+            elif cmd == "/run":
+                command = arg.strip()
+                if not command:
+                    print_colored("[!] Uso: /run <comando de shell confinado al workspace>", Color.LIGHT_GRAY)
+                else:
+                    sandbox = SafeSandbox(current_workspace)
+                    result = await sandbox.execute_shell(command, timeout=60)
+                    if result.get("success"):
+                        print_colored(f"[✓] Comando completado ({result.get('attempt', 1)} intento(s)).", Color.WHITE)
+                        output = (result.get("stdout") or "").strip()
+                        if output:
+                            print(truncate(output, 4000))
+                    else:
+                        print_colored(f"[!] {result.get('error', 'El comando falló')}", Color.LIGHT_GRAY)
+            elif cmd == "/sandbox":
+                print_box("KSPR Sandbox", [
+                    f"Workspace raíz: {SafeSandbox(current_workspace).workspace_root}",
+                    "Ejecuta comandos confinados al workspace con permisos explícitos.",
+                    "Cada operación sensible pide Accept Once / Accept Always / Cancel.",
+                    "Usa /run <comando> para ejecutar.",
+                ], Color.WHITE)
             elif cmd == "/decompilate":
                 print_box("KSPR Decompiler — Indexación Multi-Fuente", [
                     "Añade archivos (PDF, imágenes .jpg/.png/.heif, .txt, .md) o enlaces web.",
@@ -870,19 +1051,26 @@ async def interactive_shell() -> None:
                         print_colored("[*] Ingestionando y analizando fuentes con KSPR I...", Color.LIGHT_GRAY)
                         decompiler = DecompilerEngine()
                         ingested = [decompiler.ingest_source(s) for s in sources]
-                        
+
                         # Build prompt for model to generate Context Tree
                         combined_text = "\n\n".join([f"SOURCE: {item['source']}\n{item.get('content', '')}" for item in ingested if item.get('success')])
-                        
+
                         try:
                             settings = Settings()
-                            provider_instance = get_provider(ProviderName(active_provider.lower()), settings, api_key=getattr(settings, f'{active_provider.lower()}_api_key', None))
+                            provider_instance = get_provider(
+                                active_provider,
+                                settings,
+                                api_key=os.getenv(f"KSPR_{active_provider.upper()}_API_KEY"),
+                            )
                             prompt_text = f"Analiza la siguiente informacion recopilada de multiples fuentes y genera un Arbol de Contexto (Context Tree) estructurado. Identifica el concepto central y explica detalladamente hasta el mas minimo detalle en archivos tematicos markdown (.md).\n\n{combined_text}"
-                            
-                            async def run_decompile_complete():
-                                return await provider_instance.complete(prompt_text, active_model)
-                            
-                            response, latency = asyncio.run(run_decompile_complete())
+
+                            async def run_decompile_complete(provider=provider_instance, prompt=prompt_text, model=active_model):
+                                return await provider.complete(prompt, model)
+
+                            response, _latency = await animate_spinner(
+                                run_decompile_complete(),
+                                f"Generando Context Tree con {active_provider}:{active_model}...",
+                            )
                             tree_path = decompiler.generate_context_trees(ingested, str(response))
                             print_colored(f"[✓] Context Tree generado exitosamente en: {tree_path}", Color.WHITE)
                         except Exception as e:
@@ -997,9 +1185,9 @@ async def interactive_shell() -> None:
                     " 7. opencode-zen (OpenCode Zen Gateway)",
                     " 8. local        (Modo local sin API Key)"
                 ], Color.WHITE)
-                
+
                 prov_choice = arg.strip().lower() if arg else input(f"{Color.WHITE}Elige proveedor (1-8 o nombre): {Color.RESET}").strip().lower()
-                
+
                 selected_prov = active_provider
                 if prov_choice in {"1", "gemini"}:
                     selected_prov = "gemini"
@@ -1021,7 +1209,7 @@ async def interactive_shell() -> None:
                     selected_prov = prov_choice
                 elif prov_choice == "opencode_zen":
                     selected_prov = "opencode-zen"
-                
+
                 if selected_prov == "local":
                     print_colored("[✓] El proveedor local no requiere API Key.", Color.WHITE)
                     active_provider = selected_prov
@@ -1031,16 +1219,16 @@ async def interactive_shell() -> None:
                     env_key = f"KSPR_{selected_prov.upper()}_API_KEY"
                     current_key = os.getenv(env_key, "")
                     masked = (current_key[:6] + "..." + current_key[-4:]) if len(current_key) > 10 else ("Configurada" if current_key else "No configurada")
-                    
+
                     print_colored(f"[*] Proveedor seleccionado: {selected_prov}", Color.LIGHT_GRAY)
                     print_colored(f"[*] Estado actual API Key: {masked}", Color.MID_GRAY)
-                    
+
                     new_key = input(f"{Color.WHITE}Introduce la API Key para {selected_prov}: {Color.RESET}").strip()
                     if new_key:
                         os.environ[env_key] = new_key
                         if selected_prov == "gemini":
                             os.environ["GEMINI_API_KEY"] = new_key
-                        
+
                         cfg = load_local_config()
                         cfg.setdefault("api_keys", {})[selected_prov] = new_key
                         cfg["active_provider"] = selected_prov
@@ -1048,7 +1236,7 @@ async def interactive_shell() -> None:
 
                         print_colored(f"[✓] API Key para '{selected_prov}' guardada localmente y aplicada exitosamente.", Color.WHITE)
                         active_provider = selected_prov
-                        
+
                         try:
                             settings = Settings()
                             temp_prov = get_provider(ProviderName(selected_prov), settings, api_key=new_key)
@@ -1073,29 +1261,36 @@ async def interactive_shell() -> None:
             print()
             continue
 
-        # Handle file references like @filename
+        # Handle file references like @filename (sandboxed to the workspace)
         referenced_content = ""
-        words = prompt.split()
-        for word in words:
-            if word.startswith("@"):
-                filepath = word[1:]
-                fpath = current_workspace / filepath
-                if fpath.is_file():
-                    try:
-                        content = fpath.read_text(encoding="utf-8", errors="replace")
-                        attached_files[filepath] = content
-                        referenced_content += f"\n\n--- Referencia @{filepath} ---\n{content[:4000]}"
-                        print_colored(f"[+] Archivo adjuntado al contexto: @{filepath}", Color.WHITE)
-                    except Exception as e:
-                        print_colored(f"[!] No se pudo leer {filepath}: {e}", Color.MID_GRAY)
-                else:
-                    print_colored(f"[!] Archivo no encontrado: {filepath}", Color.MID_GRAY)
+        for word in prompt.split():
+            if not word.startswith("@") or len(word) < 2:
+                continue
+            filepath = word[1:]
+            fpath = safe_workspace_path(current_workspace, filepath)
+            if fpath and fpath.is_file():
+                try:
+                    content = fpath.read_text(encoding="utf-8", errors="replace")
+                    attached_files[filepath] = content
+                    referenced_content += f"\n\n--- Referencia @{filepath} ---\n{content[:4000]}"
+                    print_colored(f"[+] Archivo adjuntado al contexto: @{filepath}", Color.WHITE)
+                except OSError as e:
+                    print_colored(f"[!] No se pudo leer {filepath}: {e}", Color.MID_GRAY)
+            else:
+                print_colored(f"[!] Archivo no encontrado o fuera del workspace: {filepath}", Color.MID_GRAY)
 
+        history_block = "\n".join(
+            f"{'USUARIO' if message.get('role') == 'user' else 'KSPR I'}: {message.get('content', '')}"
+            for message in session_history[-8:]
+            if message.get("content")
+        )
         full_prompt = prompt + referenced_content
+        if history_block:
+            full_prompt = f"HISTORIAL RECIENTE:\n{history_block}\n\nMENSAJE ACTUAL:\n{full_prompt}"
 
         try:
             settings = Settings()
-            provider_instance = get_provider(ProviderName(active_provider.lower()), settings, api_key=getattr(settings, f'{active_provider.lower()}_api_key', None))
+            provider_instance = get_provider(active_provider, settings, api_key=os.getenv(f"KSPR_{active_provider.upper()}_API_KEY"))
 
             # Collect tools from MCP and plugins
             mcp_manager = None
@@ -1105,7 +1300,7 @@ async def interactive_shell() -> None:
             servers_data = load_mcp_servers()
             if servers_data:
                 mcp_manager = MCPManager({k: MCPServerConfig(**v) for k, v in servers_data.items()})
-                asyncio.run(mcp_manager.connect_all())
+                await mcp_manager.connect_all()
                 all_tool_schemas.extend(mcp_manager.get_tool_schemas())
 
             plugin_manager = PluginManager(PLUGINS_DIR)
@@ -1121,12 +1316,34 @@ async def interactive_shell() -> None:
             conversation_messages = [{"role": "user", "content": full_prompt}]
             max_tool_iterations = 10
             final_response = ""
+            latency = 0.0
+            streamed_live = False
 
             for _iteration in range(max_tool_iterations):
-                async def call_llm():
-                    return await provider_instance.complete(full_prompt, active_model, tools=all_tool_schemas if all_tool_schemas else None)
+                # Con herramientas necesitamos la respuesta estructurada para
+                # detectar tool calls; sin ellas podemos transmitir en vivo.
+                if all_tool_schemas:
+                    async def call_llm(prompt=full_prompt, schemas=all_tool_schemas):
+                        return await provider_instance.complete(prompt, active_model, tools=schemas)
 
-                (response, latency) = await animate_spinner(call_llm(), f"KSPR I processing with {active_provider}:{active_model}...")
+                    response, latency = await animate_spinner(call_llm(), f"KSPR I processing with {active_provider}:{active_model}...")
+                else:
+                    live = sys.stdout.isatty()
+                    if live:
+                        print_colored(f"  ● KSPR I streaming ({active_provider}:{active_model})", TerminalTheme.GRAPHITE)
+
+                    async def on_delta(text: str, _live=live):
+                        if _live:
+                            sys.stdout.write(text)
+                            sys.stdout.flush()
+
+                    start = time.time()
+                    response = await provider_instance.complete_stream(full_prompt, active_model, on_delta)
+                    latency = time.time() - start
+                    streamed_live = bool(live and response)
+                    if streamed_live:
+                        sys.stdout.write("\n")
+                        sys.stdout.flush()
 
                 # Check if response is a tool call
                 if isinstance(response, dict) and "tool_calls" in response:
@@ -1136,16 +1353,21 @@ async def interactive_shell() -> None:
                     # Add assistant message with tool calls to conversation
                     conversation_messages.append({"role": "assistant", "content": None, "tool_calls": tool_calls})
 
-                    for idx, tc in enumerate(tool_calls, 1):
+                    for tc in tool_calls:
                         fn_name = tc.get("function", {}).get("name", "")
                         fn_args = tc.get("function", {}).get("arguments", {})
                         tc_id = tc.get("id", "")
+                        if isinstance(fn_args, str):
+                            try:
+                                fn_args = json.loads(fn_args) if fn_args.strip() else {}
+                            except json.JSONDecodeError:
+                                fn_args = {"raw": fn_args}
 
                         t_start = time.time()
-                        # Execute tool via MCP or plugin or capability
+                        # Execute tool via MCP or plugin
                         tool_result = None
                         if mcp_manager:
-                            tool_result = asyncio.run(mcp_manager.execute_tool(fn_name, fn_args) if asyncio.iscoroutinefunction(mcp_manager.execute_tool) else _sync_execute(mcp_manager, fn_name, fn_args))
+                            tool_result = await mcp_manager.execute_tool(fn_name, fn_args)
                         if tool_result is None and plugin_manager:
                             tool_result = plugin_manager.execute_tool(fn_name, fn_args)
                         if tool_result is None:
@@ -1164,42 +1386,60 @@ async def interactive_shell() -> None:
                 final_response = response
                 break
 
-            tokens_used += len(final_response.encode()) // 3
+            if isinstance(final_response, dict):
+                final_response = final_response.get("text", "")
+            final_response = str(final_response or "")
+            tokens_used += estimate_tokens(final_response)
             session_history.append({"role": "user", "content": prompt})
             session_history.append({"role": "assistant", "content": final_response})
-            print_response_box(f"KSPR I ({active_provider}:{active_model})", final_response, latency=latency)
+            if streamed_live:
+                print_colored(f"[✓] Respuesta completa · {latency:.2f}s · {estimate_tokens(final_response)} tokens aprox.", Color.GRAPHITE)
+            else:
+                print_response_box(f"KSPR I ({active_provider}:{active_model})", final_response, latency=latency)
             if attached_files:
                 print_colored(f"[*] Contexto activo: {list(attached_files.keys())}", Color.MID_GRAY)
         except ProviderError as e:
             msg = str(e)
-            hint_lines = []
-            if "API Key" in msg or "configura" in msg.lower() or "Configure" in msg:
-                hint_lines = [
-                    "No API Key detected for the active provider.",
-                    "  → Run /login to authenticate with your license code.",
-                    "  → Run /api to configure a provider and API Key.",
-                    "  → Register at: https://kspr.membership.vercel.app/",
-                ]
-            elif "devolvió" in msg.lower() or "respondió" in msg.lower() or "returned" in msg.lower() or "no devolvió" in msg.lower():
-                hint_lines = [
-                    f"Model \"{active_model}\" did not return a valid response.",
-                    "  → Run /model to switch to a different model.",
-                    "  → Run /provider to check your active provider.",
-                ]
+            key_related = "API Key" in msg or "api key" in msg.lower() or "configura" in msg.lower() or "configure" in msg.lower()
+            if key_related and active_provider != ProviderName.local.value:
+                print_colored(f"\n[!] Proveedor '{active_provider}' sin credenciales: {msg}", Color.WHITE)
+                print_colored("[*] Fallback automático a KSPR Local (respuesta determinista).", Color.LIGHT_GRAY)
+                try:
+                    local_provider = get_provider(ProviderName.local.value, Settings())
+                    local_text = str(await local_provider.complete(full_prompt, "kspr-local"))
+                    session_history.append({"role": "user", "content": prompt})
+                    session_history.append({"role": "assistant", "content": local_text})
+                    print_response_box("KSPR I (KSPR Local · fallback)", local_text, latency=0.0)
+                except Exception as fallback_error:
+                    print_colored(f"[!] El fallback local también falló: {fallback_error}", Color.LIGHT_GRAY)
             else:
-                hint_lines = [
-                    f"Provider \"{active_provider}\" returned an error.",
-                    "  → Run /provider to switch providers.",
-                    "  → Run /api to reconfigure your API Key.",
-                ]
-            print_colored(f"\n[!] Provider Error: {msg}", Color.WHITE)
-            for line in hint_lines:
-                print_colored(line, Color.LIGHT_GRAY)
+                if key_related:
+                    hint_lines = [
+                        "No API Key detected for the active provider.",
+                        "  → Run /login to authenticate with your license code.",
+                        "  → Run /api to configure a provider and API Key.",
+                        "  → Register at: https://kspr.membership.vercel.app/",
+                    ]
+                elif "devolvió" in msg.lower() or "respondió" in msg.lower() or "returned" in msg.lower() or "no devolvió" in msg.lower():
+                    hint_lines = [
+                        f"Model \"{active_model}\" did not return a valid response.",
+                        "  → Run /model to switch to a different model.",
+                        "  → Run /provider to check your active provider.",
+                    ]
+                else:
+                    hint_lines = [
+                        f"Provider \"{active_provider}\" returned an error.",
+                        "  → Run /provider to switch providers.",
+                        "  → Run /api to reconfigure your API Key.",
+                    ]
+                print_colored(f"\n[!] Provider Error: {msg}", Color.WHITE)
+                for line in hint_lines:
+                    print_colored(line, Color.LIGHT_GRAY)
         except Exception as e:
             print_colored(f"\n[!] Unexpected Error: {e}", Color.WHITE)
             print_colored("  → Run /provider to switch providers.", Color.LIGHT_GRAY)
             print_colored("  → Run /model to switch models.", Color.LIGHT_GRAY)
-        
+
         print_dashboard(active_provider, active_model, current_workspace, len(attached_files), tokens_used, max_tokens)
         print()
 
@@ -1219,6 +1459,7 @@ def main() -> None:
     parser.add_argument("--project-name", default=None, help="Nombre del proyecto para el reporte")
     parser.add_argument("--provider", choices=["local", "gemini", "openai", "groq", "deepseek", "anthropic", "openrouter", "opencode-zen"], default="gemini", help="Proveedor de IA a utilizar")
     parser.add_argument("--model", default=None, help="Modelo de IA a utilizar (ej. gemini-2.5-flash)")
+    parser.add_argument("--iterations", "-n", type=int, default=3, choices=range(1, 9), help="Número de iteraciones de análisis (1-8)")
     args = parser.parse_args()
 
     if args.uninstall:
@@ -1232,7 +1473,7 @@ def main() -> None:
             print_colored("No hay una instalacion de KSPR encontrada en ~/.kspr/.", Color.LIGHT_GRAY)
         return
 
-    if args.interactive or args.source is None:
+    if args.interactive or (args.source is None and not args.git_url):
         asyncio.run(interactive_shell())
     else:
         asyncio.run(
@@ -1241,7 +1482,7 @@ def main() -> None:
                 git_url=args.git_url,
                 output=args.output,
                 project_name=args.project_name,
-                iterations=3,
+                iterations=args.iterations,
                 provider=args.provider,
                 model=args.model,
             )

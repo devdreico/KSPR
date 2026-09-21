@@ -37,7 +37,7 @@ def build_master_prompt(
 ) -> str:
     """Construye el prompt optimizado con directiva estricta de texto plano y ortografía seca."""
     personality_block = f"\nBLOQUE DE PERSONALIDAD ACTIVA:\n{personality_content}\n" if personality_content else ""
-    
+
     return f"""Eres KSPR I, motor hiper-eficiente de ingeniería inversa estática.
 Directivas Absolutas de Formato y Restricción:
 1. REGLA ABSOLUTA DE FORMATO: Absolutamente todas las respuestas deben ser redactadas en texto plano, con ortografía seca y perfecta, sin asteriscos referenciales (*), sin negritas, sin cursivas y sin caos de caracteres. Solo texto respondiendo y brindando informacion tecnica directa.

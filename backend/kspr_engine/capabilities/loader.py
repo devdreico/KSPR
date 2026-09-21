@@ -81,7 +81,7 @@ class CapabilityLoader:
         """Run a CLI with --help and extract basic info."""
         try:
             result = subprocess.run(
-                command + [help_flag],
+                [*command, help_flag],
                 capture_output=True,
                 text=True,
                 timeout=5,

@@ -8,7 +8,7 @@ import subprocess
 import time
 from typing import Any
 
-from .schemas import CapabilitySchema, CapabilityResult
+from .schemas import CapabilityResult, CapabilitySchema
 
 logger = logging.getLogger(__name__)
 

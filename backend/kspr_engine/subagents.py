@@ -2,12 +2,13 @@
 
 from __future__ import annotations
 
-from typing import Any
+from typing import ClassVar
+
 from .prompts import KSPR_I_SYSTEM_PROMPT
 
 
 class SubagentOrchestrator:
-    AGENTS = {
+    AGENTS: ClassVar[dict[str, dict[str, str]]] = {
         "architect": {
             "name": "KSPR I",
             "role": "Descomposición estructural, ingeniería inversa, análisis estático y supervisión general.",

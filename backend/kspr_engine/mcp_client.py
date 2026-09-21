@@ -2,12 +2,11 @@
 
 from __future__ import annotations
 
-import json
 from typing import Any
 
 import httpx
 
-from .models import MCPTool, MCPToolCall, MCPToolResult, MCPServerConfig
+from .models import MCPServerConfig, MCPTool, MCPToolResult
 
 
 class MCPClientError(RuntimeError):

@@ -149,7 +149,7 @@ class PluginManager:
         return self.get_tools_definitions()
 
     def execute_tool(self, tool_name: str, arguments: dict[str, Any]) -> str:
-        for name, mod in self.loaded.items():
+        for mod in self.loaded.values():
             executor = getattr(mod, "execute_tool", None)
             if callable(executor):
                 try:

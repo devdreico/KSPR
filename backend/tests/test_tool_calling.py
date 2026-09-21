@@ -1,8 +1,12 @@
-import pytest
+
 import httpx
-from unittest.mock import AsyncMock, MagicMock
+import pytest
 from kspr_engine.config import Settings
-from kspr_engine.providers import GeminiProvider, OpenAICompatibleProvider, OpenAIProvider, GroqProvider, DeepseekProvider, AnthropicProvider
+from kspr_engine.providers import (
+    AnthropicProvider,
+    GeminiProvider,
+    OpenAICompatibleProvider,
+)
 
 
 class FakeAsyncClient:

@@ -1,5 +1,6 @@
-import pytest
 from unittest.mock import AsyncMock, MagicMock
+
+import pytest
 from kspr_engine.mcp_client import MCPClient, MCPManager
 from kspr_engine.models import MCPServerConfig, MCPTool, MCPToolResult
 

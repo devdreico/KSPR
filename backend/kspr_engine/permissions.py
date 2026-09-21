@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Any
 
 CONFIG_DIR = Path.home() / ".kspr"
 PERMISSIONS_FILE = CONFIG_DIR / "permissions.json"
@@ -33,17 +32,17 @@ def check_permission(action_type: str, target: str) -> bool:
     key = f"{action_type}:{target}"
     if perms.get(key) == "always":
         return True
-    
+
     # Prompt user interactively
-    print(f"\n\033[95m┌─ [ 🛡️ KSPR Security & Privilege Guard ] ─────────────────────────────────────────┐\033[0m")
+    print("\n\033[95m┌─ [ 🛡️ KSPR Security & Privilege Guard ] ─────────────────────────────────────────┐\033[0m")
     print(f"\033[95m│\033[0m  \033[1mAcción protegida solicitada:\033[0m {action_type}")
     print(f"\033[95m│\033[0m  \033[1mObjetivo / Comando:\033[0m {target}")
-    print(f"\033[95m├──────────────────────────────────────────────────────────────────────────────────┤\033[0m")
-    print(f"\033[95m│\033[0m  \033[32m[1] Accept Once\033[0m    (Permitir solo para esta ejecución)")
-    print(f"\033[95m│\033[0m  \033[36m[2] Accept Always\033[0m  (Autorizar permanentemente)")
-    print(f"\033[95m│\033[0m  \033[31m[3] Cancel\033[0m         (Abortar de forma segura)")
-    print(f"\033[95m└──────────────────────────────────────────────────────────────────────────────────┘\033[0m")
-    
+    print("\033[95m├──────────────────────────────────────────────────────────────────────────────────┤\033[0m")
+    print("\033[95m│\033[0m  \033[32m[1] Accept Once\033[0m    (Permitir solo para esta ejecución)")
+    print("\033[95m│\033[0m  \033[36m[2] Accept Always\033[0m  (Autorizar permanentemente)")
+    print("\033[95m│\033[0m  \033[31m[3] Cancel\033[0m         (Abortar de forma segura)")
+    print("\033[95m└──────────────────────────────────────────────────────────────────────────────────┘\033[0m")
+
     try:
         choice = input("\033[1mSelecciona opción [1/2/3]: \033[0m").strip()
     except (KeyboardInterrupt, EOFError):
