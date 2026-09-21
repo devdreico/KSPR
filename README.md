@@ -73,10 +73,22 @@ La CLI nunca ejecuta el código analizado: solo lee archivos permitidos y genera
 
 El shell usa `prompt_toolkit` + `rich` con paleta grayscale y temas opcionales (`/theme phosphor`,
 `amber`, `ice`, `void`). Al escribir `/` se despliega el menú completo de comandos y cada letra
-filtra por similitud fuzzy (`/c` → `clear`, `config`, `carve`, `crypto`, `cfg`…). `@` autocompleta
-archivos del workspace, `#` modelos, `%` agentes. `Ctrl+K` abre la paleta de comandos, `F1` la
-ayuda y el toolbar inferior muestra proveedor, modelo, contexto y workspace en vivo. Cuando no hay
-TTY se usa un fallback `readline` con historial.
+filtra por similitud fuzzy (`/c` → `clear`, `config`, `carve`, `crypto`, `cfg`…) mostrando categoría,
+alias, uso y advertencia para comandos peligrosos. `@` autocompleta archivos del workspace, `#`
+modelos, `%` agentes. `Ctrl+K` abre la paleta de comandos, `F1` la ayuda, `F2` el mapa de comandos,
+`F3` la interconexión de rutas y el toolbar inferior muestra proveedor, modelo, contexto, workspace
+y tema en vivo. El historial persiste en `~/.kspr/shell_history`. Cuando no hay TTY se usa un
+fallback `readline` con historial.
+
+El motor visual aplica el tema activo tanto en `rich` como en el fallback ANSI 24-bit (colores
+truecolor derivados de cada tema) e incluye animaciones de escaneo, typewriter y spinner con
+resultado `✓/✕` y tiempo transcurrido. Se controlan con `/visual on|off|preview|demo|status`.
+
+Comandos visuales e interconexión: `/map` (mapa de comandos por categoría), `/palette <texto>`
+(buscador fuzzy), `/status` (panel con barra de contexto y sparkline de actividad), `/routes`
+(introspecciona las rutas FastAPI del backend y las mapea al comando CLI equivalente), `/tour`
+(recorrido animado de bienvenida) y `/visual` (efectos, temas y demo de componentes).
+
 
 ### Ingeniería inversa estática
 
@@ -93,8 +105,8 @@ evidencia, detecta packers/YARA/crypto, y recupera archivos con carving (interno
 Comandos base: `/help`, `/doctor`, `/config`, `/api`, `/project`, `/model`, `/provider`, `/mcp`,
 `/plugins`, `/capabilities`, `/prompts`, `/skills`, `/decompilate`, `/trees`, `/todo`, `/ast`,
 `/remember`, `/recall`, `/sandbox`, `/run`, `/export`, `/context`, `/compact`, `/new`, `/sessions`,
-`/banner`, `/theme`, `/update` y `/exit`. El wordmark ASCII de KSPR se dibuja al iniciar y con
-`/banner`.
+`/banner`, `/theme`, `/update`, `/map`, `/palette`, `/status`, `/routes`, `/tour`, `/visual` y
+`/exit`. El wordmark ASCII de KSPR se dibuja al iniciar y con `/banner`.
 
 ## Proveedores de IA
 

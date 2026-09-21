@@ -29,6 +29,19 @@ except ImportError:  # pragma: no cover - exercised only without the extra
 MAX_FILE_SUGGESTIONS = 200
 
 
+def _meta_for(command, limit: int = 48) -> str:
+    """Etiqueta enriquecida para el menú de autocompletado."""
+    parts = [command.category]
+    if command.aliases:
+        parts.append("alias " + " ".join(f"/{alias}" for alias in command.aliases))
+    if command.usage:
+        parts.append(command.usage)
+    if command.dangerous:
+        parts.append("⚠ peligroso")
+    text = " · ".join(parts)
+    return text if len(text) <= limit else text[: limit - 1] + "…"
+
+
 class KSPRCompleter(Completer):
     """Completer that dispatches on the leading character of the current token."""
 
@@ -66,7 +79,7 @@ class KSPRCompleter(Completer):
                 f"/{command.name} ",
                 start_position=-len(token),
                 display=f"/{command.name}",
-                display_meta=f"{command.category} · {command.summary[:46]}",
+                display_meta=_meta_for(command),
             )
 
     def _complete_files(self, token: str):
@@ -123,5 +136,5 @@ class CommandPaletteCompleter(Completer):
             yield Completion(
                 f"/{command.name}",
                 display=f"/{command.name}",
-                display_meta=f"{command.category} · {command.summary[:56]}",
+                display_meta=_meta_for(command, limit=64),
             )

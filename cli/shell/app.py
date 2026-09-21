@@ -11,6 +11,8 @@ import sys
 from collections.abc import Callable, Iterable
 from pathlib import Path
 
+from commands import COMMANDS
+
 from .completions import CommandPaletteCompleter, KSPRCompleter
 from .themes import Theme, get_theme
 
@@ -121,6 +123,18 @@ class ShellPrompt:
             event.current_buffer.cursor_position = len(event.current_buffer.text)
             event.current_buffer.validate_and_handle()
 
+        @bindings.add("f2")
+        def _map(event) -> None:
+            event.current_buffer.text = "/map"
+            event.current_buffer.cursor_position = len(event.current_buffer.text)
+            event.current_buffer.validate_and_handle()
+
+        @bindings.add("f3")
+        def _routes(event) -> None:
+            event.current_buffer.text = "/routes"
+            event.current_buffer.cursor_position = len(event.current_buffer.text)
+            event.current_buffer.validate_and_handle()
+
         return bindings
 
     # ---- public API ----
@@ -134,7 +148,7 @@ class ShellPrompt:
             complete_while_typing=True,
             history=InMemoryHistory(),
             style=self._style,
-            bottom_toolbar="Paleta · escribe para filtrar · Enter selecciona · Ctrl+C cancela",
+            bottom_toolbar=f"Paleta · {len(COMMANDS)} comandos · escribe para filtrar · Enter selecciona · Ctrl+C cancela",
         )
         try:
             return palette.prompt("⌘ ") or None

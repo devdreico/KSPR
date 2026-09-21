@@ -35,6 +35,8 @@ class Command:
 COMMANDS: tuple[Command, ...] = (
     # ---- core / sesión ----
     Command("help", "Muestra la ayuda y los comandos disponibles", "/help [comando]", "help", aliases=("h", "?",), keywords=("ayuda", "comandos")),
+    Command("palette", "Buscador fuzzy de comandos con vista previa", "/palette [consulta]", "help", aliases=("cmds",), keywords=("buscar", "paleta", "comandos")),
+    Command("map", "Mapa visual de comandos agrupados por categoría", "/map", "help", keywords=("mapa", "categorias", "indice")),
     Command("clear", "Limpia la pantalla y redibuja el dashboard", "/clear", "session", keywords=("limpiar", "cls")),
     Command("banner", "Redibuja el wordmark ASCII de KSPR", "/banner", "session", keywords=("logo", "ascii")),
     Command("new", "Inicia una sesión nueva", "/new", "session", keywords=("nueva", "reset")),
@@ -42,6 +44,8 @@ COMMANDS: tuple[Command, ...] = (
     Command("compact", "Compacta el contexto y el uso de tokens", "/compact", "session", keywords=("resumen", "summarize")),
     Command("context", "Muestra los archivos adjuntos activos", "/context", "session"),
     Command("export", "Exporta la transcripción de la sesión", "/export [md|json]", "session", args=("formato",)),
+    Command("status", "Panel de estado con métricas y barras de contexto", "/status", "session", aliases=("stats",), keywords=("estado", "metricas", "tokens")),
+    Command("tour", "Recorrido visual de bienvenida y tips de la CLI", "/tour", "session", keywords=("intro", "onboarding", "ayuda visual")),
     Command("exit", "Cierra la sesión interactiva", "/exit", "session", aliases=("quit", "q")),
     Command("update", "Actualiza KSPR a la última versión", "/update", "ops"),
 
@@ -62,6 +66,8 @@ COMMANDS: tuple[Command, ...] = (
     Command("tools", "Detecta e instala herramientas de ingeniería inversa", "/tools [detect|status|install|which] [nombre]", "ops", keywords=("radare2", "ghidra", "binwalk", "yara", "instalar")),
     Command("doctor", "Autodiagnóstico de la instalación y proveedores", "/doctor", "ops"),
     Command("theme", "Cambia el tema visual del shell", "/theme [nombre]", "ops", keywords=("color", "tema", "grayscale")),
+    Command("visual", "Controla efectos visuales: animaciones, temas y demo", "/visual [on|off|preview|demo|status]", "ops", aliases=("ui",), keywords=("animacion", "efectos", "estetica")),
+    Command("routes", "Interconecta las rutas HTTP del backend con los comandos CLI", "/routes [filtro]", "ops", aliases=("api-map",), keywords=("rutas", "endpoints", "rest", "backend")),
     Command("sandbox", "Muestra la política del sandbox", "/sandbox", "ops"),
 
     # ---- ingeniería inversa: triage ----

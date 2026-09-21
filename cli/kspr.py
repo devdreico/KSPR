@@ -194,6 +194,65 @@ animate_spinner = TerminalUI.animate_spinner
 print_response_box = TerminalUI.print_response
 
 
+# ---- Visual command helpers ----
+
+# Mapa canónico ruta HTTP del backend -> comando CLI que la consume en proceso.
+_ROUTE_CLI_MAP: dict[str, str] = {
+    "/api/v1/health": "/doctor",
+    "/api/v1/auth/register": "/login",
+    "/api/v1/auth/login": "/login",
+    "/api/v1/auth/me": "/config",
+    "/api/v1/auth/oauth": "/login",
+    "/api/v1/analyze": "/decompilate",
+    "/api/v1/analyze/stream": "/decompilate",
+    "/api/v1/jobs": "/status",
+    "/api/v1/ingest/files": "/index",
+    "/api/v1/ingest/archive": "/extract",
+    "/api/v1/transcribe": "/ask",
+    "/api/v1/providers/status": "/provider",
+    "/api/v1/providers/gemini/status": "/provider",
+    "/api/v1/decompilate": "/decompilate",
+    "/api/v1/trees": "/trees",
+    "/api/v1/re/tools": "/tools",
+    "/api/v1/re/analyze": "/recon",
+    "/api/v1/re/carve": "/carve",
+}
+
+
+def collect_backend_routes() -> list[dict[str, Any]]:
+    """Introspecciona las rutas FastAPI del motor KSPR (sin levantar el server)."""
+    try:
+        from kspr_engine.main import app
+    except Exception:
+        return []
+    routes: list[dict[str, Any]] = []
+    for route in getattr(app, "routes", []):
+        path = getattr(route, "path", None)
+        raw_methods = getattr(route, "methods", None) or []
+        methods = sorted(method for method in raw_methods if method not in {"HEAD", "OPTIONS"})
+        if not path or not methods or not str(path).startswith("/api"):
+            continue
+        routes.append(
+            {
+                "path": str(path),
+                "methods": methods,
+                "name": str(getattr(route, "name", "") or ""),
+                "tags": list(getattr(route, "tags", None) or []),
+            }
+        )
+    return routes
+
+
+def route_cli_hint(path: str) -> str:
+    """Comando CLI asociado a una ruta HTTP (explícito o por heurística)."""
+    if path in _ROUTE_CLI_MAP:
+        return _ROUTE_CLI_MAP[path]
+    slug = path.rstrip("/").split("/")[-1].replace("_", "-")
+    command = find_command(slug)
+    return command.slash if command else "—"
+
+
+
 # ---- Collect functions ----
 
 def collect(root: Path, limit: int = 2_000) -> list[SourceFile]:
@@ -424,6 +483,8 @@ def _init_line_editing() -> Any:
 
 async def interactive_shell() -> None:
     print_header()
+    if TerminalUI.animations():
+        TerminalUI.animate_scan("Inicializando motor KSPR · rutas, capacidades y memoria", duration=0.8)
     apply_config_environment()
 
     readline = _init_line_editing()
@@ -440,6 +501,7 @@ async def interactive_shell() -> None:
     session_history: list[dict[str, str]] = []
 
     TerminalUI.set_theme(config.get("theme", "grayscale"))
+    TerminalUI.set_animations(bool(config.get("animations", True)))
     shell_prompt: ShellPrompt | None = None
     if shell_available():
         try:
@@ -447,10 +509,12 @@ async def interactive_shell() -> None:
                 theme=config.get("theme", "grayscale"),
                 status_provider=lambda: (
                     f" KSPR I · {active_provider}:{active_model} · ctx {tokens_used // 1000}k/{max_tokens // 1000}k "
-                    f"· {current_workspace.name} · [Ctrl+K] paleta [/] comandos [@] archivos "
+                    f"· {current_workspace.name} · {TerminalUI.theme_name} · [Ctrl+K] paleta [/] comandos "
+                    f"[F1] ayuda [F2] mapa [F3] rutas [@] archivos "
                 ),
                 workspace_provider=lambda: current_workspace,
                 models_provider=lambda: [str(m.get("id", "")) for m in indexed_models.get(active_provider, [])] or [active_model],
+                history_path=CONFIG_DIR / "shell_history",
             )
         except Exception:
             shell_prompt = None
@@ -526,8 +590,10 @@ async def interactive_shell() -> None:
 
         if prompt.startswith("/"):
             parts = prompt.split(maxsplit=1)
-            cmd = parts[0].lower()
+            raw_cmd = parts[0].lower()
             arg = parts[1] if len(parts) > 1 else ""
+            resolved = find_command(raw_cmd)
+            cmd = resolved.slash.lower() if resolved else raw_cmd
 
             if cmd not in {"/help", "/theme"}:
                 re_context = REContext(workspace=current_workspace, provider_name=active_provider, model=active_model, config=config)
@@ -548,22 +614,22 @@ async def interactive_shell() -> None:
                             command.summary,
                             f"Uso: {command.usage or '/' + command.name}",
                             f"Categoría: {command.category}",
+                            f"Etiquetas: {', '.join(command.keywords) or '—'}",
                             f"Requiere: {', '.join(command.requires) or 'nada'}",
                         ], Color.WHITE)
                     else:
                         matches = search_commands(query, limit=8)
-                        print_box("¿Quisiste decir?", [f"/{c.name}  ·  {c.summary}" for c in matches] or ["Sin coincidencias"], Color.WHITE)
+                        if matches:
+                            TerminalUI.print_table(
+                                f"¿Quisiste decir · {query}?",
+                                ["COMANDO", "CATEGORÍA", "RESUMEN"],
+                                [[c.slash, c.category, c.summary] for c in matches],
+                            )
+                        else:
+                            TerminalUI.status_line("warn", f"Sin coincidencias para '{query}'. Prueba /map para ver todo.")
                 else:
-                    groups: dict[str, list[str]] = {}
-                    for command in COMMANDS:
-                        groups.setdefault(command.category, []).append(command.name)
-                    lines = []
-                    for category, names in groups.items():
-                        lines.append(f"[{category}]")
-                        lines.append("  " + "  ".join(f"/{name}" for name in names))
-                    lines.append("")
-                    lines.append("Escribe /help <comando> para detalle · Ctrl+K abre la paleta · / <Tab> autocompleta")
-                    print_box("KSPR CLI Commands", lines, Color.WHITE)
+                    TerminalUI.print_command_grid(COMMANDS)
+                    TerminalUI.status_line("info", "Escribe /help <comando> para detalle · Ctrl+K abre la paleta · / <Tab> autocompleta")
             elif cmd == "/theme":
                 name = arg.strip().lower()
                 if name in theme_names():
@@ -571,9 +637,15 @@ async def interactive_shell() -> None:
                     cfg = load_local_config()
                     cfg["theme"] = name
                     save_local_config(cfg)
-                    print_colored(f"[✓] Tema aplicado: {name}", Color.WHITE)
+                    TerminalUI.status_line("ok", f"Tema aplicado: {name}")
+                    TerminalUI.print_theme_swatches()
+                elif name:
+                    TerminalUI.status_line("warn", f"Tema '{name}' no existe. Disponibles: {', '.join(theme_names())}")
+                    TerminalUI.print_theme_swatches()
                 else:
-                    print_box("Temas disponibles", theme_names(), Color.WHITE)
+                    TerminalUI.print_kv([("activo", TerminalUI.theme_name)], title="KSPR I · Tema")
+                    TerminalUI.print_theme_swatches()
+                    TerminalUI.status_line("info", "Uso: /theme <nombre>")
             elif cmd == "/banner":
                 print_header(f"{active_provider}:{active_model}")
             elif cmd == "/clear":
@@ -703,12 +775,19 @@ async def interactive_shell() -> None:
                         print_colored("[!] No MCP servers configured.", Color.LIGHT_GRAY)
                         print_colored("    Usage: /mcp add <name> <url|command>", Color.MID_GRAY)
                     else:
-                        lines = []
-                        for sname, sconf in servers_data.items():
-                            status = "active" if sconf.get("enabled", True) else "inactive"
-                            url_or_cmd = sconf.get("url", "") or " ".join(sconf.get("command", []))
-                            lines.append(f" {sname}  |  {sconf.get('type', 'remote')}  |  {url_or_cmd}  |  {status}")
-                        print_box("MCP Servers", lines, Color.WHITE)
+                        TerminalUI.print_table(
+                            "MCP Servers",
+                            ["NOMBRE", "TIPO", "DESTINO", "ESTADO"],
+                            [
+                                [
+                                    sname,
+                                    sconf.get("type", "remote"),
+                                    sconf.get("url", "") or " ".join(sconf.get("command", [])),
+                                    "activo" if sconf.get("enabled", True) else "inactivo",
+                                ]
+                                for sname, sconf in servers_data.items()
+                            ],
+                        )
                 elif mcp_action == "add" and len(mcp_args) >= 3:
                     sname = mcp_args[1]
                     target = mcp_args[2]
@@ -1094,7 +1173,8 @@ async def interactive_shell() -> None:
                         f"Modelo: {agent.model_hint}",
                     ], Color.WHITE)
                 else:
-                    print_box("Subagentes KSPR", [f"{a.key:<12} {a.role}" for a in list_agents()] + ["", "Usa /agents <clave> para detalle."], Color.WHITE)
+                    TerminalUI.print_table("Subagentes KSPR", ["CLAVE", "ROL"], [[a.key, a.role] for a in list_agents()])
+                    TerminalUI.status_line("info", "Usa /agents <clave> para ver detalle de herramientas y modelo.")
             elif cmd == "/plan":
                 goal = arg.strip() or "analizar artefacto"
                 steps = plan_for(goal)
@@ -1185,14 +1265,123 @@ async def interactive_shell() -> None:
                 decompiler = DecompilerEngine()
                 trees = decompiler.list_trees()
                 if not trees:
-                    print_colored("[!] No hay Context Trees creados. Usa /decompilate para crear uno.", Color.LIGHT_GRAY)
+                    TerminalUI.status_line("warn", "No hay Context Trees creados. Usa /decompilate para crear uno.")
                 else:
-                    lines = []
-                    for t in trees:
-                        files_str = ", ".join(t["files"])
-                        lines.append(f" Concepto: {t['concept']}  |  Ruta: {t['path']}  |  Archivos: [{files_str}]")
-                    print_box("Context Trees", lines, Color.WHITE)
+                    TerminalUI.print_table(
+                        f"Context Trees · {len(trees)}",
+                        ["CONCEPTO", "RUTA", "ARCHIVOS"],
+                        [[t["concept"], t["path"], ", ".join(t["files"])] for t in trees],
+                    )
                 print_dashboard(active_provider, active_model, current_workspace, len(attached_files), tokens_used, max_tokens)
+            elif cmd == "/map":
+                TerminalUI.print_command_grid(COMMANDS)
+                TerminalUI.status_line("info", f"{len(COMMANDS)} comandos · /help <comando> para detalle · /palette <texto> para filtrar")
+            elif cmd == "/palette":
+                query = arg.strip()
+                results = search_commands(query, limit=9) if query else list(COMMANDS[:9])
+                if not results:
+                    TerminalUI.status_line("warn", f"Sin coincidencias para '{query}'.")
+                else:
+                    TerminalUI.print_table(
+                        f"Paleta de comandos{f' · {query}' if query else ''}",
+                        ["COMANDO", "CATEGORÍA", "RESUMEN"],
+                        [[c.slash, c.category, c.summary] for c in results],
+                    )
+                    TerminalUI.status_line("info", "Filtra con /palette <texto> · Ctrl+K abre la paleta interactiva")
+            elif cmd == "/status":
+                TerminalUI.print_kv([
+                    ("sesión", session_id),
+                    ("proveedor", active_provider),
+                    ("modelo", active_model),
+                    ("workspace", str(current_workspace)),
+                    ("adjuntos", f"{len(attached_files)} archivo(s)"),
+                    ("tema", f"{TerminalUI.theme_name} · {TerminalUI._theme().label}"),
+                    ("render", f"{TerminalUI.render_mode()} · animaciones {'on' if TerminalUI.animations() else 'off'}"),
+                ], title="KSPR I · Estado de sesión")
+                TerminalUI.print_divider()
+                TerminalUI.print_bar("contexto", tokens_used, max_tokens)
+                activity = [estimate_tokens(str(entry.get("content", ""))) for entry in session_history[-24:]]
+                if activity:
+                    TerminalUI.print_sparkline(activity, "actividad")
+                TerminalUI.print_status([
+                    ("Proveedor", "ok" if active_provider else "warn", f"{active_provider}:{active_model}"),
+                    ("Contexto", "ok" if attached_files else "dot", f"{len(attached_files)} adjunto(s) · {len(session_history)} mensajes"),
+                    ("Memoria", "dot", "usa /memory para inspeccionar el índice vectorial"),
+                ])
+            elif cmd == "/visual":
+                action = arg.strip().lower()
+                cfg = load_local_config()
+                if action in {"on", "off"}:
+                    enabled = action == "on"
+                    TerminalUI.set_animations(enabled)
+                    cfg["animations"] = enabled
+                    save_local_config(cfg)
+                    TerminalUI.status_line("ok", f"Animaciones {'activadas' if enabled else 'desactivadas'}.")
+                elif action == "preview":
+                    TerminalUI.print_kv([("activo", TerminalUI.theme_name)], title="KSPR I · Temas")
+                    TerminalUI.print_theme_swatches()
+                    TerminalUI.status_line("info", "Uso: /theme <nombre> para cambiar")
+                elif action == "demo":
+                    TerminalUI.print_divider("DEMO VISUAL")
+                    TerminalUI.animate_scan("Escaneando artefacto de ejemplo")
+                    TerminalUI.print_kv([
+                        ("motor", "KSPR I"),
+                        ("rutas", "/api/v1"),
+                        ("tema", TerminalUI.theme_name),
+                        ("render", TerminalUI.render_mode()),
+                    ], title="Muestra de componentes")
+                    TerminalUI.print_bar("contexto", tokens_used, max_tokens)
+                    TerminalUI.print_sparkline([2, 5, 3, 8, 6, 11, 9, 14, 10, 16], "actividad")
+                    TerminalUI.print_status([
+                        ("Backend", "ok", "en línea"),
+                        ("Sandbox", "warn", "permisos explícitos"),
+                        ("Memoria", "dot", "lista"),
+                    ])
+                    TerminalUI.print_badges(["evidence-first", "auditable", "markdown"], label="principios")
+                    TerminalUI.animate_typewriter("KSPR I · reconstrucción de conocimiento en curso…")
+                else:
+                    TerminalUI.print_kv([
+                        ("animaciones", "on" if TerminalUI.animations() else "off"),
+                        ("tema", f"{TerminalUI.theme_name} · {TerminalUI._theme().label}"),
+                        ("render", TerminalUI.render_mode()),
+                        ("ancho", f"{TerminalUI.get_width()} columnas"),
+                    ], title="KSPR I · Efectos visuales")
+                    TerminalUI.status_line("info", "Uso: /visual on|off|preview|demo|status")
+            elif cmd == "/routes":
+                filtro = arg.strip().lower()
+                routes = collect_backend_routes()
+                if not routes:
+                    TerminalUI.status_line("warn", "Backend FastAPI no disponible; mostrando mapa estático de interconexión.")
+                    routes = [{"path": path, "methods": ["POST"], "name": "", "tags": []} for path in _ROUTE_CLI_MAP]
+                if filtro:
+                    routes = [route for route in routes if filtro in route["path"].lower()]
+                if not routes:
+                    TerminalUI.status_line("warn", f"Sin rutas que coincidan con '{filtro}'.")
+                else:
+                    grouped: dict[str, list[str]] = {}
+                    for route in routes:
+                        parts = [part for part in route["path"].split("/") if part]
+                        tag = route["tags"][0] if route["tags"] else (parts[2] if len(parts) > 2 else "api")
+                        methods = "/".join(route["methods"])
+                        hint = route_cli_hint(route["path"])
+                        grouped.setdefault(tag, []).append(f"{methods:<9} {route['path']:<36} → {hint}")
+                    TerminalUI.print_route_tree("Rutas backend ↔ CLI", f"KSPR API · {len(routes)} rutas", list(grouped.items()))
+                    mapped = sum(1 for route in routes if route_cli_hint(route["path"]) != "—")
+                    TerminalUI.print_badges([f"{len(routes)} rutas", f"{mapped} mapeadas", "REST /api/v1"], label="resumen")
+                    TerminalUI.status_line("info", "La CLI ejecuta el motor en proceso; las rutas exponen el mismo motor por HTTP.")
+            elif cmd == "/tour":
+                steps = [
+                    "KSPR I reconstruye conocimiento sin ejecutar el artefacto.",
+                    "Adjunta archivos al contexto con @ruta dentro de tu mensaje.",
+                    f"Explora los {len(COMMANDS)} comandos con /map o filtra con /palette <texto>.",
+                    "Interconecta el backend REST con /routes y mide tu sesión con /status.",
+                    "Ajusta la estética con /theme y controla los efectos con /visual.",
+                ]
+                TerminalUI.print_divider("TOUR KSPR")
+                for index, line in enumerate(steps, 1):
+                    TerminalUI.print_colored(f"  {index}/{len(steps)}", Color.GRAPHITE)
+                    TerminalUI.animate_typewriter("  " + line)
+                TerminalUI.print_badges(["/routes", "/status", "/palette", "/visual", "/map", "/theme"], label="prueba")
             elif cmd == "/compact":
                 if session_history:
                     save_session()
@@ -1233,19 +1422,19 @@ async def interactive_shell() -> None:
                     if not session_files:
                         print_colored("[!] No saved sessions found.", Color.LIGHT_GRAY)
                     else:
-                        session_lines = []
+                        session_rows = []
                         for sf in session_files[:20]:
                             try:
                                 data = json.loads(sf.read_text(encoding="utf-8"))
-                                sid = data.get("id", sf.stem)
-                                prov = data.get("provider", "?")
-                                model = data.get("model", "?")
-                                hist_len = len(data.get("history", []))
-                                files_len = len(data.get("files", []))
-                                session_lines.append(f" {sid}  |  {prov}:{model}  |  {hist_len} messages  |  {files_len} files")
+                                session_rows.append([
+                                    str(data.get("id", sf.stem)),
+                                    f"{data.get('provider', '?')}:{data.get('model', '?')}",
+                                    str(len(data.get("history", []))),
+                                    str(len(data.get("files", []))),
+                                ])
                             except Exception:
-                                session_lines.append(f" {sf.stem}  |  (unreadable)")
-                        print_box("Saved Sessions", session_lines, Color.WHITE)
+                                session_rows.append([sf.stem, "(unreadable)", "—", "—"])
+                        TerminalUI.print_table("Sesiones guardadas", ["ID", "PROVEEDOR", "MENSAJES", "ARCHIVOS"], session_rows)
                         sel = input(f"{Color.WHITE}Enter session ID to restore (or press Enter to cancel): {Color.RESET}").strip()
                         if sel:
                             target = sessions_dir / f"{sel}.json"
