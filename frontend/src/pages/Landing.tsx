@@ -1,6 +1,21 @@
 import React, { useState } from "react";
 import { Terminal, Copy, Check, Sparkles, Shield, FolderArchive, Cpu, ExternalLink, Monitor, CreditCard, Zap, Layers, Activity, Search } from "lucide-react";
 import { LeafBranch, Fern, MonsteraLeaf, VineDivider } from "../components/Botanical";
+import { Typewriter } from "../components/Typewriter";
+import { useAtmosphere, useReveal, useTilt } from "../hooks/useInteractions";
+
+const marqueeItems = [
+  "PARSING ESTÁTICO",
+  "CONTEXT TREES",
+  "MULTI-LLM",
+  "MCP SERVERS",
+  "AST / TREE-SITTER",
+  "EVIDENCE-FIRST",
+  "REVERSE ENGINEERING",
+  "MARKDOWN MODULAR",
+  "gsap-skills",
+  "AUDITABLE",
+];
 
 export function Landing() {
   const [copiedCmd, setCopiedCmd] = useState<string | null>(null);
@@ -8,6 +23,10 @@ export function Landing() {
   const [decompTab, setDecompTab] = useState<number>(0);
   const [runningSim, setRunningSim] = useState(false);
   const [simStep, setSimStep] = useState(0);
+
+  useReveal();
+  useAtmosphere();
+  useTilt();
 
   const curlCommand = "curl -fsSL https://raw.githubusercontent.com/devdreiortiz/KSPR/main/bin/install.sh | bash";
 
@@ -28,6 +47,8 @@ export function Landing() {
       setRunningSim(false);
     }, 2700);
   };
+
+  const delay = (i: number) => ({ "--d": `${(i * 0.09).toFixed(2)}s` } as React.CSSProperties);
 
   const headphoneDecompParts = [
     {
@@ -62,7 +83,10 @@ export function Landing() {
 
   return (
     <div className="app-shell animate-fade-in" style={{ fontFamily: "'Montserrat', sans-serif" }}>
+      <div className="scroll-progress" aria-hidden="true" />
+      <div className="cursor-glow" aria-hidden="true" />
       <div className="grain" aria-hidden="true" />
+      <span className="side-note" aria-hidden="true">SOVERATH HOLDING · BOGOTÁ D.C. · EST. KSPR</span>
 
       {/* Topbar */}
       <header className="topbar">
@@ -97,8 +121,23 @@ export function Landing() {
         {/* Hero Section */}
         <section className="hero">
           <div className="glow-orb" aria-hidden="true" />
+          <div className="hero-beam" aria-hidden="true" />
           <Fern className="botanical botanical-fern-left" />
           <LeafBranch className="botanical botanical-branch-right" />
+
+          <div className="motes" aria-hidden="true">
+            {Array.from({ length: 14 }, (_, i) => (
+              <span
+                key={i}
+                className="mote"
+                style={{
+                  left: `${(i * 7 + 2) % 96}%`,
+                  animationDelay: `${(i * 0.9).toFixed(1)}s`,
+                  animationDuration: `${(12 + (i % 5) * 2).toFixed(0)}s`,
+                }}
+              />
+            ))}
+          </div>
 
           <div className="hero-content">
             <div className="section-tag">
@@ -115,7 +154,7 @@ export function Landing() {
 
             {/* Action Strip: Curl + Membership Side-by-Side */}
             <div className="action-strip">
-              <div className="install-box">
+              <div className="install-box" data-tilt>
                 <div style={{ display: "flex", alignItems: "center", gap: 12, overflow: "hidden" }}>
                   <Terminal size={19} color="#ffffff" style={{ flexShrink: 0 }} />
                   <code style={{ whiteSpace: "nowrap", overflowX: "auto", fontFamily: "'Montserrat', sans-serif", fontSize: "13px" }}>{curlCommand}</code>
@@ -132,10 +171,11 @@ export function Landing() {
               </div>
 
               <a
-                href="https://kspr.membership.vercel.app"
+                href="https://kspr.comunity.vercel.app"
                 target="_blank"
                 rel="noreferrer"
                 className="membership-card-btn"
+                data-tilt
               >
                 <CreditCard size={22} color="#ffffff" />
                 <div className="membership-info">
@@ -144,11 +184,15 @@ export function Landing() {
                 </div>
               </a>
             </div>
+
+            <div className="hero-cue" aria-hidden="true">
+              <span />
+            </div>
           </div>
         </section>
 
         {/* KSPR Desktop Highlight Banner */}
-        <div className="desktop-banner">
+        <div className="desktop-banner" data-reveal>
           <MonsteraLeaf className="botanical botanical-monstera" />
           <div className="banner-content">
             <div className="desktop-banner-eyebrow">
@@ -170,9 +214,22 @@ export function Landing() {
           </a>
         </div>
 
+        {/* Kinetic marquee */}
+        <div className="marquee" aria-hidden="true">
+          <div className="marquee-track">
+            {[...marqueeItems, ...marqueeItems].map((item, i) => (
+              <span key={i} className="marquee-item">
+                {item}
+                <i />
+              </span>
+            ))}
+          </div>
+        </div>
+
         {/* Real Workflows & Exploration Areas */}
-        <section style={{ margin: "60px 0" }}>
+        <section style={{ margin: "60px 0" }} data-reveal>
           <div className="section-head">
+            <span className="section-index" aria-hidden="true">01</span>
             <div>
               <span className="eyebrow">CAMPOS DE APLICACIÓN INDUSTRIAL</span>
               <h2 className="section-title">Flujos de trabajo reales donde KSPR destaca</h2>
@@ -180,7 +237,7 @@ export function Landing() {
           </div>
 
           <div className="grid-cards">
-            <div className="card">
+            <div className="card reveal-fade" data-tilt data-reveal style={delay(0)}>
               <Shield size={28} color="#ffffff" />
               <h3 style={{ fontWeight: 700 }}>1. Evidencia estática y trazabilidad</h3>
               <p>
@@ -188,7 +245,7 @@ export function Landing() {
               </p>
             </div>
 
-            <div className="card">
+            <div className="card reveal-fade" data-tilt data-reveal style={delay(1)}>
               <Layers size={28} color="#a3a3a3" />
               <h3 style={{ fontWeight: 700 }}>2. Parsing multi-fuente con /decompilate</h3>
               <p>
@@ -196,7 +253,7 @@ export function Landing() {
               </p>
             </div>
 
-            <div className="card">
+            <div className="card reveal-fade" data-tilt data-reveal style={delay(2)}>
               <Cpu size={28} color="#6f6f6f" />
               <h3 style={{ fontWeight: 700 }}>3. Orquestación de modelos y capacidades</h3>
               <p>
@@ -211,9 +268,10 @@ export function Landing() {
         </div>
 
         {/* Cinematic Hardware Decomposition Example (Planar Headphones) */}
-        <section className="decomp-container">
+        <section className="decomp-container" data-reveal>
           <div className="glow-orb" aria-hidden="true" />
           <div className="section-head">
+            <span className="section-index" aria-hidden="true">02</span>
             <div>
               <span className="eyebrow">DEMOSTRACIÓN DE CAPACIDAD TÉCNICA</span>
               <h2 style={{ fontSize: "26px", margin: "6px 0 0", fontWeight: 700 }}>Demostración: reconstrucción técnica de unos audífonos planar Hi-Fi</h2>
@@ -243,16 +301,21 @@ export function Landing() {
 
             <div className="decomp-panel-alt">
               <div className="decomp-output-label"># Evidencia estructurada generada:</div>
-              <pre className="decomp-output">
-                {headphoneDecompParts[decompTab].output}
-              </pre>
+              <div className="decomp-output" key={decompTab}>
+                {headphoneDecompParts[decompTab].output.split("\n").map((line, i) => (
+                  <div key={i} className="decomp-line" style={{ animationDelay: `${i * 0.12}s` }}>
+                    {line || "\u00A0"}
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </section>
 
         {/* Terminal Simulation Section */}
-        <section style={{ margin: "60px 0" }}>
+        <section style={{ margin: "60px 0" }} data-reveal>
           <div className="section-head">
+            <span className="section-index" aria-hidden="true">03</span>
             <div>
               <span className="eyebrow">TERMINAL CLI</span>
               <h2 className="section-title">Recorrido interactivo del flujo de análisis</h2>
@@ -302,11 +365,11 @@ export function Landing() {
               </button>
             </div>
 
-            <div className="terminal-body">
+            <div className="terminal-body" key={terminalTab}>
               {terminalTab === "install" && (
-                <div>
+                <div className="term-block">
                   <div className="term-comment"># Instalación desatendida mediante script Bash oficial</div>
-                  <div className="term-cmd">$ curl -sSL https://raw.githubusercontent.com/devdreiortiz/KSPR/main/bin/install.sh | bash</div>
+                  <div className="term-cmd">$ <Typewriter text={curlCommand} speed={12} /></div>
                   <div className="term-ok" style={{ marginTop: "14px" }}>
                     ✓ Clonación segura en ~/.kspr<br />
                     ✓ Entorno virtual Python aislado (.venv)<br />
@@ -316,9 +379,9 @@ export function Landing() {
               )}
 
               {terminalTab === "analyze" && (
-                <div>
+                <div className="term-block">
                   <div className="term-comment"># Ingesta multi-fuente y compilación de Context Trees</div>
-                  <div className="term-cmd">$ kspr /decompilate ./specs.pdf ./diagram.png https://docs.api.com</div>
+                  <div className="term-cmd">$ <Typewriter text="kspr /decompilate ./specs.pdf ./diagram.png https://docs.api.com" speed={16} /></div>
                   {simStep >= 1 && <div className="term-step">[1/3] Fuentes indexadas y subidas a staging workspace.</div>}
                   {simStep >= 2 && <div className="term-step">[2/3] Análisis agéntico con KSPR AI CLI TOOL y extracción heurística...</div>}
                   {simStep >= 3 && <div className="term-comment" style={{ marginTop: "6px" }}>[3/3] Generación de Contexto inicial.md y archivos modulares...</div>}
@@ -332,9 +395,9 @@ export function Landing() {
               )}
 
               {terminalTab === "git" && (
-                <div>
+                <div className="term-block">
                   <div className="term-comment"># Listar rutas de los Context Trees generados</div>
-                  <div className="term-cmd">$ kspr /trees</div>
+                  <div className="term-cmd">$ <Typewriter text="kspr /trees" speed={26} /></div>
                   <div className="term-ok" style={{ marginTop: "14px" }}>
                     - Concepto: Hardware - Audifonos Planar HiFi | Ruta: ./Context Trees/Hardware - Audifonos Planar HiFi<br />
                     - Concepto: Legacy Banking Core | Ruta: ./Context Trees/Legacy Banking Core
@@ -343,9 +406,9 @@ export function Landing() {
               )}
 
               {terminalTab === "dev" && (
-                <div>
+                <div className="term-block">
                   <div className="term-comment"># Iniciar shell interactivo de KSPR AI CLI TOOL</div>
-                  <div className="term-cmd">$ kspr --interactive</div>
+                  <div className="term-cmd">$ <Typewriter text="kspr --interactive" speed={24} /></div>
                   <div style={{ marginTop: "8px" }}>
                     <span className="term-ok" style={{ fontWeight: 600 }}>  KSPR AI CLI TOOL — Interactive Knowledge Reconstruction (v0.1.0)</span><br />
                     <span className="term-step">  Usa @ para adjuntar archivos, o /decompilate, /trees y /capabilities.</span><br />
@@ -362,25 +425,34 @@ export function Landing() {
         </div>
 
         {/* Feature Grid */}
-        <div className="grid-cards">
-          <div className="card">
-            <Activity size={26} color="#ffffff" />
-            <h3 style={{ fontWeight: 700 }}>9 Proveedores LLM Sincronizados</h3>
-            <p>Conectividad directa con Google Gemini, OpenAI GPT-4o, Anthropic Claude 3.5, DeepSeek Reasoner/V3, Groq, OpenRouter, OpenCode Zen, Local LLMs y gateways compatibles.</p>
+        <section data-reveal>
+          <div className="section-head">
+            <span className="section-index" aria-hidden="true">04</span>
+            <div>
+              <span className="eyebrow">CAPACIDADES DEL MOTOR</span>
+              <h2 className="section-title">Construido para análisis profundo y entrega</h2>
+            </div>
           </div>
+          <div className="grid-cards">
+            <div className="card reveal-fade" data-tilt data-reveal style={delay(0)}>
+              <Activity size={26} color="#ffffff" />
+              <h3 style={{ fontWeight: 700 }}>9 Proveedores LLM Sincronizados</h3>
+              <p>Conectividad directa con Google Gemini, OpenAI GPT-4o, Anthropic Claude 3.5, DeepSeek Reasoner/V3, Groq, OpenRouter, OpenCode Zen, Local LLMs y gateways compatibles.</p>
+            </div>
 
-          <div className="card">
-            <FolderArchive size={26} color="#a3a3a3" />
-            <h3 style={{ fontWeight: 700 }}>Paquetes Markdown Modulares</h3>
-            <p>Exportación estructurada de inventarios UI, grafos de rutas HTTP, contratos de API y reportes de seguridad listos para entrega empresarial.</p>
-          </div>
+            <div className="card reveal-fade" data-tilt data-reveal style={delay(1)}>
+              <FolderArchive size={26} color="#a3a3a3" />
+              <h3 style={{ fontWeight: 700 }}>Paquetes Markdown Modulares</h3>
+              <p>Exportación estructurada de inventarios UI, grafos de rutas HTTP, contratos de API y reportes de seguridad listos para entrega empresarial.</p>
+            </div>
 
-          <div className="card">
-            <Search size={26} color="#6f6f6f" />
-            <h3 style={{ fontWeight: 700 }}>gsap-skills &amp; Prompts Guardados</h3>
-            <p>Sistema de habilidades empaquetadas (gsap-skills) y gestión de prompts personalizados mediante el comando <code style={{ color: "#ffffff", fontWeight: 700 }}>/prompts</code>.</p>
+            <div className="card reveal-fade" data-tilt data-reveal style={delay(2)}>
+              <Search size={26} color="#6f6f6f" />
+              <h3 style={{ fontWeight: 700 }}>gsap-skills &amp; Prompts Guardados</h3>
+              <p>Sistema de habilidades empaquetadas (gsap-skills) y gestión de prompts personalizados mediante el comando <code style={{ color: "#ffffff", fontWeight: 700 }}>/prompts</code>.</p>
+            </div>
           </div>
-        </div>
+        </section>
       </main>
 
       {/* Footer */}

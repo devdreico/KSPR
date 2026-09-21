@@ -26,6 +26,8 @@ export function LeafBranch({ className, style }: BotanicalProps) {
       focusable="false"
     >
       <path
+        className="botanical-stem"
+        pathLength={1}
         d="M100 340 C 106 258 96 168 104 22"
         fill="none"
         stroke="currentColor"
@@ -33,14 +35,16 @@ export function LeafBranch({ className, style }: BotanicalProps) {
         strokeLinecap="round"
       />
       {leaves.map((leaf, i) => (
-        <ellipse
-          key={i}
-          cx={leaf.cx}
-          cy={leaf.cy}
-          rx={leaf.rx}
-          ry={leaf.ry}
-          transform={`rotate(${leaf.rot} ${leaf.cx} ${leaf.cy})`}
-        />
+        <g key={i} transform={`rotate(${leaf.rot} ${leaf.cx} ${leaf.cy})`}>
+          <ellipse
+            className="botanical-leaf"
+            style={{ animationDelay: `${0.4 + i * 0.28}s` }}
+            cx={leaf.cx}
+            cy={leaf.cy}
+            rx={leaf.rx}
+            ry={leaf.ry}
+          />
+        </g>
       ))}
     </svg>
   );
@@ -65,6 +69,8 @@ export function Fern({ className, style }: BotanicalProps) {
       focusable="false"
     >
       <path
+        className="botanical-stem"
+        pathLength={1}
         d="M100 338 C 102 250 98 140 100 18"
         fill="none"
         stroke="currentColor"
@@ -73,20 +79,26 @@ export function Fern({ className, style }: BotanicalProps) {
       />
       {pinnae.map((p, i) => (
         <g key={i}>
-          <ellipse
-            cx={100 - p.spread}
-            cy={p.y}
-            rx={p.len}
-            ry="6"
-            transform={`rotate(${-p.rot} ${100 - p.spread} ${p.y})`}
-          />
-          <ellipse
-            cx={100 + p.spread}
-            cy={p.y}
-            rx={p.len}
-            ry="6"
-            transform={`rotate(${p.rot} ${100 + p.spread} ${p.y})`}
-          />
+          <g transform={`rotate(${-p.rot} ${100 - p.spread} ${p.y})`}>
+            <ellipse
+              className="botanical-leaf"
+              style={{ animationDelay: `${0.5 + i * 0.16}s` }}
+              cx={100 - p.spread}
+              cy={p.y}
+              rx={p.len}
+              ry="6"
+            />
+          </g>
+          <g transform={`rotate(${p.rot} ${100 + p.spread} ${p.y})`}>
+            <ellipse
+              className="botanical-leaf"
+              style={{ animationDelay: `${0.58 + i * 0.16}s` }}
+              cx={100 + p.spread}
+              cy={p.y}
+              rx={p.len}
+              ry="6"
+            />
+          </g>
         </g>
       ))}
     </svg>
@@ -103,8 +115,18 @@ export function MonsteraLeaf({ className, style }: BotanicalProps) {
       aria-hidden="true"
       focusable="false"
     >
-      <path d="M100 336 L100 150" stroke="currentColor" strokeWidth="4" fill="none" strokeLinecap="round" />
       <path
+        className="botanical-stem"
+        pathLength={1}
+        d="M100 336 L100 150"
+        stroke="currentColor"
+        strokeWidth="4"
+        fill="none"
+        strokeLinecap="round"
+      />
+      <path
+        className="botanical-leaf"
+        style={{ animationDelay: "0.5s" }}
         d="M100 12
            C 142 34, 176 76, 178 122
            C 162 120, 148 126, 140 138
@@ -120,12 +142,13 @@ export function MonsteraLeaf({ className, style }: BotanicalProps) {
            C 24 76, 58 34, 100 12 Z"
       />
       <path
+        className="botanical-vein"
+        pathLength={1}
         d="M100 22 L100 300"
         stroke="currentColor"
         strokeWidth="3"
         fill="none"
         strokeLinecap="round"
-        opacity="0.35"
       />
     </svg>
   );
@@ -144,6 +167,8 @@ export function VineDivider({ className, style }: BotanicalProps) {
       focusable="false"
     >
       <path
+        className="botanical-stem"
+        pathLength={1}
         d="M0 30 C 200 6, 400 54, 600 30 C 800 6, 1000 54, 1200 30"
         fill="none"
         stroke="currentColor"
@@ -151,15 +176,17 @@ export function VineDivider({ className, style }: BotanicalProps) {
         opacity="0.6"
       />
       {leaves.map((x, i) => (
-        <ellipse
-          key={i}
-          cx={x}
-          cy={30}
-          rx="20"
-          ry="6"
-          transform={`rotate(${i % 2 === 0 ? -28 : 28} ${x} 30)`}
-          opacity="0.6"
-        />
+        <g key={i} transform={`rotate(${i % 2 === 0 ? -28 : 28} ${x} 30)`}>
+          <ellipse
+            className="botanical-leaf"
+            style={{ animationDelay: `${0.3 + i * 0.18}s` }}
+            cx={x}
+            cy={30}
+            rx="20"
+            ry="6"
+            opacity="0.6"
+          />
+        </g>
       ))}
     </svg>
   );
