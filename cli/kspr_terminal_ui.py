@@ -25,6 +25,19 @@ class TerminalTheme:
     CHARCOAL = "\033[2m"       # Dim background accents
 
 
+# Wordmark oficial de KSPR restaurado y corregido (mismo bloque monocromo que
+# usaba la CLI antes del rediseño grayscale). Cada línea tiene 23 columnas.
+KSPR_ASCII: tuple[str, ...] = (
+    "░   ░ ░░░░░ ░░░░  ░░░░ ",
+    "░  ░  ░     ░   ░ ░   ░",
+    "░░░   ░░░░  ░░░░  ░░░░ ",
+    "░  ░      ░ ░     ░ ░  ",
+    "░   ░ ░░░░░ ░     ░   ░",
+)
+
+KSPR_SUBTITLE = "KSPR AI · Empresarial  |  KSPR I ENGINE"
+
+
 class TerminalUI:
     @staticmethod
     def print_colored(text: str, color: str = TerminalTheme.SILVER, bold: bool = False) -> None:
@@ -37,6 +50,16 @@ class TerminalUI:
             return os.get_terminal_size().columns
         except OSError:
             return 80
+
+    @staticmethod
+    def print_header(subtitle: str = "") -> None:
+        """Render the official KSPR wordmark in grayscale."""
+        print()
+        for line in KSPR_ASCII:
+            TerminalUI.print_colored(line, TerminalTheme.WHITE, bold=True)
+        label = f"{KSPR_SUBTITLE}  |  {subtitle}" if subtitle else KSPR_SUBTITLE
+        TerminalUI.print_colored(label, TerminalTheme.GRAPHITE)
+        print()
 
     @staticmethod
     def print_box(title: str, lines: list[str]) -> None:

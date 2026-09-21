@@ -65,8 +65,9 @@ La CLI nunca ejecuta el código analizado: solo lee archivos permitidos y genera
 Comandos del shell interactivo: `/help`, `/doctor`, `/config`, `/api`, `/project`, `/model`,
 `/provider`, `/mcp`, `/plugins`, `/capabilities`, `/prompts`, `/skills`, `/decompilate`,
 `/trees`, `/todo`, `/ast`, `/remember`, `/recall`, `/sandbox`, `/run`, `/export`, `/context`,
-`/compact`, `/new`, `/sessions`, `/update` y `/exit`. La entrada soporta historial (flechas ↑/↓),
-referencias `@archivo` confinadas al workspace y streaming en vivo de la respuesta.
+`/compact`, `/new`, `/sessions`, `/banner`, `/update` y `/exit`. La entrada soporta historial
+(flechas ↑/↓), referencias `@archivo` confinadas al workspace y streaming en vivo de la respuesta.
+El wordmark ASCII de KSPR se dibuja al iniciar el shell y puede redibujarse con `/banner`.
 
 ## Gemini real
 

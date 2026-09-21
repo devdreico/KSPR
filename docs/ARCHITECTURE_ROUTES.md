@@ -51,6 +51,7 @@ La interfaz de comandos interactiva maneja el siguiente enrutamiento de comandos
 | `/export` | Exporta la transcripción de la sesión (`md`/`json`). |
 | `/context` | Inspección de archivos adjuntos activos en la sesión. |
 | `/compact` / `/new` / `/sessions` | Gestión de contexto y sesiones persistentes. |
+| `/banner` | Redibuja el wordmark ASCII de KSPR con el proveedor/modelo activos. |
 | `/clear` | Limpia la pantalla y redibuja el dashboard ejecutivo. |
 | `/update` | Actualización automática mediante `install.sh`. |
 | `/exit` | Cierre de la sesión interactiva. |

@@ -21,10 +21,10 @@ Para garantizar mantenibilidad, testendibilidad y evolución independiente, KSPR
 - **`auth.py` / `permissions.py` / `todos.py` / `memory.py`**: Seguridad JWT, hashing, control de acceso perimetral y gestión de tareas.
 - **`cli/kspr.py` (Lógica Funcional)**: Bucle interactivo de comandos, lectura de entrada de usuario (`get_input_with_tab`), carga/guardado de configuración JSON, manejo de referencias `@archivo` y llamadas asíncronas a proveedores.
 
-### Capa de Diseño y Presentación (`cli/kspr.py` visual & `frontend/`)
-- **`Color` (Clase ANSI)**: Definición de paleta monocromática de alto contraste (Blanco, Gris Claro, Gris Medio).
-- **`KSPR_ASCII`**: Arte ASCII oficial del logotipo de KSPR.
-- **`print_header()`**: Renderizado del título y cabecera visual al iniciar la CLI.
+### Capa de Diseño y Presentación (`cli/kspr_terminal_ui.py` & `frontend/`)
+- **`TerminalTheme` (Clase ANSI)**: Definición de paleta monocromática de alto contraste (Blanco, Silver, Graphite, Charcoal).
+- **`KSPR_ASCII`**: Wordmark ASCII oficial de KSPR (bloque monocromo `░`), restaurado y alineado en la capa de UI.
+- **`TerminalUI.print_header()`**: Renderizado del wordmark y la cabecera visual al iniciar la CLI; también accesible con `/banner`.
 - **`print_dashboard()`**: Representación visual del estado de sesión (Proveedor, Modelo, Iteraciones, Workspace, Archivos adjuntos y barra de uso de contexto con pesos en tokens).
 - **`print_box()` / `print_response_box()`**: Constructores de cajas de texto dinámicas con ajuste de ancho de terminal y soporte flexible para cadenas (`str`) o listas de cadenas (`list[str]`).
 - **`animate_spinner()`**: Animación de espera visual con indicador de tiempo transcurrido en segundos.

@@ -181,8 +181,8 @@ def print_box(title: str, lines: list[str], color: Any = None) -> None:
     TerminalUI.print_box(title, lines)
 
 
-def print_header() -> None:
-    pass
+def print_header(subtitle: str = "") -> None:
+    TerminalUI.print_header(subtitle or f"v{__version__}")
 
 
 print_dashboard = TerminalUI.print_session_banner
@@ -521,12 +521,15 @@ async def interactive_shell() -> None:
                     "/new                 - Start a fresh session",
                     "/sessions            - Browse and restore saved sessions",
                     "/clear               - Clear screen and redraw dashboard",
+                    "/banner              - Redraw the KSPR ASCII wordmark",
                     "/update              - Update KSPR to latest version",
                     "/exit                - Exit interactive session",
                 ], Color.WHITE)
+            elif cmd == "/banner":
+                print_header(f"{active_provider}:{active_model}")
             elif cmd == "/clear":
                 os.system("cls" if os.name == "nt" else "clear")
-                print_header()
+                print_header(f"{active_provider}:{active_model}")
                 print_dashboard(active_provider, active_model, current_workspace, len(attached_files), tokens_used, max_tokens)
                 print()
             elif cmd == "/login":
