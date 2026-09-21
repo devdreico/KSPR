@@ -5,15 +5,40 @@ type BotanicalProps = {
   style?: React.CSSProperties;
 };
 
+/* Hojas: origen en el punto de inserción (0,0), punta en (0,-100). */
+const BROAD_LEAF =
+  "M0 0 C -20 -12 -31 -32 -30 -54 C -29 -76 -16 -93 0 -100 C 17 -93 31 -76 32 -54 C 33 -32 20 -12 0 0 Z";
+
+const NARROW_LEAF =
+  "M0 0 C -10 -16 -14 -50 -11 -76 C -9 -92 -5 -100 0 -100 C 5 -100 9 -92 11 -76 C 14 -50 10 -16 0 0 Z";
+
+const MONSTERA_LEAF =
+  "M100 14 C 124 18 146 32 158 52 C 172 72 181 88 181 102 " +
+  "C 168 102 158 104 148 106 C 164 116 176 128 180 142 " +
+  "C 182 156 179 166 178 172 C 166 170 158 172 152 174 " +
+  "C 166 184 174 194 176 204 C 177 214 172 219 168 223 " +
+  "C 156 220 142 224 132 228 C 126 244 116 254 100 258 " +
+  "C 84 254 76 246 70 238 C 60 242 50 246 40 244 " +
+  "C 30 232 26 216 28 206 C 35 202 42 199 48 196 " +
+  "C 34 188 25 178 23 166 C 21 152 20 140 20 130 " +
+  "C 30 132 42 133 52 134 C 40 124 28 112 23 98 " +
+  "C 20 82 24 68 34 54 C 48 34 74 20 100 14 Z " +
+  "M120 128 a7 11 0 1 0 14 0 a7 11 0 1 0 -14 0 Z " +
+  "M72 200 a6 10 0 1 0 12 0 a6 10 0 1 0 -12 0 Z";
+
+type LeafTransform = { x: number; y: number; r: number; s: number };
+
 export function LeafBranch({ className, style }: BotanicalProps) {
-  const leaves = [
-    { cx: 104, cy: 58, rx: 30, ry: 12, rot: -58 },
-    { cx: 96, cy: 92, rx: 34, ry: 13, rot: 56 },
-    { cx: 106, cy: 132, rx: 33, ry: 13, rot: -60 },
-    { cx: 96, cy: 172, rx: 36, ry: 14, rot: 58 },
-    { cx: 106, cy: 214, rx: 34, ry: 13, rot: -62 },
-    { cx: 98, cy: 254, rx: 31, ry: 12, rot: 60 },
-    { cx: 105, cy: 292, rx: 26, ry: 11, rot: -64 },
+  const leaves: LeafTransform[] = [
+    { x: 99, y: 306, r: -66, s: 0.5 },
+    { x: 104, y: 272, r: 60, s: 0.47 },
+    { x: 97, y: 238, r: -63, s: 0.44 },
+    { x: 94, y: 202, r: 58, s: 0.41 },
+    { x: 99, y: 166, r: -62, s: 0.38 },
+    { x: 102, y: 130, r: 56, s: 0.34 },
+    { x: 99, y: 96, r: -60, s: 0.3 },
+    { x: 101, y: 62, r: 52, s: 0.25 },
+    { x: 100, y: 30, r: -4, s: 0.19 },
   ];
 
   return (
@@ -28,21 +53,18 @@ export function LeafBranch({ className, style }: BotanicalProps) {
       <path
         className="botanical-stem"
         pathLength={1}
-        d="M100 340 C 106 258 96 168 104 22"
+        d="M100 338 C 94 286 106 236 99 186 C 93 140 104 92 100 20"
         fill="none"
         stroke="currentColor"
         strokeWidth="3"
         strokeLinecap="round"
       />
       {leaves.map((leaf, i) => (
-        <g key={i} transform={`rotate(${leaf.rot} ${leaf.cx} ${leaf.cy})`}>
-          <ellipse
+        <g key={i} transform={`translate(${leaf.x} ${leaf.y}) rotate(${leaf.r}) scale(${leaf.s})`}>
+          <path
             className="botanical-leaf"
-            style={{ animationDelay: `${0.4 + i * 0.28}s` }}
-            cx={leaf.cx}
-            cy={leaf.cy}
-            rx={leaf.rx}
-            ry={leaf.ry}
+            style={{ animationDelay: `${0.35 + i * 0.22}s` }}
+            d={BROAD_LEAF}
           />
         </g>
       ))}
@@ -51,12 +73,14 @@ export function LeafBranch({ className, style }: BotanicalProps) {
 }
 
 export function Fern({ className, style }: BotanicalProps) {
-  const pinnae = Array.from({ length: 16 }, (_, i) => {
-    const t = i / 15;
-    const y = 24 + t * 290;
-    const spread = 62 * Math.sin(Math.PI * (0.18 + t * 0.82));
-    const len = 30 * Math.sin(Math.PI * (0.2 + t * 0.8)) + 8;
-    return { y, spread, len, rot: -34 - t * 12 };
+  const levels = Array.from({ length: 14 }, (_, i) => {
+    const t = i / 13;
+    return {
+      y: 300 - t * 258,
+      x: 100 + Math.sin(t * 3.1) * 4,
+      scale: 0.42 - t * 0.31,
+      rot: 70 + t * 10,
+    };
   });
 
   return (
@@ -71,36 +95,33 @@ export function Fern({ className, style }: BotanicalProps) {
       <path
         className="botanical-stem"
         pathLength={1}
-        d="M100 338 C 102 250 98 140 100 18"
+        d="M100 336 C 96 258 104 160 100 18"
         fill="none"
         stroke="currentColor"
         strokeWidth="2.5"
         strokeLinecap="round"
       />
-      {pinnae.map((p, i) => (
+      {levels.map((p, i) => (
         <g key={i}>
-          <g transform={`rotate(${-p.rot} ${100 - p.spread} ${p.y})`}>
-            <ellipse
+          <g transform={`translate(${p.x} ${p.y}) rotate(${-p.rot}) scale(${p.scale})`}>
+            <path
               className="botanical-leaf"
-              style={{ animationDelay: `${0.5 + i * 0.16}s` }}
-              cx={100 - p.spread}
-              cy={p.y}
-              rx={p.len}
-              ry="6"
+              style={{ animationDelay: `${0.4 + i * 0.12}s` }}
+              d={NARROW_LEAF}
             />
           </g>
-          <g transform={`rotate(${p.rot} ${100 + p.spread} ${p.y})`}>
-            <ellipse
+          <g transform={`translate(${p.x} ${p.y - 4}) rotate(${p.rot - 4}) scale(${p.scale * 0.92})`}>
+            <path
               className="botanical-leaf"
-              style={{ animationDelay: `${0.58 + i * 0.16}s` }}
-              cx={100 + p.spread}
-              cy={p.y}
-              rx={p.len}
-              ry="6"
+              style={{ animationDelay: `${0.46 + i * 0.12}s` }}
+              d={NARROW_LEAF}
             />
           </g>
         </g>
       ))}
+      <g transform="translate(100 40) rotate(-3) scale(0.16)">
+        <path className="botanical-leaf" style={{ animationDelay: "0.3s" }} d={NARROW_LEAF} />
+      </g>
     </svg>
   );
 }
@@ -118,73 +139,55 @@ export function MonsteraLeaf({ className, style }: BotanicalProps) {
       <path
         className="botanical-stem"
         pathLength={1}
-        d="M100 336 L100 150"
-        stroke="currentColor"
-        strokeWidth="4"
+        d="M100 338 C 100 306 99 284 100 256"
         fill="none"
+        stroke="currentColor"
+        strokeWidth="5"
         strokeLinecap="round"
       />
       <path
         className="botanical-leaf"
-        style={{ animationDelay: "0.5s" }}
-        d="M100 12
-           C 142 34, 176 76, 178 122
-           C 162 120, 148 126, 140 138
-           C 168 150, 184 178, 180 208
-           C 162 202, 146 206, 138 218
-           C 160 236, 166 268, 152 300
-           C 130 286, 114 288, 100 306
-           C 86 288, 70 286, 48 300
-           C 34 268, 40 236, 62 218
-           C 54 206, 38 202, 20 208
-           C 16 178, 32 150, 60 138
-           C 52 126, 38 120, 22 122
-           C 24 76, 58 34, 100 12 Z"
-      />
-      <path
-        className="botanical-vein"
-        pathLength={1}
-        d="M100 22 L100 300"
-        stroke="currentColor"
-        strokeWidth="3"
-        fill="none"
-        strokeLinecap="round"
+        style={{ animationDelay: "0.35s" }}
+        d={MONSTERA_LEAF}
+        fillRule="evenodd"
       />
     </svg>
   );
 }
 
-export function VineDivider({ className, style }: BotanicalProps) {
-  const leaves = [90, 220, 360, 500, 640, 780, 920, 1060, 1140];
+export function Sprig({ className, style }: BotanicalProps) {
+  const leaves: LeafTransform[] = [
+    { x: 22, y: 46, r: -34, s: 0.3 },
+    { x: 60, y: 38, r: 28, s: 0.3 },
+    { x: 100, y: 31, r: -32, s: 0.28 },
+    { x: 142, y: 24, r: 26, s: 0.24 },
+    { x: 184, y: 18, r: -30, s: 0.2 },
+  ];
+
   return (
     <svg
-      viewBox="0 0 1200 60"
+      viewBox="0 0 240 60"
       className={className}
       style={style}
       fill="currentColor"
-      preserveAspectRatio="none"
       aria-hidden="true"
       focusable="false"
     >
       <path
         className="botanical-stem"
         pathLength={1}
-        d="M0 30 C 200 6, 400 54, 600 30 C 800 6, 1000 54, 1200 30"
+        d="M2 50 C 60 42 130 30 238 8"
         fill="none"
         stroke="currentColor"
-        strokeWidth="1.5"
-        opacity="0.6"
+        strokeWidth="2"
+        strokeLinecap="round"
       />
-      {leaves.map((x, i) => (
-        <g key={i} transform={`rotate(${i % 2 === 0 ? -28 : 28} ${x} 30)`}>
-          <ellipse
+      {leaves.map((leaf, i) => (
+        <g key={i} transform={`translate(${leaf.x} ${leaf.y}) rotate(${leaf.r}) scale(${leaf.s})`}>
+          <path
             className="botanical-leaf"
             style={{ animationDelay: `${0.3 + i * 0.18}s` }}
-            cx={x}
-            cy={30}
-            rx="20"
-            ry="6"
-            opacity="0.6"
+            d={BROAD_LEAF}
           />
         </g>
       ))}

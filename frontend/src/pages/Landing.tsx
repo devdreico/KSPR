@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Terminal, Copy, Check, Sparkles, Shield, FolderArchive, Cpu, ExternalLink, Monitor, CreditCard, Zap, Layers, Activity, Search } from "lucide-react";
-import { LeafBranch, Fern, MonsteraLeaf, VineDivider } from "../components/Botanical";
+import { LeafBranch, Fern, MonsteraLeaf, Sprig } from "../components/Botanical";
 import { Typewriter } from "../components/Typewriter";
 import { useAtmosphere, useReveal, useTilt } from "../hooks/useInteractions";
 
@@ -264,7 +264,9 @@ export function Landing() {
         </section>
 
         <div className="divider-wrap" aria-hidden="true">
-          <VineDivider className="vine" />
+          <span className="vine-line" />
+          <Sprig className="vine-sprig" />
+          <span className="vine-line" />
         </div>
 
         {/* Cinematic Hardware Decomposition Example (Planar Headphones) */}
@@ -421,7 +423,9 @@ export function Landing() {
         </section>
 
         <div className="divider-wrap" aria-hidden="true">
-          <VineDivider className="vine" />
+          <span className="vine-line" />
+          <Sprig className="vine-sprig" />
+          <span className="vine-line" />
         </div>
 
         {/* Feature Grid */}
