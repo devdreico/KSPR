@@ -1,23 +1,30 @@
-# KSPR AI - Empresarial
+# KSPR AI CLI TOOL
 
-**KSPR AI - Empresarial** (impulsado por el modelo de inteligencia artificial **KSPR I**) transforma repositorios y contextos legados en un mapa técnico auditable y reutilizable por otros agentes.
+**Knowledge Source Parsing & Reconstruction Artificial Intelligence Command Line Interface Tool**
 
-KSPR I recupera funcionalidades de interfaces y backend —botones, enlaces, formularios, eventos, consultas, procedimientos, rutas y mutaciones de estado—, contrasta sus hallazgos mediante iteraciones y exporta una carpeta Markdown de contexto masivo.
+KSPR AI CLI TOOL es una herramienta de línea de comandos para descomponer y reconstruir procesos ingenieriles, sistemas legados, objetos técnicos y fuentes de conocimiento complejas. Convierte código, documentación, artefactos binarios y contexto disperso en una representación técnica estructurada, trazable y reutilizable por personas y agentes de IA.
 
-## Alcance inicial
+Su principio es simple: separar lo que la evidencia demuestra de lo que el análisis infiere. KSPR identifica componentes, relaciones, flujos, dependencias, riesgos y preguntas abiertas; conserva las referencias que sustentan cada hallazgo y entrega un paquete de contexto que puede inspeccionarse, contrastarse y continuar desarrollándose.
 
-- Importación de archivos pegados, múltiples archivos, ZIP y repositorios Git mediante la CLI (opción --git-url).
-- Extracción estática segura por heurísticas: componentes UI, handlers, rutas HTTP, SQL, dependencias y puntos de mutación.
-- Análisis híbrido: respuesta directa para contextos pequeños y jobs asíncronos para contextos grandes.
-- Conexión real con Google Gemini, selección de modelos habilitados por API y `KSPR Local` para comprobar la interfaz sin credenciales.
-- Conexión de endpoints OpenAI-compatible para gateways y proveedores compatibles, con distribución de modelos por proveedor; los proveedores personalizados importados se enrutan por el mismo contrato.
-- Shell de trabajo tipo agente: sesiones persistentes locales, paleta `Ctrl/Cmd+K`, comandos slash con plantillas y argumentos, referencias `@archivo`, pegar/arrastrar archivos, detener respuestas con `Ctrl+G`, Main Prompt y configuración de agente.
-- Catálogo extensible: descubre modelos desde la API o crea modelos manuales con ID, proveedor y endpoint compatible.
-- Configuración portable de referencia en `examples/kspr.config.example.json`, compatible con el flujo de importación/exportación de la interfaz.
-- Paquete de contexto con índice, inventario UI, mapa de flujos, contratos, riesgos, contradicciones, preguntas abiertas y trazabilidad.
-- UI React con identidad Phantom: negro carbón, grises fríos, líneas finas, tipografía técnica y estados de progreso legibles.
+## Qué resuelve
 
-## Ejecutar el backend
+- **Descomposición de sistemas**: extrae interfaces, handlers, rutas HTTP, operaciones SQL, dependencias, eventos y mutaciones de estado.
+- **Reconstrucción de conocimiento**: organiza múltiples fuentes en índices, inventarios, mapas de flujo, contratos, riesgos, contradicciones y preguntas abiertas.
+- **Ingeniería inversa estática**: inspecciona archivos, binarios, firmware y capturas sin ejecutar el artefacto analizado; conserva hashes, offsets, símbolos y firmas.
+- **Análisis progresivo**: combina respuesta directa para contextos pequeños con jobs asíncronos, streaming de progreso e iteraciones para contextos grandes.
+- **Orquestación extensible**: conecta Gemini, proveedores OpenAI-compatible, modelos locales, MCP, plugins y capabilities externas bajo permisos explícitos.
+- **Salida auditable**: exporta Markdown y JSON para que otro equipo, sistema o agente pueda verificar el origen de cada conclusión.
+
+## Capacidades verificables
+
+- Importación de archivos pegados, múltiples archivos, ZIP y repositorios Git mediante `--git-url`.
+- Shell interactivo con sesiones persistentes, paleta `Ctrl/Cmd+K`, comandos slash, referencias `@archivo`, historial y configuración de agente.
+- Catálogo de modelos consultable por API y modelos manuales con proveedor y endpoint compatible.
+- `KSPR Local` para validar el flujo de conversación sin credenciales externas.
+- Configuración portable en `examples/kspr.config.example.json`.
+- UI React con estados de progreso observables y contexto de sesión.
+
+## Ejecutar el motor
 
 ```bash
 python -m venv .venv
@@ -40,7 +47,7 @@ La UI espera la API en `http://localhost:8000` o en `VITE_API_URL`.
 
 Para Vercel, importa `frontend/` como proyecto Vite y define `VITE_API_URL` con la URL pública del backend. El rewrite SPA ya está incluido en `frontend/vercel.json`. El backend FastAPI puede desplegarse como proyecto Vercel independiente siguiendo la entrada `backend/kspr_engine/main.py` y manteniendo las variables `KSPR_*` exclusivamente en el entorno del servidor.
 
-## CLI
+## CLI de KSPR AI
 
 Puedes instalar y ejecutar KSPR directamente desde **npm**:
 
@@ -62,7 +69,7 @@ python cli/kspr.py --git-url https://github.com/org/repo.git --output ./kspr-con
 
 La CLI nunca ejecuta el código analizado: solo lee archivos permitidos y genera evidencia estructurada.
 
-### Shell interactivo premium
+### Shell interactivo
 
 El shell usa `prompt_toolkit` + `rich` con paleta grayscale y temas opcionales (`/theme phosphor`,
 `amber`, `ice`, `void`). Al escribir `/` se despliega el menú completo de comandos y cada letra
@@ -71,7 +78,7 @@ archivos del workspace, `#` modelos, `%` agentes. `Ctrl+K` abre la paleta de com
 ayuda y el toolbar inferior muestra proveedor, modelo, contexto y workspace en vivo. Cuando no hay
 TTY se usa un fallback `readline` con historial.
 
-### Ingeniería inversa real
+### Ingeniería inversa estática
 
 Comandos de análisis: `/recon`, `/file`, `/hashes`, `/strings`, `/hex`, `/sections`, `/imports`,
 `/exports`, `/symbols`, `/entropy`, `/disasm`, `/decompile`, `/pseudo`, `/cfg`, `/graph`,
@@ -89,6 +96,6 @@ Comandos base: `/help`, `/doctor`, `/config`, `/api`, `/project`, `/model`, `/pr
 `/banner`, `/theme`, `/update` y `/exit`. El wordmark ASCII de KSPR se dibuja al iniciar y con
 `/banner`.
 
-## Gemini real
+## Proveedores de IA
 
-Configura `KSPR_GEMINI_API_KEY` en el entorno o conéctala desde `/connect` en la interfaz. KSPR consulta los modelos reales mediante `models.list` y el chat usa `models.generateContent` con el modelo seleccionado. También puedes conectar un endpoint `openai-compatible` desde la misma pantalla.
+Configura `KSPR_GEMINI_API_KEY` en el entorno o conéctala desde `/connect` en la interfaz. KSPR consulta los modelos reales mediante `models.list` y el chat usa `models.generateContent` con el modelo seleccionado. También puedes conectar un endpoint `openai-compatible` desde la misma pantalla. Las credenciales se mantienen en el ámbito de la sesión y no se persisten en el servidor.

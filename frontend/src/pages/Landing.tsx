@@ -64,10 +64,10 @@ export function Landing() {
       {/* Topbar */}
       <header className="topbar">
         <div className="brand">
-          <img src="/casper-ai-logo.png" alt="KSPR AI" className="brand-logo" />
+          <img src="/casper-ai-logo.png" alt="KSPR AI CLI TOOL" className="brand-logo" />
           <div>
             <strong style={{ fontWeight: 700 }}>KSPR CLI</strong>
-            <span style={{ fontWeight: 500 }}>Reverse Engineering Engine v0.1.0</span>
+            <span style={{ fontWeight: 500 }}>Knowledge Source Parsing & Reconstruction · v0.1.0</span>
           </div>
         </div>
         
@@ -94,15 +94,15 @@ export function Landing() {
         {/* Hero Section */}
         <section className="hero">
           <div className="section-tag">
-            <Sparkles size={14} /> KSPR ENGINE · AGENTE DE INGENIERÍA INVERSA ESTÁTICA
+            <Sparkles size={14} /> KSPR AI CLI TOOL · PARSING Y RECONSTRUCCIÓN DE CONOCIMIENTO
           </div>
           
           <h1 style={{ fontWeight: 700 }}>
-            Transforma sistemas legados y hardware en <em style={{ fontWeight: 400 }}>mapas de contexto</em> desde la terminal.
+            Descompón sistemas complejos y reconstruye su conocimiento técnico <em style={{ fontWeight: 400 }}>desde la terminal</em>.
           </h1>
           
           <p style={{ fontWeight: 400 }}>
-            Motor autónomo de ingeniería inversa estática desarrollado por <strong style={{ fontWeight: 700 }}>Soverath Holding (Bogotá D.C. - Colombia)</strong>. Analiza repositorios de código, esquemáticos, PDFs técnicos, imágenes y enlaces web mediante análisis estricto sin ejecución, generando árboles de conocimiento auditables para arquitectos e ingenieros de élite.
+            Herramienta de línea de comandos para analizar repositorios, esquemáticos, PDFs técnicos, imágenes y enlaces web sin ejecutar el artefacto. KSPR AI CLI TOOL conserva la evidencia, separa hechos de inferencias y genera árboles de conocimiento auditables para comprender, documentar y reconstruir procesos.
           </p>
 
           {/* Action Strip: Curl + Membership Side-by-Side */}
@@ -156,10 +156,10 @@ export function Landing() {
               <Zap size={15} /> CLIENTE NATIVO DE ESCRITORIO DISPONIBLE
             </div>
             <h3 style={{ margin: 0, fontSize: "22px", fontWeight: 700, color: "#fff" }}>
-              KSPR AI Desktop — Entorno Gráfico Avanzado
+              KSPR AI Desktop — Entorno visual para explorar el conocimiento
             </h3>
             <p style={{ margin: "8px 0 0", color: "var(--muted)", fontSize: "15px", maxWidth: "720px", fontWeight: 400 }}>
-              ¿Prefieres una interfaz visual nativa con control de grafos y MCP servers en tiempo real? Accede al cliente de escritorio oficial en la infraestructura de Soverath Holding.
+              ¿Prefieres explorar sesiones, grafos y servidores MCP desde una interfaz visual? Accede al cliente de escritorio de KSPR AI CLI TOOL.
             </p>
           </div>
           <a
@@ -198,25 +198,25 @@ export function Landing() {
           <div className="grid-cards">
             <div className="card">
               <Shield size={28} color="#ffffff" />
-              <h3 style={{ fontWeight: 700 }}>1. Auditoría y Taint Analysis sin Ejecución</h3>
+              <h3 style={{ fontWeight: 700 }}>1. Evidencia estática y trazabilidad</h3>
               <p>
-                Analiza software crítico de cadena de suministro y repositorios legados con 0% de riesgo de runtime. KSPR rastrea entradas de usuario desde controladores hasta sumideros de riesgo (SQLi, XSS, RCE) puramente mediante AST y análisis sintáctico.
+                Inspecciona software crítico y repositorios legados sin ejecutar el código. KSPR rastrea entradas, handlers y puntos sensibles mediante AST y análisis sintáctico, conservando las referencias que sostienen cada hallazgo.
               </p>
             </div>
 
             <div className="card">
               <Layers size={28} color="#d4d4d8" />
-              <h3 style={{ fontWeight: 700 }}>2. Decompilación Multi-Modal con /decompilate</h3>
+              <h3 style={{ fontWeight: 700 }}>2. Parsing multi-fuente con /decompilate</h3>
               <p>
-                Ingesta simultánea de PDFs, esquemáticos en imagen (.jpg, .png, .heif), notas de texto y enlaces web. KSPR agrupa la evidencia y genera árboles de contexto estructurados en carpetas con sub-archivos Markdown granulares.
+                Reúne PDFs, imágenes, notas y enlaces en un mismo análisis. KSPR agrupa la evidencia y genera árboles de contexto estructurados en carpetas Markdown que pueden revisarse y ampliarse.
               </p>
             </div>
 
             <div className="card">
               <Cpu size={28} color="#a1a1aa" />
-              <h3 style={{ fontWeight: 700 }}>3. Orquestación Multi-LLM y Tool-Calling</h3>
+              <h3 style={{ fontWeight: 700 }}>3. Orquestación de modelos y capacidades</h3>
               <p>
-                Bucle agéntico autónomo de hasta 10 iteraciones (KSPR I) respaldado por 9 proveedores (Gemini, Claude 3.5, GPT-4o, DeepSeek, Groq, OpenRouter, OpenCode Zen, Local). Invoca herramientas y corrige hipótesis dinámicamente.
+                Coordina proveedores de IA, MCP, plugins y capabilities con permisos explícitos. Las iteraciones contrastan hipótesis, riesgos y contradicciones sin confundir una inferencia con una prueba.
               </p>
             </div>
           </div>
@@ -227,7 +227,7 @@ export function Landing() {
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24, flexWrap: "wrap", gap: 16 }}>
             <div>
               <span style={{ color: "#d4d4d8", fontSize: "12px", fontWeight: 600, letterSpacing: ".12em" }}>DEMOSTRACIÓN DE CAPACIDAD TÉCNICA</span>
-              <h2 style={{ fontSize: "26px", margin: "6px 0 0", fontWeight: 700 }}>Decompilación Estática de Hardware: Audífonos Planar Hi-Fi</h2>
+              <h2 style={{ fontSize: "26px", margin: "6px 0 0", fontWeight: 700 }}>Demostración: reconstrucción técnica de unos audífonos planar Hi-Fi</h2>
             </div>
             <span style={{ color: "var(--muted)", fontSize: "12px", fontWeight: 500 }}>Soverath Holding · Bogotá D.C.</span>
           </div>
@@ -257,7 +257,7 @@ export function Landing() {
             </div>
 
             <div style={{ background: "#010103", padding: "30px", borderRadius: "16px", border: "1px solid var(--line)", fontSize: "13px", display: "flex", flexDirection: "column", justifyContent: "center" }}>
-              <div style={{ color: "var(--muted)", marginBottom: "10px", fontWeight: 500 }}># Resultado del Árbol de Contexto Generado:</div>
+              <div style={{ color: "var(--muted)", marginBottom: "10px", fontWeight: 500 }}># Evidencia estructurada generada:</div>
               <pre style={{ margin: 0, color: "#d4d4d8", whiteSpace: "pre-wrap", lineHeight: 1.7, fontWeight: 500 }}>
                 {headphoneDecompParts[decompTab].output}
               </pre>
@@ -270,7 +270,7 @@ export function Landing() {
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20, flexWrap: "wrap", gap: 16 }}>
             <div>
               <span style={{ color: "#d4d4d8", fontSize: "12px", fontWeight: 600, letterSpacing: ".12em" }}>TERMINAL CLI</span>
-              <h2 style={{ fontSize: "24px", margin: "6px 0 0", fontWeight: 700 }}>Simulador de Comandos y Flujo Interactivo</h2>
+              <h2 style={{ fontSize: "24px", margin: "6px 0 0", fontWeight: 700 }}>Recorrido interactivo del flujo de análisis</h2>
             </div>
             <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
               <button
@@ -295,7 +295,7 @@ export function Landing() {
                 onClick={() => setTerminalTab("dev")}
                 className={`decomp-tab ${terminalTab === "dev" ? "active" : ""}`}
               >
-                4. Shell KSPR I
+                4. Shell KSPR AI CLI TOOL
               </button>
             </div>
           </div>
@@ -344,7 +344,7 @@ export function Landing() {
                   <div style={{ color: "#71717a" }}># Ingesta multi-fuente y compilación de Context Trees</div>
                   <div style={{ color: "#ffffff", margin: "10px 0", fontWeight: 600 }}>$ kspr /decompilate ./specs.pdf ./diagram.png https://docs.api.com</div>
                   {simStep >= 1 && <div style={{ color: "#d4d4d8", marginTop: "8px" }}>[1/3] Fuentes indexadas y subidas a staging workspace.</div>}
-                  {simStep >= 2 && <div style={{ color: "#a1a1aa", marginTop: "6px" }}>[2/3] Análisis agéntico con KSPR I y extracción heurística...</div>}
+                  {simStep >= 2 && <div style={{ color: "#a1a1aa", marginTop: "6px" }}>[2/3] Análisis agéntico con KSPR AI CLI TOOL y extracción heurística...</div>}
                   {simStep >= 3 && <div style={{ color: "#71717a", marginTop: "6px" }}>[3/3] Generación de Contexto inicial.md y archivos modulares...</div>}
                   {simStep >= 4 && (
                     <div style={{ color: "#ffffff", marginTop: "12px", borderTop: "1px dashed #27272a", paddingTop: "10px", fontWeight: 600 }}>
@@ -368,11 +368,11 @@ export function Landing() {
 
               {terminalTab === "dev" && (
                 <div>
-                  <div style={{ color: "#71717a" }}># Iniciar shell interactivo de KSPR I</div>
+                  <div style={{ color: "#71717a" }}># Iniciar shell interactivo de KSPR AI CLI TOOL</div>
                   <div style={{ color: "#ffffff", margin: "10px 0", fontWeight: 600 }}>$ kspr --interactive</div>
                   <div style={{ color: "#e2e8f0", marginTop: "8px" }}>
-                    <span style={{ color: "#d4d4d8", fontWeight: 600 }}>  KSPR CLI — OpenCode Interactive Terminal Agent (v0.1.0)</span><br/>
-                    <span style={{ color: "#a1a1aa" }}>  Usa @ para adjuntar archivos, o comandos /decompilate, /trees, /capabilities.</span><br/>
+                    <span style={{ color: "#d4d4d8", fontWeight: 600 }}>  KSPR AI CLI TOOL — Interactive Knowledge Reconstruction (v0.1.0)</span><br/>
+                    <span style={{ color: "#a1a1aa" }}>  Usa @ para adjuntar archivos, o /decompilate, /trees y /capabilities.</span><br/>
                     <span style={{ color: "#ffffff", fontWeight: 700 }}>kspr (architect)&gt; /trees</span>
                   </div>
                 </div>
@@ -406,7 +406,7 @@ export function Landing() {
       {/* Footer */}
       <footer>
         <div>
-          <span className="footer-brand">KSPR AI</span> · Terminal-First Reverse Engineering Agent
+          <span className="footer-brand">KSPR AI CLI TOOL</span> · Knowledge Source Parsing & Reconstruction
         </div>
         <div className="footer-provenance">
           Engineered & Maintained by Soverath Holding · Bogotá D.C. - Colombia

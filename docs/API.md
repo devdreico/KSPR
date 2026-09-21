@@ -1,6 +1,6 @@
-# API inicial
+# API del KSPR AI CLI TOOL
 
-Base local: http://localhost:8000.
+Base local: `http://localhost:8000`. La API expone el motor de ingesta, análisis, streaming, jobs y proveedores; sus respuestas están diseñadas para conservar un resultado técnico verificable.
 
 | Método | Ruta | Propósito |
 | --- | --- | --- |

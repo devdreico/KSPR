@@ -1,13 +1,13 @@
 ---
 name: security-audit
-description: Source code security audit tools
+description: KSPR AI CLI TOOL skills for source code security audits
 category: security
 version: 0.1.0
 ---
 
-# Security Audit Skills
+# Security Audit Skills for KSPR AI CLI TOOL
 
-Tools for detecting vulnerabilities and security issues.
+Structured checks for common vulnerability classes and security evidence in source code and dependencies.
 
 ## Commands
 

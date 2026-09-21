@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "kspr-ai"
 version = "0.1.0"
-description = "KSPR AI - Empresarial — Powered by KSPR Engine"
+description = "KSPR AI CLI TOOL — Knowledge Source Parsing & Reconstruction Artificial Intelligence Command Line Interface Tool"
 requires-python = ">=3.11"
 dependencies = [
   "fastapi>=0.115.0",

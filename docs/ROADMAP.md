@@ -1,6 +1,6 @@
-# KSPR AI - Empresarial — alcance y primeras metas
+# KSPR AI CLI TOOL — alcance y evolución
 
-## Entregado en v0.1
+## Disponible en v0.1
 
 - Workspace web Phantom en escala de grises.
 - Pegado y carga múltiple de archivos.

@@ -1,10 +1,10 @@
-# KSPR-AI — Plan de Implementación: Capability Layer, /prompts y gsap-skills
+# KSPR AI CLI TOOL — plan de capacidades, `/prompts` y `gsap-skills`
 
 ---
 
 ## 1. Resumen Ejecutivo
 
-Este plan documenta tres cambios fundamentales que transformarán a KSPR-AI de un orquestador de LLMs con herramientas MCP y plugins en una plataforma extensible con capacidades nativas de descubrimiento y ejecución de herramientas CLI.
+Este plan documenta la evolución de KSPR AI CLI TOOL hacia una plataforma extensible para descubrir, describir y ejecutar capacidades externas desde una interfaz unificada. La capa de capacidades amplía el análisis sin ocultar el origen de cada herramienta ni sus permisos.
 
 ### Los Tres Cambios
 
@@ -2353,7 +2353,7 @@ skills/gsap-skills/
 {
   "version": "1.0.0",
   "name": "gsap-skills",
-  "description": "Skills base para KSPR-AI",
+    "description": "Skills base para KSPR AI CLI TOOL",
   "skills": {
     "cli-anything-default": {
       "name": "cli-anything-default",
@@ -2387,7 +2387,7 @@ Este skill enseña a KSPR I cómo usar la Capability Layer:
 ```markdown
 ---
 name: cli-anything-default
-description: Guía completa para usar la Capability Layer de KSPR-AI
+description: Guía completa para usar la Capability Layer de KSPR AI CLI TOOL
 category: core
 version: 0.1.0
 ---
@@ -3288,6 +3288,6 @@ class CapabilityDiscovery:
 
 ---
 
-*Documento generado como parte del plan de implementación de KSPR-AI.*
+*Documento generado como parte del plan de implementación de KSPR AI CLI TOOL.*
 *Fecha: 2026-09-18*
 *Estado: Plan en revisión*

@@ -86,14 +86,14 @@ const COMMANDS: CommandItem[] = [
   { id: "sessions", title: "Cambiar de sesión", description: "Busca entre las conversaciones guardadas", slash: "/sessions", shortcut: "⌘L" },
   { id: "models", title: "Cambiar modelo", description: "Abre el catálogo por proveedor", slash: "/models", shortcut: "⌘M" },
   { id: "provider", title: "Conectar proveedor", description: "Añade una API y descubre sus modelos", slash: "/connect" },
-  { id: "config", title: "Configuración de KSPR I", description: "Tema, agente, Main Prompt y comandos", slash: "/config" },
+  { id: "config", title: "Configuración de KSPR AI CLI TOOL", description: "Tema, agente, Main Prompt y comandos", slash: "/config" },
   { id: "agents", title: "Gestionar agentes", description: "Crea agentes con prompt, modo y permisos", slash: "/agents" },
   { id: "mcp", title: "Configurar MCP", description: "Gestiona el endpoint de contexto externo", slash: "/mcp" },
   { id: "permissions", title: "Permisos del agente", description: "Define si las acciones requieren aprobación", slash: "/permissions" },
   { id: "export", title: "Exportar conversación", description: "Descarga la sesión actual como Markdown", slash: "/export", shortcut: "⌘⇧E" },
   { id: "share", title: "Compartir conversación", description: "Copia una transcripción portable de la sesión", slash: "/share" },
   { id: "editor", title: "Editor de mensaje", description: "Enfoca el editor de conversación", slash: "/editor", shortcut: "⌘E" },
-  { id: "init", title: "Inicializar agente", description: "Abre el Main Prompt inicial de KSPR I", slash: "/init" },
+  { id: "init", title: "Inicializar agente", description: "Abre el Main Prompt inicial de KSPR AI CLI TOOL", slash: "/init" },
   { id: "compact", title: "Compactar sesión", description: "Reduce el contexto visible de la conversación", slash: "/compact" },
   { id: "thinking", title: "Mostrar revisiones", description: "Alterna el paquete de revisiones agenticas", slash: "/thinking" },
   { id: "details", title: "Detalles de ejecución", description: "Muestra el paquete técnico de salida", slash: "/details" },
@@ -178,7 +178,7 @@ function getSpeechRecognition(): RecognitionConstructor | undefined {
 }
 
 function sessionMarkdown(session: SessionRecord) {
-  return [`# ${session.title}`, "", `> Exportado por KSPR I · ${new Date(session.updatedAt).toLocaleString()}`, "", ...session.messages.flatMap((message) => [`## ${message.role === "user" ? "Usuario" : "KSPR I"}`, "", message.content, message.files?.length ? `\nArchivos: ${message.files.join(", ")}` : "", ""])].join("\n");
+  return [`# ${session.title}`, "", `> Exportado por KSPR AI CLI TOOL · ${new Date(session.updatedAt).toLocaleString()}`, "", ...session.messages.flatMap((message) => [`## ${message.role === "user" ? "Usuario" : "KSPR AI CLI TOOL"}`, "", message.content, message.files?.length ? `\nArchivos: ${message.files.join(", ")}` : "", ""])].join("\n");
 }
 
 function exportSession(session: SessionRecord | undefined) {
@@ -457,9 +457,9 @@ export function Studio() {
         ...Object.fromEntries(Object.entries(providerModels).map(([key, modelMap]) => [key, { name: key === "gemini" ? "Google Gemini" : key === "local" ? "KSPR" : "OpenAI-compatible", options: providerConfigs[key]?.baseUrl ? { baseURL: providerConfigs[key]?.baseUrl } : key === "openai-compatible" ? { baseURL: compatibleBaseUrl } : {}, models: modelMap }])),
       },
       agent: {
-        "kspr-i": { description: "KSPR I — Reverse engineering engine", mode: "primary", model: `${providerId}/${modelId}`, prompt: personalityMd },
-        "kspr-i-plan": { description: "KSPR I · Plan — analysis without changes", mode: "primary", model: `${providerId}/${modelId}`, prompt: `${personalityMd}\nWork in plan mode: separate decisions and do not propose destructive actions.` },
-        "kspr-i-review": { description: "KSPR I · Review — evidence review", mode: "primary", model: `${providerId}/${modelId}`, prompt: `${personalityMd}\nWork in review mode: look for contradictions, risks and missing evidence.` },
+        "kspr-i": { description: "KSPR AI CLI TOOL — knowledge reconstruction", mode: "primary", model: `${providerId}/${modelId}`, prompt: personalityMd },
+        "kspr-i-plan": { description: "KSPR AI CLI TOOL · Plan — analysis without changes", mode: "primary", model: `${providerId}/${modelId}`, prompt: `${personalityMd}\nWork in plan mode: separate decisions and do not propose destructive actions.` },
+        "kspr-i-review": { description: "KSPR AI CLI TOOL · Review — evidence review", mode: "primary", model: `${providerId}/${modelId}`, prompt: `${personalityMd}\nWork in review mode: look for contradictions, risks and missing evidence.` },
         ...Object.fromEntries(customAgents.map((agent) => [agent.id, { description: agent.description, mode: agent.mode, model: agent.model || `${providerId}/${modelId}`, prompt: agent.prompt, permission: agent.permission }])),
       },
       default_agent: defaultAgent,

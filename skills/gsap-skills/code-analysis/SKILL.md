@@ -1,13 +1,13 @@
 ---
 name: code-analysis
-description: Code quality analysis tools
+description: KSPR AI CLI TOOL skills for code quality analysis
 category: analysis
 version: 0.1.0
 ---
 
-# Code Analysis Skills
+# Code Analysis Skills for KSPR AI CLI TOOL
 
-Tools for analyzing code quality, complexity, and style.
+Structured checks for code quality, complexity, duplication, and maintainability. Results can be used as evidence in a reconstructed technical context.
 
 ## Commands
 

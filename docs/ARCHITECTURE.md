@@ -1,8 +1,8 @@
-# KSPR AI - Empresarial — arquitectura inicial
+# KSPR AI CLI TOOL — arquitectura del motor
 
 ## Identidad
 
-**KSPR AI - Empresarial** utiliza el motor de inteligencia artificial **KSPR** (**Reverse Engineering Artificial Intelligence Agent**). Es una plataforma empresarial para convertir código, UI y contexto de sistemas legados en documentación técnica reutilizable por personas y agentes.
+**KSPR AI CLI TOOL** utiliza inteligencia artificial y análisis estático para convertir código, UI, artefactos y contexto de sistemas legados en conocimiento técnico reutilizable por personas y agentes.
 
 ## Flujo de análisis
 

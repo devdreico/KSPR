@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
   "name": "gsap-skills",
-  "description": "Default skills bundle for KSPR I",
+  "description": "Default skills bundle for KSPR AI CLI TOOL",
   "skills": {
     "cli-anything-default": {
       "name": "cli-anything-default",

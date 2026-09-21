@@ -1,6 +1,6 @@
-# KSPR Reverse Engineering Engine
+# KSPR AI CLI TOOL — motor de ingeniería inversa estática
 
-El motor de ingeniería inversa de KSPR (`backend/kspr_engine/re/`) analiza
+El módulo de ingeniería inversa estática de KSPR AI CLI TOOL (`backend/kspr_engine/re/`) analiza
 binarios, firmware, archivos y capturas **sin ejecutar el artefacto**. Cada
 hallazgo conserva su evidencia (offset, símbolo o firma) para que el resultado
 sea auditable.

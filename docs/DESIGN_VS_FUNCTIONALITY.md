@@ -1,6 +1,6 @@
-# KSPR AI - Separación entre Diseño (UI/UX) y Funcionalidad (Core Engine)
+# KSPR AI CLI TOOL — diseño y funcionalidad
 
-Este documento registra la separación estricta de responsabilidades adoptada en KSPR AI para aislar la capa de presentación y diseño de la capa funcional de negocio e inferencia.
+Este documento registra cómo KSPR AI CLI TOOL separa la experiencia de uso de la lógica que descompone, analiza y reconstruye fuentes de conocimiento. La interfaz presenta el estado del trabajo; el motor conserva la evidencia y ejecuta el procesamiento.
 
 ---
 

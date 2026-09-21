@@ -1,6 +1,6 @@
-# KSPR AI - Arquitectura y Rutas de Ejecución (Core Engine)
+# KSPR AI CLI TOOL — arquitectura y rutas de ejecución
 
-Este documento detalla las rutas verdaderas de ejecución del motor KSPR (`kspr_engine`) y la interfaz de comandos (`kspr` CLI), garantizando la estabilidad y asegurando que las operaciones críticas del sistema funcionen sin interrupciones.
+Este documento registra las rutas de ejecución comprobables del motor KSPR (`kspr_engine`) y de la CLI `kspr`. Sirve como mapa operativo para entender qué procesa cada entrada, qué salida produce y qué controles protegen las operaciones sensibles.
 
 ---
 

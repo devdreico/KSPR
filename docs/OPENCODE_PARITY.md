@@ -1,6 +1,6 @@
-# KSPR AI - Empresarial / OpenCode Desktop parity
+# KSPR AI CLI TOOL — experiencia de trabajo y paridad funcional
 
-KSPR AI - Empresarial toma como referencia el flujo de trabajo de OpenCode Desktop: sesión a la izquierda, conversación central, compositor único y configuración accesible desde comandos. La implementación conserva la identidad de KSPR y añade el análisis estático seguro del proyecto.
+KSPR AI CLI TOOL toma como referencia patrones de trabajo de herramientas de desarrollo asistido: sesiones persistentes, conversación central, compositor único y configuración accesible desde comandos. La implementación los adapta a su propósito principal: descomponer fuentes, reconstruir contexto y mantener el análisis estático seguro del proyecto.
 
 ## Capacidades implementadas
 
