@@ -25,14 +25,15 @@ class TerminalTheme:
     CHARCOAL = "\033[2m"       # Dim background accents
 
 
-# Wordmark oficial de KSPR restaurado y corregido (mismo bloque monocromo que
-# usaba la CLI antes del rediseño grayscale). Cada línea tiene 23 columnas.
+# Wordmark ASCII oficial creado por el autor (diseño ░ de 6 líneas). Se
+# conserva exactamente igual, incluida la sangría, para no alterar el diseño.
 KSPR_ASCII: tuple[str, ...] = (
-    "░   ░ ░░░░░ ░░░░  ░░░░ ",
-    "░  ░  ░     ░   ░ ░   ░",
-    "░░░   ░░░░  ░░░░  ░░░░ ",
-    "░  ░      ░ ░     ░ ░  ",
-    "░   ░ ░░░░░ ░     ░   ░",
+    "░                             ",
+    " ░░░░░░░░░░                              ",
+    "░░░░░░░░░░   ░░  ░░ ░░░░░░ ░░░░░░  ░░░░░ ",
+    "░   ░░   ░   ░░ ░░  ░░░░░  ░░   ░ ░░   ░░",
+    "░░░░░░░░░░   ░░░░     ░░░░ ░░░░░░ ░░░░░░ ",
+    "░░░░  ░░░░   ░░ ░░░ ░░░░░░ ░░░    ░░   ░░",
 )
 
 KSPR_SUBTITLE = "KSPR AI · Empresarial  |  KSPR I ENGINE"
