@@ -125,6 +125,23 @@ def test_read_artifact_missing_raises(tmp_path: Path):
         read_artifact(tmp_path / "nope.bin")
 
 
+def test_pcap_analysis(tmp_path: Path):
+    from kspr_engine.re.network import pcap_available
+
+    if not pcap_available():
+        pytest.skip("scapy no disponible")
+    from kspr_engine.re.network.pcap import analyze_pcap
+    from scapy.all import IP, TCP, Raw, wrpcap  # type: ignore
+
+    packets = [IP(src="10.0.0.1", dst="10.0.0.2") / TCP(sport=1234, dport=80) / Raw(load=b"GET /x HTTP/1.1\r\nHost: example.com\r\n\r\n")]
+    capture = tmp_path / "traffic.pcap"
+    wrpcap(str(capture), packets)
+    result = analyze_pcap(capture)
+    assert result["packets"] == 1
+    assert "TCP" in result["protocols"]
+    assert any(host == "example.com" for host, _count in result["http_hosts"])
+
+
 def test_agents_catalog_and_selection():
     from kspr_engine.agents import list_agents, plan_for, select_agent
 

@@ -92,6 +92,7 @@ COMMANDS: tuple[Command, ...] = (
     Command("capa", "Detecta capacidades (MITRE ATT&CK) con capa", "/capa <ruta>", "detect", keywords=("mitre", "capacidades")),
     Command("crypto", "Identifica constantes y algoritmos criptográficos", "/crypto <ruta>", "detect", keywords=("aes", "sha", "cifrado")),
     Command("iocs", "Extrae indicadores de compromiso", "/iocs <ruta>", "detect", keywords=("ioc", "indicadores", "red")),
+    Command("pcap", "Analiza una captura de red (protocolos, DNS, HTTP)", "/pcap <ruta>", "detect", keywords=("red", "wireshark", "tcpdump", "dns")),
 
     # ---- recuperación / restauración ----
     Command("carve", "Carving de archivos embebidos en una imagen", "/carve <imagen> [salida]", "recovery", keywords=("recuperar", "carving", "forense")),
@@ -102,6 +103,7 @@ COMMANDS: tuple[Command, ...] = (
 
     # ---- IA / ecosistema ----
     Command("ask", "Pregunta a la IA sobre el artefacto (RAG citando offsets)", "/ask <ruta> <pregunta>", "ai", keywords=("preguntar", "rag", "consulta")),
+    Command("index", "Indexa un artefacto en la memoria vectorial para RAG", "/index <ruta>", "ai", keywords=("rag", "memoria", "indexar")),
     Command("agents", "Lista y selecciona subagentes", "/agents [nombre]", "ai", keywords=("subagente",)),
     Command("plan", "Crea un plan de análisis reanudable", "/plan <objetivo>", "ai", keywords=("tareas", "objetivo")),
     Command("verify", "Verifica hallazgos contra la evidencia", "/verify [hallazgo]", "ai", keywords=("verificar", "auditar")),

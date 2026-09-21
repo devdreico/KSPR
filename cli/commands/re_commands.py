@@ -39,7 +39,7 @@ RE_COMMANDS = {
     "tools", "recon", "file", "strings", "hex", "sections", "imports", "exports", "symbols",
     "entropy", "hashes", "disasm", "decompile", "pseudo", "cfg", "callgraph", "xrefs", "diff",
     "signature", "packer", "yara", "capa", "crypto", "iocs", "carve", "recover", "extract",
-    "unpack", "firmware", "report", "sbom", "graph", "ask",
+    "unpack", "firmware", "report", "sbom", "graph", "ask", "pcap", "index",
 }
 
 
@@ -532,6 +532,54 @@ def _cmd_sbom(ctx: REContext, parts: list[str]) -> bool:
     return True
 
 
+def _cmd_index(ctx: REContext, parts: list[str]) -> bool:
+    path = _need_path(ctx, " ".join(parts), "/index <ruta>")
+    if not path:
+        return True
+    from kspr_engine.memory import VectorMemory
+
+    memory = VectorMemory(Path.home() / ".kspr" / "memory")
+    report = analyze_artifact(path)
+    indexed = 0
+    for index, (offset, text) in enumerate(report.strings):
+        if len(text) < 6:
+            continue
+        memory.add_document(f"{path.name}:str:{index}", text, {"artifact": str(path), "kind": "string", "offset": offset})
+        indexed += 1
+    for symbol in report.symbols[:200]:
+        memory.add_document(f"{path.name}:sym:{symbol}", symbol, {"artifact": str(path), "kind": "symbol"})
+        indexed += 1
+    TerminalUI.print_box("Indexado", [f"Artefacto: {path.name}", f"Documentos indexados: {indexed}", "Usa /ask <ruta> <pregunta> para consultar con contexto recuperado."])
+    return True
+
+
+def _cmd_pcap(ctx: REContext, parts: list[str]) -> bool:
+    path = _need_path(ctx, parts[0] if parts else "", "/pcap <ruta>")
+    if not path:
+        return True
+    from kspr_engine.re.network.pcap import analyze_pcap, available
+
+    if not available():
+        TerminalUI.print_box("PCAP", ["scapy no está instalado. Instala el extra [re]."])
+        return True
+    result = analyze_pcap(path)
+    if result.get("error"):
+        TerminalUI.print_box("PCAP", [str(result["error"])])
+        return True
+    TerminalUI.print_box(f"PCAP · {path.name}", [
+        f"Paquetes: {result['packets']}",
+        f"Protocolos: {result['protocols']}",
+        f"Hosts HTTP: {len(result['http_hosts'])} · DNS: {len(result['dns_queries'])}",
+    ])
+    if result["dns_queries"]:
+        TerminalUI.print_table("DNS", ["CONSULTA", "REPETICIONES"], [[name, count] for name, count in result["dns_queries"][:40]])
+    if result["endpoints"]:
+        TerminalUI.print_table("Endpoints", ["FLUJO", "PAQUETES"], [[flow, count] for flow, count in result["endpoints"][:40]])
+    if result["http_hosts"]:
+        TerminalUI.print_table("HTTP Hosts", ["HOST", "REPETICIONES"], [[host, count] for host, count in result["http_hosts"][:40]])
+    return True
+
+
 async def _cmd_ask(ctx: REContext, parts: list[str]) -> bool:
     if len(parts) < 2:
         TerminalUI.print_box("Uso", ["/ask <ruta> <pregunta>"])
@@ -549,9 +597,19 @@ async def _cmd_ask(ctx: REContext, parts: list[str]) -> bool:
         f"SECCIONES: {[s.get('name') for s in report.sections][:20]}",
         f"IMPORTS: {report.imports[:40]}",
         f"EXPORTS: {report.exports[:40]}",
-        "STRINGS (muestra):",
-        "\n".join(text for _off, text in report.strings[:120]),
     ]
+    try:
+        from kspr_engine.memory import VectorMemory
+
+        memory = VectorMemory(Path.home() / ".kspr" / "memory")
+        retrieved = [item for item in memory.search(question, top_k=30) if item.get("metadata", {}).get("artifact") == str(path)][:10]
+        if retrieved:
+            context.append("CONTEXTO RECUPERADO (memoria):")
+            context.extend(f"  [{item['score']}] {item['content'][:160]}" for item in retrieved)
+    except Exception:
+        pass
+    context.append("STRINGS (muestra):")
+    context.append("\n".join(text for _off, text in report.strings[:120]))
     prompt = (
         "Eres KSPR I, experto en ingeniería inversa. Responde en texto plano sin markdown. "
         "Ancla cada afirmación a la evidencia de offsets/strings cuando sea posible.\n\n"
@@ -639,4 +697,6 @@ _HANDLERS = {
     "sbom": _cmd_sbom,
     "ask": _cmd_ask,
     "report": _cmd_report,
+    "pcap": _cmd_pcap,
+    "index": _cmd_index,
 }

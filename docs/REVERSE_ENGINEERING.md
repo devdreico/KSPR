@@ -43,7 +43,8 @@ sea auditable.
 /strings <ruta> [min]    /symbols <ruta>      /cfg <ruta>
 /hex <ruta> [off] [len]  /entropy <ruta>      /graph <ruta> [fmt]
 /packer <ruta>           /yara <ruta> [reglas] /crypto <ruta>
-/iocs <ruta>             /carve <img> [out]   /recover <img> [out]
+/iocs <ruta>             /pcap <ruta>         /index <ruta>
+/carve <img> [out]       /recover <img> [out]
 /extract <archivo> [out] /unpack <ruta>       /firmware <img> [out]
 /signature <ruta> [off]  /report <ruta>       /ask <ruta> <pregunta>
 /verify <ruta>           /agents [clave]      /plan <objetivo>
