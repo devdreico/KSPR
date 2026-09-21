@@ -76,8 +76,9 @@ TTY se usa un fallback `readline` con historial.
 Comandos de análisis: `/recon`, `/file`, `/hashes`, `/strings`, `/hex`, `/sections`, `/imports`,
 `/exports`, `/symbols`, `/entropy`, `/disasm`, `/decompile`, `/pseudo`, `/cfg`, `/graph`,
 `/callgraph`, `/xrefs`, `/diff`, `/signature`, `/packer`, `/yara`, `/capa`, `/crypto`, `/iocs`,
-`/carve`, `/recover`, `/extract`, `/unpack`, `/firmware`, `/report`, `/sbom`, `/ask`, `/verify`,
-`/agents`, `/plan`, `/memory` y `/tools`. El motor parsea ELF/PE/Mach-O/archivos, desensambla con
+`/pcap` (capturas de red), `/carve`, `/recover`, `/extract`, `/unpack`, `/firmware`, `/report`,
+`/sbom`, `/ask`, `/index` (RAG), `/kg` (grafo de conocimiento), `/verify`, `/agents`, `/plan`,
+`/memory` y `/tools`. El motor parsea ELF/PE/Mach-O/archivos, desensambla con
 `capstone`/`objdump`, decompila con `radare2`/RetDec o pseudocódigo asistido por IA anclado a
 evidencia, detecta packers/YARA/crypto, y recupera archivos con carving (interno o `foremost`).
 `/tools detect|install` detecta e instala herramientas externas (radare2, binwalk, ghidra, jadx…).

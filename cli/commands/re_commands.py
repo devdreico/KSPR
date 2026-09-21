@@ -39,7 +39,7 @@ RE_COMMANDS = {
     "tools", "recon", "file", "strings", "hex", "sections", "imports", "exports", "symbols",
     "entropy", "hashes", "disasm", "decompile", "pseudo", "cfg", "callgraph", "xrefs", "diff",
     "signature", "packer", "yara", "capa", "crypto", "iocs", "carve", "recover", "extract",
-    "unpack", "firmware", "report", "sbom", "graph", "ask", "pcap", "index",
+    "unpack", "firmware", "report", "sbom", "graph", "ask", "pcap", "index", "kg",
 }
 
 
@@ -267,9 +267,7 @@ def _cmd_decompile(ctx: REContext, parts: list[str]) -> bool:
     target = parts[1] if len(parts) > 1 else None
     result = decompile(str(path), target=target)
     if result.get("engine") == "none":
-        jvm = _try_jvm_decompile(path)
-        if jvm is not None:
-            result = jvm
+        result = _try_jvm_decompile(path) or _try_dotnet_decompile(path) or result
     if result.get("engine") == "none":
         TerminalUI.print_box("Decompilador no disponible", [
             result.get("message", ""),
@@ -296,6 +294,20 @@ def _try_jvm_decompile(path: Path) -> dict[str, Any] | None:
             sources.append(source_file.read_text(encoding="utf-8", errors="replace")[:8000])
         output = "\n".join(sources) or (completed.stdout + completed.stderr)[:8000]
         return {"engine": "jadx", "output": output, "returncode": completed.returncode}
+
+
+def _try_dotnet_decompile(path: Path) -> dict[str, Any] | None:
+    """Decompile .NET assemblies with ilspycmd when available."""
+    import shutil
+    import subprocess
+
+    if path.suffix.lower() not in {".dll", ".exe", ".netmodule"} or not shutil.which("ilspycmd"):
+        return None
+    data = read_artifact(path)[:5_000_000]
+    if b"mscoree" not in data and b"#~" not in data and b".NET" not in data:
+        return None
+    completed = subprocess.run(["ilspycmd", str(path)], capture_output=True, text=True, timeout=600, check=False)
+    return {"engine": "ilspycmd", "output": (completed.stdout or completed.stderr)[:40_000], "returncode": completed.returncode}
 
 
 async def _cmd_pseudo(ctx: REContext, parts: list[str]) -> bool:
@@ -554,6 +566,32 @@ def _cmd_sbom(ctx: REContext, parts: list[str]) -> bool:
     return True
 
 
+def _cmd_kg(ctx: REContext, parts: list[str]) -> bool:
+    report = _format_artifact(ctx, " ".join(parts), "kg")
+    if not report:
+        return True
+    lines = ["---", "title: KSPR Knowledge Graph", "---", "flowchart LR", f'  art["{Path(report.path).name} ({report.kind})"]']
+
+    def add_group(group: str, items: list[str], limit: int = 12) -> None:
+        lines.append(f'  {group}["{group}"]')
+        lines.append(f"  art --> {group}")
+        for index, item in enumerate(items[:limit]):
+            label = str(item).replace('"', "'")[:44]
+            node = f"{group}_{index}"
+            lines.append(f'  {node}["{label}"]')
+            lines.append(f"  {group} --> {node}")
+
+    add_group("secciones", [str(s.get("name")) for s in report.sections])
+    add_group("imports", report.imports)
+    add_group("exports", report.exports)
+    add_group("hallazgos", [finding.title for finding in report.findings])
+    graph = "\n".join(lines)
+    target = ctx.workspace / f"kspr_kg_{Path(report.path).stem}.mmd"
+    target.write_text(graph, encoding="utf-8")
+    TerminalUI.print_box("Knowledge Graph", [f"Exportado: {target}", f"nodos: {len(report.sections) + len(report.imports) + len(report.exports) + len(report.findings)}"])
+    return True
+
+
 def _cmd_index(ctx: REContext, parts: list[str]) -> bool:
     path = _need_path(ctx, " ".join(parts), "/index <ruta>")
     if not path:
@@ -721,4 +759,5 @@ _HANDLERS = {
     "report": _cmd_report,
     "pcap": _cmd_pcap,
     "index": _cmd_index,
+    "kg": _cmd_kg,
 }

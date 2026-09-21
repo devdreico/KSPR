@@ -61,7 +61,7 @@ def _parse_with_pyelftools(path: str) -> dict[str, Any]:
             for symbol in section.iter_symbols():
                 entry = symbol.entry
                 info_type = entry["st_info"]["type"]
-                symbol_name = entry["st_name"]
+                symbol_name = symbol.name
                 result["symbols"].append(symbol_name)
                 if info_type == "STT_FUNC":
                     result["exports"].append(symbol_name)

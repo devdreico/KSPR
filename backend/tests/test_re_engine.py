@@ -142,6 +142,21 @@ def test_pcap_analysis(tmp_path: Path):
     assert any(host == "example.com" for host, _count in result["http_hosts"])
 
 
+def test_elf_parser_returns_string_symbols():
+    import sys
+
+    from kspr_engine.re.formats.elf import parse_elf
+
+    try:
+        result = parse_elf(sys.executable)
+    except Exception:
+        pytest.skip("no hay un ELF disponible")
+    if result.get("format") != "ELF":
+        pytest.skip("el intérprete no es ELF en esta plataforma")
+    assert all(isinstance(symbol, str) for symbol in result["symbols"])
+    assert all(isinstance(symbol, str) for symbol in result["imports"])
+
+
 def test_multi_language_ast(tmp_path: Path):
     from kspr_engine.re.code.ast import analyze_code, supported_languages
 

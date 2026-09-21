@@ -25,7 +25,10 @@ def analyze_pcap(path: str | Path, max_packets: int = 5000) -> dict[str, object]
         return {"error": "scapy no está instalado; instala el extra [re] o /tools install."}
     from scapy.all import DNS, DNSQR, IP, TCP, UDP, IPv6, Raw, rdpcap  # type: ignore
 
-    packets = rdpcap(str(path))
+    try:
+        packets = rdpcap(str(path))
+    except Exception as exc:
+        return {"error": f"No es una captura de red válida: {exc}"}
     protocols: Counter[str] = Counter()
     endpoints: Counter[str] = Counter()
     dns_queries: Counter[str] = Counter()

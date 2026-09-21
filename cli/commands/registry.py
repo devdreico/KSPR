@@ -114,6 +114,7 @@ COMMANDS: tuple[Command, ...] = (
     Command("report", "Genera un informe técnico auditable", "/report <ruta> [salida]", "ai", keywords=("informe", "documentacion")),
     Command("sbom", "Genera un SBOM de dependencias", "/sbom <ruta>", "ai"),
     Command("graph", "Exporta el grafo de artefactos (mermaid/dot/json)", "/graph <ruta> [formato]", "ai"),
+    Command("kg", "Genera un grafo de conocimiento de entidades del artefacto", "/kg <ruta>", "ai", keywords=("conocimiento", "entidades", "grafo")),
 
     # ---- helpers de código ----
     Command("ast", "Análisis AST de un archivo Python del workspace", "/ast <archivo.py>", "re"),
