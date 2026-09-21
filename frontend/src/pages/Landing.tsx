@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Terminal, Copy, Check, Sparkles, Shield, FolderArchive, Cpu, ExternalLink, Monitor, CreditCard, Zap, Layers, Activity, Search } from "lucide-react";
 import { Typewriter } from "../components/Typewriter";
+import { HeadphoneBlueprint } from "../components/HeadphoneBlueprints";
 import { useAtmosphere, useReveal, useTilt } from "../hooks/useInteractions";
 
 const marqueeItems = [
@@ -14,6 +15,13 @@ const marqueeItems = [
   "MARKDOWN MODULAR",
   "gsap-skills",
   "AUDITABLE",
+];
+
+const blueprintFigures = [
+  { title: "FIG. 01 — SECCIÓN A-A DEL DRIVER PLANAR", note: "Cotas en mm · Materiales y espesores" },
+  { title: "FIG. 02 — CADENA DE SEÑAL DSP / DAC", note: "Diagrama de bloques · UAC2 384 kHz" },
+  { title: "FIG. 03 — CORTE DE CÁMARA ACÚSTICA Y FAZORES", note: "Trayectoria de onda · Atenuación modal" },
+  { title: "FIG. 04 — DESPIECE MECÁNICO DEL ENSAMBLE", note: "Vista explosionada · Tolerancias ±0.05 mm" },
 ];
 
 export function Landing() {
@@ -157,13 +165,14 @@ export function Landing() {
                   <code style={{ whiteSpace: "nowrap", overflowX: "auto", fontFamily: "'Montserrat', sans-serif", fontSize: "13px" }}>{curlCommand}</code>
                 </div>
                 <button
+                  type="button"
                   onClick={() => copyToClipboard(curlCommand, "curl-install")}
                   className="copy-btn"
                   aria-label="Copiar comando de instalación"
                   title="Copiar comando de instalación"
                 >
                   {copiedCmd === "curl-install" ? <Check size={14} color="#000000" /> : <Copy size={14} />}
-                  <span style={{ fontWeight: 700 }}>{copiedCmd === "curl-install" ? "Copiado" : "Copiar cURL"}</span>
+                  <span aria-live="polite" style={{ fontWeight: 700 }}>{copiedCmd === "curl-install" ? "Copiado" : "Copiar cURL"}</span>
                 </button>
               </div>
 
@@ -275,10 +284,13 @@ export function Landing() {
             <span style={{ color: "var(--muted)", fontSize: "12px", fontWeight: 500 }}>Soverath Holding · Bogotá D.C.</span>
           </div>
 
-          <div className="decomp-tabs">
+          <div className="decomp-tabs" role="tablist" aria-label="Piezas del sistema">
             {headphoneDecompParts.map((part, idx) => (
               <button
                 key={idx}
+                type="button"
+                role="tab"
+                aria-selected={decompTab === idx}
                 onClick={() => setDecompTab(idx)}
                 className={`decomp-tab ${decompTab === idx ? "active" : ""}`}
               >
@@ -291,6 +303,13 @@ export function Landing() {
             <div className="decomp-panel">
               <h4>{headphoneDecompParts[decompTab].title}</h4>
               <div className="decomp-subtitle">{headphoneDecompParts[decompTab].subtitle}</div>
+              <figure className="blueprint-figure" key={decompTab}>
+                <HeadphoneBlueprint index={decompTab} />
+                <figcaption className="blueprint-caption">
+                  <span>{blueprintFigures[decompTab].title}</span>
+                  <span>{blueprintFigures[decompTab].note}</span>
+                </figcaption>
+              </figure>
               <p>{headphoneDecompParts[decompTab].desc}</p>
               <div className="decomp-command">$ {headphoneDecompParts[decompTab].command}</div>
             </div>
@@ -316,26 +335,38 @@ export function Landing() {
               <span className="eyebrow">TERMINAL CLI</span>
               <h2 className="section-title">Recorrido interactivo del flujo de análisis</h2>
             </div>
-            <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+            <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }} role="tablist" aria-label="Flujo de análisis">
               <button
+                type="button"
+                role="tab"
+                aria-selected={terminalTab === "install"}
                 onClick={() => setTerminalTab("install")}
                 className={`decomp-tab ${terminalTab === "install" ? "active" : ""}`}
               >
                 1. cURL Install
               </button>
               <button
+                type="button"
+                role="tab"
+                aria-selected={terminalTab === "analyze"}
                 onClick={() => setTerminalTab("analyze")}
                 className={`decomp-tab ${terminalTab === "analyze" ? "active" : ""}`}
               >
                 2. /decompilate
               </button>
               <button
+                type="button"
+                role="tab"
+                aria-selected={terminalTab === "git"}
                 onClick={() => setTerminalTab("git")}
                 className={`decomp-tab ${terminalTab === "git" ? "active" : ""}`}
               >
                 3. /trees
               </button>
               <button
+                type="button"
+                role="tab"
+                aria-selected={terminalTab === "dev"}
                 onClick={() => setTerminalTab("dev")}
                 className={`decomp-tab ${terminalTab === "dev" ? "active" : ""}`}
               >
@@ -353,6 +384,7 @@ export function Landing() {
                 <span style={{ marginLeft: 10, fontSize: "13px", fontWeight: 500, color: "#a3a3a3" }}>kspr@soverath-bogota:~</span>
               </div>
               <button
+                type="button"
                 onClick={runSimulation}
                 disabled={runningSim}
                 className="terminal-run-btn"

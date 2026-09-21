@@ -1,11 +1,12 @@
-@import url("https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap");
-
 :root {
   font-family: "Montserrat", sans-serif;
   color: #f5f5f5;
   background: #0a0a0a;
+  color-scheme: dark;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 
   /* Matte black + pure contrast */
   --void: #000000;
@@ -145,6 +146,12 @@ button:focus-visible, a:focus-visible, input:focus-visible {
   from { opacity: 0; transform: translateY(8px); }
   to { opacity: 1; transform: none; }
 }
+@keyframes blueprintScan {
+  0% { transform: translateY(-120%); opacity: 0; }
+  12% { opacity: 1; }
+  88% { opacity: 1; }
+  100% { transform: translateY(260%); opacity: 0; }
+}
 @keyframes caretBlink {
   0%, 100% { opacity: 1; }
   50% { opacity: 0; }
@@ -244,6 +251,7 @@ button:focus-visible, a:focus-visible, input:focus-visible {
 .desktop-link-btn:hover { border-color: var(--white); background: #1d1d1d; transform: translateY(-2px); }
 
 main { max-width: 1400px; margin: auto; padding: 0 5vw 90px; width: 100%; flex: 1; position: relative; z-index: 1; }
+main > section { scroll-margin-top: 96px; }
 
 /* ---------- Hero ---------- */
 .hero {
@@ -306,6 +314,7 @@ main { max-width: 1400px; margin: auto; padding: 0 5vw 90px; width: 100%; flex: 
   font-weight: 700;
   max-width: 1150px;
   color: var(--white);
+  text-wrap: balance;
 }
 .hero h1 em { font-weight: 400; color: var(--muted); font-style: normal; letter-spacing: -.02em; }
 .hero p { color: var(--muted); max-width: 850px; font-size: 17px; line-height: 1.7; margin: 0; font-weight: 400; }
@@ -520,7 +529,7 @@ main { max-width: 1400px; margin: auto; padding: 0 5vw 90px; width: 100%; flex: 
   pointer-events: none;
 }
 .eyebrow { color: var(--soft); font-size: 12px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; }
-.section-title { font-size: 30px; margin: 8px 0 0; font-weight: 700; color: var(--white); }
+.section-title { font-size: clamp(24px, 2.4vw, 30px); margin: 8px 0 0; font-weight: 700; color: var(--white); text-wrap: balance; }
 
 /* ---------- Cards ---------- */
 .grid-cards {
@@ -611,6 +620,74 @@ main { max-width: 1400px; margin: auto; padding: 0 5vw 90px; width: 100%; flex: 
 .decomp-output-label { color: var(--soft); margin-bottom: 10px; font-weight: 500; }
 .decomp-output { line-height: 1.7; font-weight: 500; }
 .decomp-line { opacity: 0; color: var(--ink); white-space: pre-wrap; animation: lineIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+
+/* ---------- Technical blueprints ---------- */
+.blueprint-figure {
+  position: relative;
+  margin: 20px 0 22px;
+  border: 1px solid var(--line-hi);
+  border-radius: 12px;
+  overflow: hidden;
+  background: #050505;
+  animation: blockIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.blueprint-figure::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 42%;
+  pointer-events: none;
+  background: linear-gradient(180deg, transparent, rgba(255, 255, 255, 0.045), transparent);
+  animation: blueprintScan 7s linear infinite;
+}
+.blueprint { width: 100%; height: auto; display: block; }
+.blueprint-caption {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  padding: 10px 14px;
+  border-top: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--muted);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: .1em;
+}
+.blueprint-caption span:last-child { color: var(--soft); font-weight: 500; }
+
+.bp-grid-minor { stroke: rgba(255,255,255,0.035); stroke-width: 1; }
+.bp-grid-major { stroke: rgba(255,255,255,0.07); stroke-width: 1; }
+.bp-frame { fill: rgba(255,255,255,0.015); stroke: #6f6f6f; stroke-width: 1.2; }
+.bp-line { fill: none; stroke: #a8a8a8; stroke-width: 1.1; }
+.bp-thick { fill: none; stroke: #d4d4d4; stroke-width: 3; }
+.bp-accent { stroke: #ffffff; stroke-width: 1.6; fill: none; }
+.bp-fill { fill: rgba(255,255,255,0.06); stroke: #8f8f8f; stroke-width: 1; }
+.bp-fill-dark { fill: rgba(255,255,255,0.02); stroke: #7a7a7a; stroke-width: 1; }
+.bp-mag-a { fill: rgba(255,255,255,0.14); stroke: #b5b5b5; stroke-width: 0.8; }
+.bp-mag-b { fill: rgba(255,255,255,0.04); stroke: #b5b5b5; stroke-width: 0.8; }
+.bp-trace { stroke: #e8e8e8; stroke-width: 1; fill: none; }
+.bp-dash { stroke: #565656; stroke-width: 1; stroke-dasharray: 5 5; fill: none; }
+.bp-dim { stroke: #6a6a6a; stroke-width: 0.9; fill: none; }
+.bp-leader { stroke: #565656; stroke-width: 0.9; fill: none; }
+.bp-flow { stroke: #9a9a9a; stroke-width: 1.1; fill: none; }
+.bp-flow path { fill: #9a9a9a; stroke: none; }
+.bp-wave { stroke: #d0d0d0; stroke-width: 1.1; fill: none; opacity: 0.5; }
+.bp-label { fill: #8f8f8f; font-family: "Montserrat", sans-serif; font-size: 9.5px; font-weight: 600; letter-spacing: .06em; font-variant-numeric: tabular-nums; }
+.bp-label-hi { fill: #ffffff; }
+.bp-micro { fill: #6f6f6f; font-family: "Montserrat", sans-serif; font-size: 7.5px; font-weight: 600; letter-spacing: .05em; font-variant-numeric: tabular-nums; }
+.bp-tag { fill: #ffffff; stroke: none; }
+.bp-tag-num { fill: #0a0a0a; font-family: "Montserrat", sans-serif; font-size: 8px; font-weight: 700; }
+.bp-title-block rect { fill: rgba(255,255,255,0.02); stroke: #4a4a4a; stroke-width: 1; }
+.bp-title-block line { stroke: #4a4a4a; stroke-width: 1; }
+
+@media (max-width: 900px) {
+  .decomp-panel { padding: 22px; }
+  .blueprint-caption { font-size: 9.5px; letter-spacing: .06em; }
+}
 
 /* ---------- Terminal simulator ---------- */
 .terminal-window {
@@ -734,6 +811,21 @@ footer {
   .decomp-container { padding: 26px; }
   .desktop-banner { padding: 28px; }
   .section-index { font-size: 72px; top: -28px; }
+}
+
+@media (max-width: 720px) {
+  .topbar { height: 68px; padding: 0 4vw; }
+  .institute-badge { display: none; }
+  .brand-logo { width: 38px; height: 38px; }
+  .brand strong { font-size: 13px; letter-spacing: .12em; }
+  .brand span { font-size: 10px; }
+  .desktop-link-btn { padding: 9px 13px; font-size: 12px; }
+  main { padding: 0 5vw 60px; }
+  .hero { padding: 52px 0 40px; }
+  .section-index { display: none; }
+  .marquee-item { font-size: 11px; letter-spacing: .2em; }
+  .terminal-body { padding: 20px; font-size: 13px; }
+  .blueprint { font-size: 90%; }
 }
 
 @media (prefers-reduced-motion: reduce) {
