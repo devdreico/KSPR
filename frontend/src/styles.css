@@ -18,8 +18,6 @@
   --soft: #6f6f6f;
   --line: #242424;
   --line-hi: #3a3a3a;
-  --glow: rgba(255, 255, 255, 0.08);
-  --leaf: #000000;
 }
 
 * { box-sizing: border-box; }
@@ -106,45 +104,7 @@ button:focus-visible, a:focus-visible, input:focus-visible {
   translate: calc(var(--mx, 0) * 24px) calc(var(--scroll-y, 0) * -0.03px + var(--my, 0) * 18px);
 }
 
-/* ---------- Botanical silhouettes ---------- */
-.botanical {
-  position: absolute;
-  color: var(--leaf);
-  pointer-events: none;
-  z-index: 0;
-  transform-origin: bottom center;
-  translate: calc(var(--mx, 0) * 16px) calc(var(--scroll-y, 0) * -0.05px + var(--my, 0) * 12px);
-  animation: botanicalReveal 2s cubic-bezier(0.16, 1, 0.3, 1) both, sway 16s ease-in-out infinite;
-}
-.botanical-fern-left  { left: -46px; bottom: -40px; width: 320px; height: 520px; opacity: 0.85; animation-delay: 0.1s, -3s; }
-.botanical-branch-right { right: -34px; top: 40px; width: 240px; height: 420px; opacity: 0.9; animation-delay: 0.35s, -7s; }
-.botanical-monstera { right: -30px; bottom: -40px; width: 260px; height: 420px; opacity: 0.9; animation-delay: 0.2s, -4s; }
-
-.botanical-stem, .botanical-vein {
-  stroke-dasharray: 1;
-  stroke-dashoffset: 1;
-  animation: stemDraw 2.6s cubic-bezier(0.16, 1, 0.3, 1) 0.15s forwards;
-}
-.botanical-leaf {
-  transform-box: fill-box;
-  transform-origin: 50% 100%;
-  animation: leafFlutter 7s ease-in-out infinite;
-}
-
 /* ---------- Animations ---------- */
-@keyframes botanicalReveal {
-  from { clip-path: inset(100% 0 0 0); }
-  to { clip-path: inset(0 0 0 0); }
-}
-@keyframes stemDraw { to { stroke-dashoffset: 0; } }
-@keyframes leafFlutter {
-  0%, 100% { transform: rotate(-1.6deg) scale(0.995); }
-  50% { transform: rotate(1.6deg) scale(1.01); }
-}
-@keyframes sway {
-  0%, 100% { transform: rotate(-1.1deg); }
-  50% { transform: rotate(1.1deg); }
-}
 @keyframes breathe {
   0%, 100% { box-shadow: 0 0 0 1px rgba(255,255,255,0.04), 0 18px 50px rgba(0,0,0,0.75); }
   50% { box-shadow: 0 0 0 1px rgba(255,255,255,0.14), 0 18px 60px rgba(0,0,0,0.85); }
@@ -457,7 +417,9 @@ main { max-width: 1400px; margin: auto; padding: 0 5vw 90px; width: 100%; flex: 
 .desktop-banner {
   position: relative;
   overflow: hidden;
-  background: var(--surface);
+  background:
+    radial-gradient(620px 200px at 88% 0%, rgba(255,255,255,0.055), transparent 70%),
+    var(--surface);
   border: 1px solid var(--line-hi);
   border-radius: 20px;
   padding: 34px 42px;
@@ -710,23 +672,27 @@ main { max-width: 1400px; margin: auto; padding: 0 5vw 90px; width: 100%; flex: 
 
 /* ---------- Vine divider ---------- */
 .divider-wrap {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 22px;
   margin: 26px 0;
   color: var(--line-hi);
 }
+.divider-wrap::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 5px;
+  height: 5px;
+  background: rgba(255, 255, 255, 0.45);
+  transform: translate(-50%, -50%) rotate(45deg);
+}
 .vine-line {
   flex: 1;
   height: 1px;
   background: linear-gradient(90deg, transparent, rgba(255,255,255,0.16) 15%, rgba(255,255,255,0.16) 85%, transparent);
-}
-.vine-sprig {
-  width: 170px;
-  height: 44px;
-  flex-shrink: 0;
-  overflow: visible;
-  color: #4a4a4a;
 }
 
 /* ---------- Footer ---------- */
@@ -765,13 +731,9 @@ footer {
 .link-white:hover::after, .link-muted:hover::after { transform: scaleX(1); }
 
 @media (max-width: 900px) {
-  .botanical-fern-left { width: 220px; height: 360px; opacity: 0.6; }
-  .botanical-branch-right { width: 170px; height: 300px; opacity: 0.7; }
-  .botanical-monstera { width: 180px; height: 300px; opacity: 0.6; }
   .decomp-container { padding: 26px; }
   .desktop-banner { padding: 28px; }
   .section-index { font-size: 72px; top: -28px; }
-  .vine-sprig { width: 120px; height: 34px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -787,5 +749,4 @@ footer {
     filter: none !important;
   }
   .cursor-glow { display: none; }
-  .botanical { translate: none; }
 }

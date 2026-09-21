@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { Terminal, Copy, Check, Sparkles, Shield, FolderArchive, Cpu, ExternalLink, Monitor, CreditCard, Zap, Layers, Activity, Search } from "lucide-react";
-import { LeafBranch, Fern, MonsteraLeaf, Sprig } from "../components/Botanical";
 import { Typewriter } from "../components/Typewriter";
 import { useAtmosphere, useReveal, useTilt } from "../hooks/useInteractions";
 
@@ -122,8 +121,6 @@ export function Landing() {
         <section className="hero">
           <div className="glow-orb" aria-hidden="true" />
           <div className="hero-beam" aria-hidden="true" />
-          <Fern className="botanical botanical-fern-left" />
-          <LeafBranch className="botanical botanical-branch-right" />
 
           <div className="motes" aria-hidden="true">
             {Array.from({ length: 14 }, (_, i) => (
@@ -171,7 +168,7 @@ export function Landing() {
               </div>
 
               <a
-                href="https://kspr.comunity.vercel.app"
+                href="https://kspr-membership.vercel.app"
                 target="_blank"
                 rel="noreferrer"
                 className="membership-card-btn"
@@ -193,7 +190,6 @@ export function Landing() {
 
         {/* KSPR Desktop Highlight Banner */}
         <div className="desktop-banner" data-reveal>
-          <MonsteraLeaf className="botanical botanical-monstera" />
           <div className="banner-content">
             <div className="desktop-banner-eyebrow">
               <Zap size={15} /> CLIENTE NATIVO DE ESCRITORIO DISPONIBLE
@@ -264,8 +260,6 @@ export function Landing() {
         </section>
 
         <div className="divider-wrap" aria-hidden="true">
-          <span className="vine-line" />
-          <Sprig className="vine-sprig" />
           <span className="vine-line" />
         </div>
 
@@ -423,8 +417,6 @@ export function Landing() {
         </section>
 
         <div className="divider-wrap" aria-hidden="true">
-          <span className="vine-line" />
-          <Sprig className="vine-sprig" />
           <span className="vine-line" />
         </div>
 
